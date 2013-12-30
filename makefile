@@ -1,8 +1,13 @@
 ## Makefile for 2D DNS
 ## Build on Babel and on Duke
 
-MOD_FILES = share_vars gif_util FieldExport PerformanceMeasurement  spectral_essentials navier_stokes
-SUB_FILES = dealiase_mask mean_velocity lib_inicond/init_fields params save_fields time_step lib_mask/create_mask 
+MOD_FILES = share_vars gif_util FieldExport PerformanceMeasurement  navier_stokes
+SUB_FILES = mean_velocity\
+lib_inicond/init_fields\
+params save_fields time_step\
+lib_mask/create_mask\
+lib_spectral_operators/spectral_essentials\
+lib_spectral_operators/dealiase_mask
 PROG_FILE = dns
 
 
@@ -11,7 +16,7 @@ FFTW_LOC = $(FFT_ROOT)/lib
 FFTW_INC = $(FFT_ROOT)/include
 FFT_LINK = -I$(FFTW_INC) -L$(FFTW_LOC) -lfftw3_threads -lfftw3
 FPAR = -fopenmp -lpthread
-COF_FILE = cof_fftw33
+COF_FILE = lib_spectral_operators/cof_fftw33
 SUPPORT_FILE =
 FF = gfortran
 
