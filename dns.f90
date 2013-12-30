@@ -21,12 +21,7 @@ subroutine StartSimulation()
   call system('mkdir '//trim(dir_name) )
   call system('mkdir '//trim(dir_name)//'/fields' )
   call system('mkdir '//trim(dir_name)//'/vor' )
-  call system('mkdir '//trim(dir_name)//'/ux' )
-  call system('mkdir '//trim(dir_name)//'/press' )
-  call system('mkdir '//trim(dir_name)//'/uy' )
-  call system('mkdir '//trim(dir_name)//'/maskvx' )
-  call system('mkdir '//trim(dir_name)//'/maskvy' )
-  write (*,*) "*** information: created directories"
+  write (*,*) "*** information: created subdirectories"
 
   allocate ( dealiase(0:nx-1,0:ny-1) )
   allocate ( mask(0:nx-1,0:ny-1) )    

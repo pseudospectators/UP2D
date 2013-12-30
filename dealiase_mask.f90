@@ -26,7 +26,4 @@ subroutine dealiase_mask
   !$omp end parallel do
 
   write (*,*) "dealiase_mask is set..."
-
-
 end subroutine
-

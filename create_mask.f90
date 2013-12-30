@@ -25,6 +25,8 @@ subroutine create_mask (time)
       enddo      
     enddo
     !$omp end parallel do
+  case('none')
+    mask = 0.0
   case default
     write (*,*) "mask not defnd", iMask
     stop    
