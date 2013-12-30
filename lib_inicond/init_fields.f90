@@ -21,7 +21,18 @@ subroutine init_fields (u, uk, p, vor, nlk)
     vor = 0.0
     p = 0.0
   case ('turbulent')
+    call random_seed()
+    do ix=0,nx-1
+    do iy=0,ny-1
+       call RANDOM_NUMBER(d)
+       vor(ix,iy) = 200.d0*(2.0d0*d - 1.d0)
+    enddo
+    enddo    
     
+    call coftxy (vor, vortk)    
+    call vorticity2velocity ( vortk, u )    
+    call coftxy( u(:,:,1), uk(:,:,1))
+    call coftxy( u(:,:,2), uk(:,:,2))
   case ('dipole')  
     x0 = 0.5*xl
     y0 = 0.5*yl

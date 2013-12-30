@@ -2,7 +2,7 @@
 ## Build on Babel and on Duke
 
 MOD_FILES = share_vars gif_util FieldExport PerformanceMeasurement  spectral_essentials navier_stokes
-SUB_FILES = dealiase_mask mean_velocity init_fields params save_fields time_step lib_mask/create_mask 
+SUB_FILES = dealiase_mask mean_velocity lib_inicond/init_fields params save_fields time_step lib_mask/create_mask 
 PROG_FILE = dns
 
 
