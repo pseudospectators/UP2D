@@ -54,25 +54,7 @@ subroutine time_step
         write (*,*) "time=", time
         T_lastdrag=time
       endif
-!   
-!       !--------------------------------------------------------------------------------------------
-!       !--   save fields
-!       !--------------------------------------------------------------------------------------------
-!       if (time-T_lastsave>tsave) then
-! 	  write (name, '(es10.4)') time
-! 	  call cofdx ( uk(:,:,2), vort )
-! 	  call cofdy ( uk(:,:,1), p )
-! 	  !$omp parallel do private(iy)
-! 	  do iy=0,ny-1
-! 	      p(:,iy) = vort(:,iy) - p(:,iy)
-! 	  enddo
-! 	  !$omp end parallel do  
-! 	  
-! 	  call cofitxy( p, vort)	  
-! 	  call SaveField (trim(dir_name)//'/fields/'//trim(simulation_name)//'vor_'//name, vort, 1, xl,yl, 'precision')
-!   
-! 	  T_lastsave=time
-!       endif 
+ 
       t1 = Performance("stop",1)
       !----------------------------------------------------------------
       !-- remaining time
@@ -88,14 +70,3 @@ subroutine time_step
       endif
   enddo
 end subroutine time_step
-
-
-
-
-
-
-
-
-
-
-

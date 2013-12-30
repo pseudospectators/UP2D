@@ -49,7 +49,7 @@
 module FieldExport
   implicit none
   contains
-  
+
   
 subroutine ResizeAvg(field_source, field_target)
   ! this routine is the simplest way to upsample a field to a higher resolution.

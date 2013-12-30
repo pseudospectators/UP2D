@@ -113,77 +113,6 @@ subroutine fft_initialize
 end subroutine fft_initialize
 
 
-!subroutine fft_initialize_small_big
-!!====================================================================
-!!     Allocate memory and initialize FFT for small and big box
-!!====================================================================
-!  use share_vars
-!  use mkl_dfti
-!  use mkl_fft_descriptors
-!  implicit none
-!  integer :: Status, L(2), strides_in(3)
-!  ! ------------------------------------------------------------------------------
-!  !  SMALL FFT
-!  ! ------------------------------------------------------------------------------
-!  ! Prepare FFT data
-!  ! Dataset dimensions
-!  L(1) = nxs
-!  L(2) = nys
-
-!  ! Strides for a (nx+2)*(ny+2) array
-!  strides_in(1) = 0
-!  strides_in(2) = 1
-!  strides_in(3) = nxs+2
-
-!  ! Initialize FFT
-!  if ( precision(0.0) .eq. precision(0d0)) then
-!!    write (*,*) 'double precision'
-!    Status = DftiCreateDescriptor( Desc_Handle_xy_small, DFTI_DOUBLE, DFTI_REAL, 2, L )
-!    Status = DftiSetValue( Desc_Handle_xy_small, DFTI_PRECISION, DFTI_DOUBLE) ! Set double precision
-!  else
-!!    write (*,*) 'single precision'
-!    Status = DftiCreateDescriptor( Desc_Handle_xy_small, DFTI_SINGLE, DFTI_REAL, 2, L )
-!    Status = DftiSetValue( Desc_Handle_xy_small, DFTI_PRECISION, DFTI_SINGLE) ! Set single precision
-!  endif
-
-!  Status = DftiSetValue( Desc_Handle_xy_small, DFTI_FORWARD_SCALE, 1.0 / ( real(nxs) * real(nys) ) ) ! Set forward scaling
-!  Status = DftiSetValue( Desc_Handle_xy_small, DFTI_BACKWARD_SCALE, 1.0 ) ! Set backward scaling
-!  Status = DftiSetValue( Desc_Handle_xy_small, DFTI_INPUT_STRIDES, strides_in) ! Set strides
-
-!  Status = DftiCommitDescriptor( Desc_Handle_xy_small )
-  
-!  ! ------------------------------------------------------------------------------
-!  ! BIG IFFT
-!  ! ------------------------------------------------------------------------------
-!  ! Prepare FFT data
-!  ! Dataset dimensions
-!  L(1) = up*nxs
-!  L(2) = up*nys
-!  write (*,*) "L big", L
-
-!  ! Strides for a (nx+2)*(ny+2) array
-!  strides_in(1) = 0
-!  strides_in(2) = 1
-!  strides_in(3) = up*nxs+2
-
-!  ! Initialize FFT
-!  if ( precision(0.0) .eq. precision(0d0)) then
-!!    write (*,*) 'double precision'
-!    Status = DftiCreateDescriptor( Desc_Handle_xy_big, DFTI_DOUBLE, DFTI_REAL, 2, L )
-!    Status = DftiSetValue( Desc_Handle_xy_big, DFTI_PRECISION, DFTI_DOUBLE) ! Set double precision
-!  else
-!!    write (*,*) 'single precision'
-!    Status = DftiCreateDescriptor( Desc_Handle_xy_big, DFTI_SINGLE, DFTI_REAL, 2, L )
-!    Status = DftiSetValue( Desc_Handle_xy_big, DFTI_PRECISION, DFTI_SINGLE) ! Set single precision
-!  endif
-
-!  Status = DftiSetValue( Desc_Handle_xy_big, DFTI_FORWARD_SCALE, 1.0 / ( real(up*nxs) * real(up*nys) ) ) ! Set forward scaling
-!  Status = DftiSetValue( Desc_Handle_xy_big, DFTI_BACKWARD_SCALE, 1.0 ) ! Set backward scaling
-!  Status = DftiSetValue( Desc_Handle_xy_big, DFTI_INPUT_STRIDES, strides_in) ! Set strides
-
-!  Status = DftiCommitDescriptor( Desc_Handle_xy_big )
-
-!end subroutine fft_initialize_small_big
 
 
 subroutine fft_free
@@ -361,63 +290,6 @@ subroutine cofity (fk, f)
 end subroutine cofity
 
 
-!subroutine coftxy_big (f, fk)
-!!====================================================================
-!!     Calculation of the Fourier-coefficients of a real function
-!!     along x (1st index) and y (2nd index)
-!!     FILTERING
-!!====================================================================
-!  use share_vars
-!  use mkl_dfti
-!  use mkl_fft_descriptors
-!  implicit none
-!  integer :: j,nx_tmp,ny_tmp
-!  real (kind=pr), dimension ( (up*nxs+2) * (up*nys+2) ) :: ft
-!  real (kind=pr), dimension (0:up*nxs-1, 0:up*nys-1), intent (in) ::  f
-!  real (kind=pr), dimension (0:up*nxs-1, 0:up*nys-1), intent (out) ::  fk
-!  integer :: Status
-!nx_tmp=nx
-!ny_tmp=ny
-!nx=up*nxs
-!ny=up*nys
-!  ! Arrange the data in a 1D array
-!  !$omp parallel do private(j)
-!  do j = 0, ny-1
-!     ft( (nx+2)*j+1:(nx+2)*j+nx ) = f(:,j)
-!     ft( (nx+2)*j+nx+1:(nx+2)*j+nx+2 ) = 0.0
-!  enddo
-!  !$omp end parallel do
-!  ft( (nx+2)*ny+1:(nx+2)*(ny+2) ) = 0.0
-
-!  ! Compute forward FFT
-!  Status = DftiComputeForward( Desc_Handle_xy_big, ft)
-
-!  ! Arrange the result in a Temperton-like ordering
-!  fk(0:nx-1,0) = ft(1:nx)
-!  fk(:,1) = 0.0
-
-!  fk(0,0:ny-1) = ft(1:ny*(nx+2):(nx+2))
-!  fk(1,:) = 0.0
-
-!  !$omp parallel do private(j)
-!  do j = 1, ny/2-1
-!    fk(2:nx-2:2,2*j) = 0.5 * ( ft( (nx+2)*j+3:(nx+2)*j+nx-1:2 ) &
-!                           + ft( (nx+2)*(ny-j)+3:(nx+2)*(ny-j)+nx-1:2 ) )
-!    fk(2:nx-2:2,2*j+1) = 0.5 * ( ft( (nx+2)*j+4:(nx+2)*j+nx:2 ) &
-!                           - ft( (nx+2)*(ny-j)+4:(nx+2)*(ny-j)+nx:2 ) )
-!    fk(3:nx-1:2,2*j) = 0.5 * ( ft( (nx+2)*j+4:(nx+2)*j+nx:2 ) &
-!                           + ft( (nx+2)*(ny-j)+4:(nx+2)*(ny-j)+nx:2 ) )
-!    fk(3:nx-1:2,2*j+1) = 0.5 * ( - ft( (nx+2)*j+3:(nx+2)*j+nx-1:2 ) &
-!                           + ft( (nx+2)*(ny-j)+3:(nx+2)*(ny-j)+nx-1:2 ) )
-!  enddo
-!  !$omp end parallel do
-
-!  ! mode KF left unconsidered => filtering
-!  nx=nx_tmp
-!  ny=ny_tmp
-!end subroutine coftxy_big
-
-
 
 
 
@@ -472,65 +344,6 @@ subroutine coftxy (f, fk)
   ! mode KF left unconsidered => filtering
 end subroutine coftxy
 
-!subroutine coftxy_small (f, fk)
-!!====================================================================
-!!     Calculation of the Fourier-coefficients of a real function
-!!     along x (1st index) and y (2nd index)
-!!     FILTERING
-!!====================================================================
-!  use share_vars
-!  use mkl_dfti
-!  use mkl_fft_descriptors
-!  implicit none
-!  integer :: j,nx_tmp,ny_tmp
-!  real (kind=pr), dimension ( (nxs+2) * (nys+2) ) :: ft
-!  real (kind=pr), dimension (0:nxs-1, 0:nys-1), intent (in) ::  f
-!  real (kind=pr), dimension (0:nxs-1, 0:nys-1), intent (out) ::  fk
-!  integer :: Status
-!  ! LAZY!
-!  nx_tmp = nx
-!  ny_tmp = ny
-!  nx=nxs
-!  ny=nys
-!  ! Arrange the data in a 1D array
-!  !$omp parallel do private(j)
-!  do j = 0, ny-1
-!     ft( (nx+2)*j+1:(nx+2)*j+nx ) = f(:,j)
-!     ft( (nx+2)*j+nx+1:(nx+2)*j+nx+2 ) = 0.0
-!  enddo
-!  !$omp end parallel do
-!  ft( (nx+2)*ny+1:(nx+2)*(ny+2) ) = 0.0
-
-!  ! Compute forward FFT
-!  Status = DftiComputeForward( Desc_Handle_xy_small, ft)
-
-!  ! Arrange the result in a Temperton-like ordering
-!  fk(0:nx-1,0) = ft(1:nx)
-!  fk(:,1) = 0.0
-
-!  fk(0,0:ny-1) = ft(1:ny*(nx+2):(nx+2))
-!  fk(1,:) = 0.0
-
-!  !$omp parallel do private(j)
-!  do j = 1, ny/2-1
-!    fk(2:nx-2:2,2*j) = 0.5 * ( ft( (nx+2)*j+3:(nx+2)*j+nx-1:2 ) &
-!                           + ft( (nx+2)*(ny-j)+3:(nx+2)*(ny-j)+nx-1:2 ) )
-!    fk(2:nx-2:2,2*j+1) = 0.5 * ( ft( (nx+2)*j+4:(nx+2)*j+nx:2 ) &
-!                           - ft( (nx+2)*(ny-j)+4:(nx+2)*(ny-j)+nx:2 ) )
-!    fk(3:nx-1:2,2*j) = 0.5 * ( ft( (nx+2)*j+4:(nx+2)*j+nx:2 ) &
-!                           + ft( (nx+2)*(ny-j)+4:(nx+2)*(ny-j)+nx:2 ) )
-!    fk(3:nx-1:2,2*j+1) = 0.5 * ( - ft( (nx+2)*j+3:(nx+2)*j+nx-1:2 ) &
-!                           + ft( (nx+2)*(ny-j)+3:(nx+2)*(ny-j)+nx-1:2 ) )
-!  enddo
-!  !$omp end parallel do
-  
-!  nx=nx_tmp
-!  ny=ny_tmp
-  
-!  ! mode KF left unconsidered => filtering
-!end subroutine coftxy_small
-
-
 
 subroutine cofitxy (fk, f)
 !====================================================================
@@ -575,58 +388,6 @@ subroutine cofitxy (fk, f)
 
   ! mode KF left unconsidered => filtering
 end subroutine cofitxy
-
-!subroutine cofitxy_big (fk, f)
-!!====================================================================
-!!     B I G 
-!!====================================================================
-!  use share_vars
-!  use mkl_dfti
-!  use mkl_fft_descriptors
-!  implicit none
-!  integer :: j,nx_tmp,ny_tmp
-!  real (kind=pr), dimension ( (up*nxs+2) * (up*nys+2) ) :: ft
-!  real (kind=pr), dimension (0:up*nxs-1, 0:up*nys-1), intent (in) ::  fk
-!  real (kind=pr), dimension (0:up*nxs-1, 0:up*nys-1), intent (out) ::  f
-!  integer :: Status
-  
-!  ! LAZY!
-!  nx_tmp = nx
-!  ny_tmp = ny
-!  nx=up*nxs
-!  ny=up*nys
-
-!  ! Arrange the result in a Temperton-like ordering
-!  ft = 0.0
-!  ft(1:nx) = fk(0:nx-1,0)
-!  ft(2:ny*(nx+2)+1:(nx+2)) = 0.0
-!  ft(1:ny*(nx+2):(nx+2)) = fk(0,0:ny-1)
-
-!  !$omp parallel do private(j)
-!  do j = 1, ny/2-1
-!    ft( (nx+2)*j+3:(nx+2)*j+nx-1:2 ) = fk(2:nx-2:2,2*j) - fk(3:nx-1:2,2*j+1) ! real part, first columns (0..ny/2-1)
-!    ft( (nx+2)*j+4:(nx+2)*j+nx:2 ) =  fk(2:nx-2:2,2*j+1) + fk(3:nx-1:2,2*j) ! imaginary part, first columns (0..ny/2-1)
-!    ft( (nx+2)*(ny-j)+3:(nx+2)*(ny-j)+nx-1:2 ) = fk(2:nx-2:2,2*j) + fk(3:nx-1:2,2*j+1) ! real part, last columns
-!    ft( (nx+2)*(ny-j)+4:(nx+2)*(ny-j)+nx:2 ) = - fk(2:nx-2:2,2*j+1) + fk(3:nx-1:2,2*j) ! imaginary part, last columns
-!  enddo
-!  !$omp end parallel do
-
-!  ! Compute backward FFT
-!  Status = DftiComputeBackward( Desc_Handle_xy_big, ft)
-
-!  ! Arrange the data in a 2D array
-!  !$omp parallel do private(j)
-!  do j = 0, ny-1
-!     f(:,j) = ft( (nx+2)*j+1:(nx+2)*j+nx )
-!  enddo
-!  !$omp end parallel do
-  
-!  nx=nx_tmp
-!  ny=ny_tmp
-
-!  ! mode KF left unconsidered => filtering
-!end subroutine cofitxy_big
-
 
 
 
