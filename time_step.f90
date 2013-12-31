@@ -24,7 +24,7 @@ subroutine time_step
   call create_mask (time)
   call SaveGIF(mask, trim(simulation_name)//"startup_mask", 13)  
 
-  call cal_pressure ( uk, pk )
+  
   
   !----------------------------------------------------------------
   ! loop over time steps

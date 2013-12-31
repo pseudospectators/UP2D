@@ -1,8 +1,9 @@
 subroutine cal_pressure (time,u,uk,pk)
   use share_vars
+  use rhs
   implicit none
   real(kind=pr), intent(in) :: time
-  real(kind=pr), dimension(0:nx-1,0:ny-1,1:2), intent (inout) :: uk
+  real(kind=pr), dimension(0:nx-1,0:ny-1,1:2), intent (inout) :: uk, u
   real(kind=pr), dimension(0:nx-1,0:ny-1), intent (out) :: pk
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2) :: nlk
   real(kind=pr), dimension (0:nx-1, 0:ny-1) :: work1, work2

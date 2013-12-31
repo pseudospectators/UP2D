@@ -11,16 +11,16 @@ subroutine init_fields (u, uk, pk, vor, nlk)
   u = 0.0
   uk = 0.0
   vor = 0.0
-  p = 0.0
+  pk = 0.0
   
   select case (inicond)
   case ('quiescent')
     u = 0.0
     uk= 0.0
     vor = 0.0
-    p = 0.0
+    pk = 0.0
   case ('lamballais')
-    call lamballais(u,uk,p,vor,nlk)
+    call lamballais(u,uk,pk,vor,nlk)
   case ('couette')
   case ('turbulent')
     call random_seed()

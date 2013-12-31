@@ -10,7 +10,7 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   real(kind=pr), intent (out) :: dt
   real(kind=pr), intent (in) :: time
   real (kind=pr), dimension (0:nx-1, 0:ny-1) :: work1, workvis
-  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp
+  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp, u_tmp
   integer :: iy
   integer, intent(in) :: it
   real(kind=pr) :: drag,lift,timestep
@@ -53,21 +53,33 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   
   !--RHS, without penalization
   call cal_nlk(time, u, uk, vort, nlk, .false.)
+  !--add old pressure term
   call add_pressure_grad( nlk, pk )
-  ! compute integrating factor
-  call cal_vis(dt, workvis)
+  !-- compute integrating factor
+  call cal_vis( dt, workvis )
   
-  
-   
   !$omp parallel do private (iy)
   do iy=0,ny-1
     uk_tmp(:,iy,1) = (uk(:,iy,1) + dt*nlk(:,iy,1) )*dealiase(:,iy)*workvis(:,iy)
     uk_tmp(:,iy,2) = (uk(:,iy,2) + dt*nlk(:,iy,2) )*dealiase(:,iy)*workvis(:,iy)
   enddo
-  !$omp end parallel do 
+  !$omp end parallel do
   
-  ! mean flow forcing
+  !-- mean flow forcing
   call mean_flow(uk_tmp)
+  !-- to phys space again
+  call cofitxy ( uk_tmp(:,:,1),u_tmp(:,:,1) )
+  call cofitxy ( uk_tmp(:,:,2),u_tmp(:,:,2) ) 
+   
+  !--RHS, without penalization
+  call cal_nlk(time, u_tmp, uk_tmp, vort, nlk2, .false.)
+  !--add old pressure term
+  call add_pressure_grad( nlk, pk )   
+   
+   
+
+  
+  
   
   !---------------------------------------------------------------------------------
   ! do second RK2 step (RHS evaluation with the argument defined above)
