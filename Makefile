@@ -6,7 +6,8 @@ include .mkdep_includes
 include .mkdep_objects
 
 F95=gfortran
-BASEFLAGS=-O3 -fopenmp -lpthread
+BASEFLAGS=-g -fopenmp -lpthread -O3
+#-fdefault-real-8
 FREEFLAGS=$(INC) $(BASEFLAGS)
 FFTW_LOC = $(FFT_ROOT)/lib
 FFTW_INC = $(FFT_ROOT)/include

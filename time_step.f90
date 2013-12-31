@@ -4,10 +4,10 @@ subroutine time_step
   use FieldExport  
   use PerformanceMeasurement
   implicit none
-  real(kind=pr) :: time=0.0, dt1=0.0
+  real(kind=pr) :: time=0.0d0, dt1=0.0d0
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2) :: u, uk, nlk
   real(kind=pr), dimension(0:nx-1,0:ny-1) :: pk, vort
-  real(kind=pr) :: T_lastdrag=0.0, T_lastsave=0.0, t1, time_left
+  real(kind=pr) :: T_lastdrag=0.0d0, T_lastsave=0.0d0, t1, time_left
   integer :: it=0, iy
   character(len=17) :: timestring
   character (len=11) :: name
@@ -56,7 +56,7 @@ subroutine time_step
         !-- video snapshots
         !----------------------------------------------------------------
         write (timestring,'(i5.5)') nint(time*100.d0)         
-        colorscale = 0.10*max(maxval(vort),abs(minval(vort))) 
+        colorscale = 0.1d0*max(maxval(vort),abs(minval(vort))) 
         call SaveGIF(vort, "vor/"//trim(timestring)//".vor", 1, -colorscale, colorscale)
                         
         write (*,*) "time=", time
@@ -70,11 +70,11 @@ subroutine time_step
       if (modulo(it,200)==0) then
         time_left = t1*(Tmax-time)/dt1
         write (*,'("time left=",i3,"d ",i2,"h ",i2,"m ",i2,"s (",i2,"%)")') &
-          floor(time_left/(24.*3600.)),&
-          floor(mod(time_left,24.*3600.)/3600.),&
-          floor(mod(time_left,3600.)/60.),&
-          floor(mod(mod(time_left,3600.),60.)),&
-          nint(100.*time/Tmax)
+          floor(time_left/(24.d0*3600.d0)),&
+          floor(mod(time_left,24.d0*3600.d0)/3600.d0),&
+          floor(mod(time_left,3600.d0)/60.d0),&
+          floor(mod(mod(time_left,3600.d0),60.d0)),&
+          nint(100.d0*time/Tmax)
       endif
   enddo
 end subroutine time_step

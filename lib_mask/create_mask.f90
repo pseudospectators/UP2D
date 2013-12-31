@@ -30,7 +30,7 @@ subroutine create_mask (time)
     enddo
     !$omp end parallel do
   case('none')
-    mask = 0.0
+    mask = 0.d0
   case default
     write (*,*) "mask not defnd", iMask
     stop    
@@ -55,11 +55,11 @@ subroutine SmoothStep (f,x,t,h)
   real (kind=pr), intent (in)  :: x,t,h
 
   if (x<=t-h) then
-    f = 1.0
+    f = 1.d0
   elseif (((t-h)<x).and.(x<(t+h))) then
-    f = 0.5*(1.+cos((x-t+h)*pi/(2.0*h)) )
+    f = 0.5d0*(1.0d0+cos((x-t+h)*pi/(2.d0*h)) )
   else
-    f = 0.0
+    f = 0.0d0
   endif
 end subroutine SmoothStep
 

@@ -9,7 +9,7 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   real(kind=pr), dimension(0:nx-1,0:ny-1), intent (inout) :: vort, p
   real(kind=pr), intent (out) :: dt
   real(kind=pr), intent (in) :: time
-  real (kind=pr), dimension (0:nx-1, 0:ny-1) :: work1, workvis
+  real (kind=pr), dimension (0:nx-1, 0:ny-1) :: work1,work2, workvis
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp, u_tmp
   integer :: iy
   integer, intent(in) :: it
@@ -55,6 +55,11 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   
   !-- mean flow forcing
   call mean_flow(uk)  
+  
+  call cofdx(uk(:,:,1),work1)
+  call cofdy(uk(:,:,2),work2)
+  call cofitxy(work1+work2,workvis)
+  write(*,*) "divergence", maxval(workvis), minval(workvis)
   
   !-- velocity in phys. space
   call cofitxy (uk(:,:,1), u(:,:,1))

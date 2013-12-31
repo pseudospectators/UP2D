@@ -95,6 +95,8 @@ subroutine fft_initialize_best
 
 end subroutine
 
+
+
 subroutine fft_free
 !====================================================================
 !     Free memory allocated for FFT
@@ -134,7 +136,7 @@ subroutine coftxy (f, fk)
 
 
   ! normalization
-  norm = 1.0 / ( real(nx) * real(ny) )
+  norm = 1.d0 / ( real(nx) * real(ny) )
 
   ! complex 2d Fourier coefficients are used to
   ! compute coefficients before sin and cos (Temperton style)
@@ -142,20 +144,20 @@ subroutine coftxy (f, fk)
   do ix=0,nx/2-1
      fk(2*ix,0) = real( ft(ix,0) ) * norm
      fk(2*ix+1,0) = imag( ft(ix,0) ) * norm
-     fk(2*ix,1) = 0.0
-     fk(2*ix+1,1) = 0.0
+     fk(2*ix,1) = 0.d0
+     fk(2*ix+1,1) = 0.d0
   end do
   !$omp end parallel do
 
   !$omp parallel do private(iy)
   do iy=1,ny/2-1
-     fk(0:nx-2:2,2*iy) = 0.5 * ( real( ft(0:nx/2-1,iy)) &
+     fk(0:nx-2:2,2*iy) = 0.5d0 * ( real( ft(0:nx/2-1,iy)) &
                             + real( ft(0:nx/2-1,ny-iy)) ) * norm
-     fk(0:nx-2:2,2*iy+1) = 0.5 * ( imag( ft(0:nx/2-1,iy)) &
+     fk(0:nx-2:2,2*iy+1) = 0.5d0 * ( imag( ft(0:nx/2-1,iy)) &
                             - imag( ft(0:nx/2-1,ny-iy)) ) * norm
-     fk(1:nx-1:2,2*iy) = 0.5 * ( imag( ft(0:nx/2-1,iy)) &
+     fk(1:nx-1:2,2*iy) = 0.5d0 * ( imag( ft(0:nx/2-1,iy)) &
                             + imag( ft(0:nx/2-1,ny-iy)) ) * norm
-     fk(1:nx-1:2,2*iy+1) = 0.5 * ( - real( ft(0:nx/2-1,iy)) &
+     fk(1:nx-1:2,2*iy+1) = 0.5d0 * ( - real( ft(0:nx/2-1,iy)) &
                             + real( ft(0:nx/2-1,ny-iy)) ) * norm
   end do
   !$omp end parallel do
@@ -185,12 +187,12 @@ subroutine cofitxy (fk, f)
   !$omp parallel do private(ix)
   do ix=0,nx/2-1
      ft(ix,0) = cmplx( fk(2*ix,0), fk(2*ix+1,0), pr )
-     ft(ix,ny/2) = 0.0
+     ft(ix,ny/2) = 0.0d0
   end do
   !$omp end parallel do
 
-  ft(nx/2,0) = 0.0
-  ft(nx/2,ny/2) = 0.0
+  ft(nx/2,0) = 0.0d0
+  ft(nx/2,ny/2) = 0.0d0
 
   !$omp parallel do private(iy)
   do iy=1,ny/2-1
@@ -198,8 +200,8 @@ subroutine cofitxy (fk, f)
                           fk(0:nx-2:2,2*iy+1) + fk(1:nx-1:2,2*iy) )
      ft(0:nx/2-1,ny-iy) = cmplx( fk(0:nx-2:2,2*iy) + fk(1:nx-1:2,2*iy+1), &
                          -fk(0:nx-2:2,2*iy+1) + fk(1:nx-1:2,2*iy) )
-     ft(nx/2,iy) = 0.0
-     ft(nx/2,ny-iy) = 0.0
+     ft(nx/2,iy) = 0.0d0
+     ft(nx/2,ny-iy) = 0.0d0
   end do
   !$omp end parallel do
 
@@ -240,7 +242,7 @@ subroutine cofts (f, fk, L, n)
 
 
   ! Output
-  norm = 1.0 / real(L)
+  norm = 1.d0 / real(L)
   !$omp parallel do private(j)
   do j=0,n-1
      fk(:,j) = ft(0:L-1,j) * norm
@@ -275,7 +277,7 @@ subroutine cofits (fk, f, L, n)
   !$omp parallel do private(j)
   do j=0,n-1
      ft(0:L-1,j) = fk(:,j)
-     ft(L:L+1,j) = 0.0
+     ft(L:L+1,j) = 0.d0
   end do
   !$omp end parallel do
 

@@ -227,7 +227,6 @@ subroutine vorticity2velocity( vortk, uk )
   call cofdy (stream, work2)
   call cofitxy (work2, uk(:,:,1)) ! u(:,:,1) here contains ux = dpsi/dy
 
-  !--Add a mean velocity
   !$omp parallel do private(iy)
   do iy=0,ny-1
     uk(:,iy,2) = - uk(:,iy,2)  
