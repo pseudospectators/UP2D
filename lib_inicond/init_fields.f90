@@ -1,9 +1,9 @@
-subroutine init_fields (u, uk, p, vor, nlk)
+subroutine init_fields (u, uk, pk, vor, nlk)
   use share_vars
   use FieldExport
   implicit none
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2), intent (inout) :: u, uk, nlk
-  real(kind=pr), dimension(0:nx-1,0:ny-1), intent (inout) :: vor, p
+  real(kind=pr), dimension(0:nx-1,0:ny-1), intent (inout) :: vor, pk
   real(kind=pr), dimension(0:nx-1,0:ny-1) :: vortk
   real(kind=pr) :: r0,we,d,r1,r2
   integer :: ix,iy
@@ -56,6 +56,8 @@ subroutine init_fields (u, uk, p, vor, nlk)
     call coftxy( u(:,:,2), uk(:,:,2))
      
   end select
-   
 
+  !-- compute initial pressure (for implicit penalization)
+  call cal_pressure ( 0.0, u, uk, pk )
+  
 end subroutine 

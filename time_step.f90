@@ -4,24 +4,19 @@ subroutine time_step
   use FieldExport  
   use PerformanceMeasurement
   implicit none
-  real(kind=pr) :: time, dt1
+  real(kind=pr) :: time=0.0, dt1=0.0
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2) :: u, uk, nlk
-  real(kind=pr), dimension(0:nx-1,0:ny-1) :: p, vort
-  real(kind=pr) :: T_lastdrag, T_lastsave, t1, time_left
+  real(kind=pr), dimension(0:nx-1,0:ny-1) :: pk, vort
+  real(kind=pr) :: T_lastdrag=0.0, T_lastsave=0.0, t1, time_left
   integer :: it=0, iy
   character(len=17) :: timestring
   character (len=11) :: name
 
-  time = 0.0
-  dt1 = 0.0
-  it = 0
-  T_lastdrag = 0.0
-  T_lastsave = 0.0
   
   !----------------------------------------------------------------  
   ! Initialize vorticity or read values from a backup file
   !----------------------------------------------------------------
-  call init_fields (u, uk, p, vort, nlk)
+  call init_fields (u, uk, pk, vort, nlk)
 
   !----------------------------------------------------------------
   ! create startup mask
@@ -29,6 +24,7 @@ subroutine time_step
   call create_mask (time)
   call SaveGIF(mask, trim(simulation_name)//"startup_mask", 13)  
 
+  call cal_pressure ( uk, pk )
   
   !----------------------------------------------------------------
   ! loop over time steps
@@ -36,10 +32,24 @@ subroutine time_step
   do while ((time<Tmax) .and. (it<=nt))
       t1 = Performance("start",1)
       
-      call Runge (time, dt1,it, u, uk, p, vort, nlk) 
+      !----------------------------------------------------------------
+      !-- Actual time step
+      !----------------------------------------------------------------
+      select case (iMethod)
+      case ('RK2')
+        call RK2 (time, dt1,it, u, uk, pk, vort, nlk) 
+      case ('RK2_implicit')
+        call RK2_implicit (time, dt1,it, u, uk, pk, vort, nlk) 
+      case default
+        write (*,*) "Error: iMethod undefined"
+      end select
+      
+      
       
       time = time + dt1  ! Advance in time
       it = it + 1
+      
+      
       
       if (time-T_lastdrag>tdrag) then 
         !----------------------------------------------------------------

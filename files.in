@@ -1,17 +1,26 @@
-share_vars.f90      OPT       free     source  
-gif_util.f90        OPT       free     source  
-FieldExport.f90     OPT       free     source  
-PerformanceMeasurement.f90  OPT       free     source  
-./lib_spectral_operators/spectral_essentials.f90  OPT       free     source  
-./lib_navier_stokes/navier_stokes.f90             OPT       free     source  
-mean_velocity.f90                                 OPT       free     source  
-./lib_inicond/init_fields.f90                     OPT       free     source  
-./lib_inicond/lamballais.f90                      OPT       free     source  
-params.f90                                        OPT       free     source  
-save_fields.f90                                   OPT       free     source  
-time_step.f90                                     OPT       free     source  
-./lib_mask/create_mask.f90                        OPT       free     source  
-./lib_spectral_operators/dealiase_mask.f90        OPT       free     source  
-dns.f90                                           OPT       free     source  
-./lib_spectral_operators/cof_fftw33.f90           OPT       free     source  
+share_vars.f90  
+gif_util.f90    
+FieldExport.f90     
+PerformanceMeasurement.f90  
+mean_velocity.f90                             
+params.f90                                    
+save_fields.f90                               
+time_step.f90    
+dns.f90      
 
+./lib_mask/create_mask.f90                    
+
+./lib_spectral_operators/dealiase_mask.f90                                     
+./lib_spectral_operators/cof_fftw33.f90       
+./lib_spectral_operators/spectral_essentials.f90  
+
+./lib_inicond/init_fields.f90                 
+./lib_inicond/lamballais.f90       
+
+
+./lib_navier_stokes/add_diffusion.f90         
+./lib_navier_stokes/add_pressure.f90         
+./lib_navier_stokes/dt.f90
+./lib_navier_stokes/RK2.f90
+./lib_navier_stokes/RK2_implicit.f90
+./lib_navier_stokes/cal_nlk.f90

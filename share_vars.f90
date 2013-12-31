@@ -14,7 +14,7 @@ module share_vars
   real(kind=pr), save :: nu, eps, pi, scalex, scaley
   real(kind=pr), save :: ux_mean, uy_mean
   
-  character (len=40), save :: inicond, iMask, iMeanFlow
+  character (len=40), save :: inicond, iMask, iMeanFlow, iMethod
   
   integer,parameter :: nlines=2048 ! maximum number of lines in PARAMS-file
 

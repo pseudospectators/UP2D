@@ -76,6 +76,7 @@ subroutine get_params_common(PARAMS,i)
   call GetValue_Int(PARAMS,i,"Time","nt",nt, 9999999)
   call GetValue_Real(PARAMS,i,"Time","Tmax",Tmax,1.d9)
   call GetValue_Real(PARAMS,i,"Time","CFL",cfl,0.1d0)
+  call GetValue_String(PARAMS,i,"Time","iMethod",iMethod,"RK2")
   call GetValue_Real(PARAMS,i,"ReynoldsNumber","nu",nu,1.d-2)  
 
   ! Initial conditions section

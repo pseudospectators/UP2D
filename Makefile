@@ -21,10 +21,9 @@ include .mkdep_dependencies
 %.o : %.f90 ; $(F95) -c $(FREEFLAGS)   -o $@ $<
 
 dep:
-	./mkdep/mkdep --fc gfortran -c -b files.in
+	# the switch "-b" inhibits collecting all *.o files in
+	# the build directory. does not work without it.
+	./mkdep/mkdep --fc gfortran -b files.in
 clean:
 	rm -f *.mod *~ $(PROJECT) $(MAINLIB)
 	rmobjs .mkdep_objects
-
-	
-
