@@ -1,0 +1,17 @@
+share_vars.f90      OPT       free     source  
+gif_util.f90        OPT       free     source  
+FieldExport.f90     OPT       free     source  
+PerformanceMeasurement.f90  OPT       free     source  
+./lib_spectral_operators/spectral_essentials.f90  OPT       free     source  
+./lib_navier_stokes/navier_stokes.f90             OPT       free     source  
+mean_velocity.f90                                 OPT       free     source  
+./lib_inicond/init_fields.f90                     OPT       free     source  
+./lib_inicond/lamballais.f90                      OPT       free     source  
+params.f90                                        OPT       free     source  
+save_fields.f90                                   OPT       free     source  
+time_step.f90                                     OPT       free     source  
+./lib_mask/create_mask.f90                        OPT       free     source  
+./lib_spectral_operators/dealiase_mask.f90        OPT       free     source  
+dns.f90                                           OPT       free     source  
+./lib_spectral_operators/cof_fftw33.f90           OPT       free     source  
+

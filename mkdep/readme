@@ -1,0 +1,208 @@
+The Fortran dependency, call tree .and./.or. Makefile generator mkdep
+
+Helge Avlesen <avle@bccs.uib.no>
+
+This tool has two modes of usage: the simplified makefile approach,
+and the project file approach.  The goal is to make it quick to set up
+makefiles that handle complicated dependencies automatically, which
+makes the use of modules much more convenient.
+
+
+*The simplified Makefile approach
+
+**Install:
+
+First install mkdep in a convenient location. since you are now
+already reading a readme file in this directory, do a
+
+  python install.py
+
+this will create a file called "rules" that we must include in all
+Makefiles that want to use this system.
+
+it is a good idea to have the mkdep directory first in your PATH,
+e.g. with mkdep in your $HOME
+
+  export PATH=~/mkdep:$PATH
+
+**The makefile:
+
+As a minimum, a Makefile to compile and link two sourcefiles
+could look like these 3 lines
+
+ SOURCEFILES= program.f90 module.f90
+ FORTRANCOMPILER=g95
+ include ../mkdep/rules
+
+make sure the last line really points to the "rules" file, otherwise
+things will not work! Now execute
+
+    mkdep reset
+
+To initialize the makefile.
+
+
+(Sidetrack: if you omit e.g. FORTRANCOMPILER the tool will assume
+FORTRANCOMPILER to be g95 by default.  it is also possible to specify
+the name of the resulting executable in the EXECUTABLE variable.
+these special variables has to be defined before the include
+statement.)
+
+
+Now, compiling the first time:
+    make dep
+    make
+
+From then on, you can use a single "make" to rebuild, with two exceptions:
+1) you modify SOURCEFILES below
+2) you modify the code so that dependencies due to modules change.
+in any of those cases, rebuild code with
+    make dep
+    make
+
+
+*The project file approach
+
+The user provides a "project file" that contains a list of all source
+files that his program is made from. mkdep uses the project file to
+create a list of object files and their dependencies in a form
+suitable for inclusion in a Makefile. a simple template Makefile is
+also created (Makefile.tmp). when the list of files in the project
+file is changed, mkdep should be rerun (gmake dep). mkdep will only
+reparse new or modified files, unless a file called
+.mkdep_restart_file is deleted.
+
+Example; 
+if "ls *.f90" gives a complete list of source files for a program, and
+we start in a directory without a Makefile and .o files, these three
+commands are sufficient to build the executable using the g95 fortran
+compiler:
+
+  ls -1 *.f90 > files
+  mkdep --fc g95 files
+  gmake
+
+
+* Installation and requirements
+
+To make it work;
+1) you need Python and GNU Make. (and of course a Fortran compiler to build)
+2) ensure the mkdep files are in the $PATH.
+
+For Windows users, go to the directory containing the mkdep scripts,
+execute "install.py" and a set of .bat files should be produced.
+make sure this directory is in the %path%. 
+
+(The GNU make from e.g. http://unxutils.sourceforge.net/ works ok.)
+
+For projects with a large number of object files, it may on some
+systems be necessary to have the "ar" library tool available. ar is
+invoked from the template Makefile if you use the -L option for
+mkdep. The only difference to the template Makefile is in the final
+link stage; if -L is used for mkdep, ar will be used to assemble the
+object files into a big library in batches. This avoids getting into
+problems with very long command lines in e.g. Windows and AIX.
+
+
+* Basic usage and a description of the format for the project file
+
+mkdep needs at least one argument: the name of a file which
+contains a list of source files that you intend to use in the
+project. the format of this file is simple:
+
+1) if a line starts with a #, or is blank, it is ignored.
+
+2) otherwise, in the first column on each line in the file,
+   mkdep expects the full path to a source file, relative to the 
+   current directory.
+
+3) optionally, three other columns may be provided to override the default behaviour.
+   mkdep will normally try to guess the file type based on the file name suffix;
+  -column two is a user specified string that is used to group object files.
+   the only restriction on the value of this string is the reserved group MAIN
+   the one and only file in this group contains the main program.
+   otherwise, the user may define as many groups as desired. these groups are made
+   into Makefile variables that can be used later to compile object files with 
+   different flags. if none of the files listed has the MAIN group, it
+   is assumed that the main program is in the first file listed.
+  -column three is a string (free format fortran, fixed format or C) to hint about 
+   the language form. if this one is wrong, mkdep may fail to produce the correct 
+   dependencies.
+  -column four a string (source or include) to hint if the file is
+   to be compiled or just "included". mkdep will not use include files in the list of
+   object files.
+
+To generate a list of source files, you can do something like
+
+  ls -1 *.f90 > all.files
+
+or, if the files are stored in a subdirectory tree, the more advanced
+
+  find . \( -name "*.F" -o -name "*.F90" -o -name "*.h" -o -name "*.c" \) -print > all.files
+
+
+Now, to generate dependencies for a Makefile, comment out stuff not
+needed in the list of files, and feed the result into mkdep, e.g.:
+
+  mkdep all.files
+
+mkdep will warn if it finds duplicate file names, module definitions
+and a few syntactical quirks it cannot handle.  A template Makefile
+(Makefile.tmp) will be written in the current directory, as well
+as a series of files which name start with .mkdep, see screen output
+for what they contain. You can now edit the template Makefile and try
+to build the program.
+
+For a description of the other options to mkdep we refer to the
+command line help
+
+  mkdep -h
+
+
+
+*Significance of the order of files
+
+For very large projects, dependencies may be tricky to get right.
+Fortran files may include files that use modules (that again can
+include or use ...)  if a file is an included file, its source may
+depend on e.g modules
+
+   file.h : module1.o ...
+
+If the same module is defined in multiple files, the actual source
+file that will be used is the last one listed in the project file.
+
+Similarly for multiply defined include files: the last file in the
+project file will be used by default. The search order may be
+overridden through the use of -I flags in the makefile, or by
+providing a list of include directories to search via the -i argument
+to mkdep. the last directories in the list will be the first in the
+search list.
+
+an example of how to "manually" produce a template list of directories
+
+  cat files2.map | awk '{print $1}' | grep -i -e "[.]h" | sed 's/\/[a-zA-Z0-9_]*[.][Hh]//' | sort | uniq
+
+
+*Making a call tree
+
+The command
+
+  mkdep --treetop SUPERBEE -t "A test tree" files.txt
+
+will generate a call tree from the files in files.txt, but only with
+routines called from SUPERBEE. The tree will be written to a file
+called "A test tree.html" that can be opened in a browser, and also a
+ascii file called .mkdep.tree
+
+The parser does not support many Fortran 9x features yet, such as
+correct handling of nested name spaces, but it should still generate
+trees that are "close" to correct in some sense.
+
+
+*Shortcomings
+
+mkdep currently first joins all continuated lines, then split these
+lines at ";"'s, and then empties all strings before searching for use
+or include statements. mkdep will get problems if continuation is used
+across c preprocessing #ifdef regions.

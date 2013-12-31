@@ -26,7 +26,7 @@ subroutine time_step
   ! create startup mask
   !---------------------------------------------------------------- 
   call create_mask (time)
-  call SaveGIF(mask, trim(dir_name)//'/'//trim(simulation_name)//"startup_mask", 13)  
+  call SaveGIF(mask, trim(simulation_name)//"startup_mask", 13)  
 
   
   !----------------------------------------------------------------
@@ -46,7 +46,7 @@ subroutine time_step
         !----------------------------------------------------------------
         write (timestring,'(i5.5)') nint(time*100.d0)         
         colorscale = 0.10*max(maxval(vort),abs(minval(vort))) 
-        call SaveGIF(vort, trim(dir_name)//"/vor/"//trim(timestring)//".vor", 1, -colorscale, colorscale)
+        call SaveGIF(vort, "vor/"//trim(timestring)//".vor", 1, -colorscale, colorscale)
                         
         write (*,*) "time=", time
         T_lastdrag=time

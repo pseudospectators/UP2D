@@ -1,6 +1,3 @@
-## Makefile for 2D DNS
-## Build on Babel and on Duke
-
 MOD_FILES = share_vars gif_util FieldExport PerformanceMeasurement\
 lib_spectral_operators/spectral_essentials\
 lib_navier_stokes/navier_stokes  
@@ -29,17 +26,13 @@ RES = $(addsuffix .res ,$(PROG_FILE))
 
 
 #-------------------------------------------------------------------------------
-
-help:
-	@echo Usage: make {duke/clean/help} [LIBFFT=fftw3] 
 duke:
 	rm -f dns.out share_vars.o share_vars.res
 	$(MAKE) build CONF=duke
 build:
-	$(MAKE) $(COMMON) $(RES)	
+	$(MAKE) $(COMMON) $(RES)
 clean:
 	rm -f dns.out *.o *.mod
-
 #-------------------------------------------------------------------------------
 
 $(COMMON): %.o: %.f90
@@ -48,6 +41,4 @@ $(COMMON): %.o: %.f90
 $(RES): %.res: %.f90
 	$(FF) $(FOPTS) $(COMMON) $< $(FPAR) $(FFT_LINK) -lm -o $*.out
 	
-	
-
 #-------------------------------------------------------------------------------

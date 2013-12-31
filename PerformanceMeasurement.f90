@@ -79,42 +79,5 @@ module PerformanceMeasurement
   end function GetRuntime
   
   !----------------------------------------------------------------------------
-
-  subroutine SavePerformance(time,time_dt, time_nst, time_pressure, time_mask, time_solid, steps_left,dt1)
-    use share_vars
-    implicit none
-    
-    real, intent(in) :: time, time_dt, time_nst, time_pressure, time_mask, time_solid,dt1
-    integer, intent(in) :: steps_left
-    real :: totaltime, time_left, time_sum
-    integer :: days,mins,hours,secs,days1,mins1,hours1,secs1
-
-    totaltime=GetRuntime('now')
-
-    days   =floor(totaltime/(24.*3600.))
-    hours  =floor(mod(totaltime,24.*3600.)/3600.)
-    mins   =floor(mod(totaltime,3600.)/60.)
-    secs   =floor(mod(mod(totaltime,3600.),60.))
-
-    time_left = steps_left*time_dt
-    
-    days1   =floor(time_left/(24.*3600.))
-    hours1  =floor(mod(time_left,24.*3600.)/3600.)
-    mins1   =floor(mod(time_left,3600.)/60.)
-    secs1   =floor(mod(mod(time_left,3600.),60.))
-    
-    time_sum=time_nst+time_pressure+time_mask+time_solid
-    
-    open  (10, file = trim(dir_name)//'/'//trim(simulation_name)//"performance_details", status = 'unknown', access = 'append')
-    write (10,'( 2(i3,"d ",i2,"h ",i2,"m ",i2,"s "), 2(es11.4,1x)," - ",2(es11.4,1x),4(es11.4,1x,i3,"% "))') &
-        days1,hours1,mins1,secs1,days,hours,mins,secs,&
-        time,dt1,time_dt,time_sum,&
-        time_nst, nint(100.*time_nst/time_sum), time_pressure, &
-        nint(100.*time_pressure/time_sum), time_mask, nint(100.*time_mask/time_sum),&
-        time_solid, nint(100.*time_solid/time_sum)
-    close (10)
-   
-  end subroutine SavePerformance
-
-end module PerformanceMeasurement
+  end module PerformanceMeasurement
 

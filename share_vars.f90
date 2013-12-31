@@ -4,7 +4,7 @@ module share_vars
   integer, parameter :: pr = kind (0.d0) 
   
 
-  character (len=40), save :: simulation_name, dir_name
+  character (len=40), save :: simulation_name
   integer, save :: nx, ny, nt
   integer, save :: iDealias, iPenalization, iMoving, nPalettes=14
 

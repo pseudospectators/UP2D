@@ -5,7 +5,6 @@ program dns
   implicit none
   
   call get_params("PARAMS.ini")
-  dir_name = '.'
   simulation_name='test'
   call StartSimulation()   
 
@@ -18,9 +17,8 @@ subroutine StartSimulation()
   implicit none
   write (*,*) "*** information: entering StartSimulation"
 
-  call system('mkdir '//trim(dir_name) )
-  call system('mkdir '//trim(dir_name)//'/fields' )
-  call system('mkdir '//trim(dir_name)//'/vor' )
+  call system('mkdir fields' )
+  call system('mkdir vor' )
   write (*,*) "*** information: created subdirectories"
 
   allocate ( dealiase(0:nx-1,0:ny-1) )
