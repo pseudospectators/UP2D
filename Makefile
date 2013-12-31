@@ -1,6 +1,6 @@
 ## Use GNU Make (gmake) to build
 
-PROJECT = proj1.exe
+PROJECT = dns.out
 
 include .mkdep_includes
 include .mkdep_objects
@@ -21,7 +21,7 @@ include .mkdep_dependencies
 %.o : %.f90 ; $(F95) -c $(FREEFLAGS)   -o $@ $<
 
 dep:
-	/home/tommy/Documents/Research/Incompressible/CODE_UP_2d/mkdep/mkdep --fc gfortran -c -b files.in
+	./mkdep/mkdep --fc gfortran -c -b files.in
 clean:
 	rm -f *.mod *~ $(PROJECT) $(MAINLIB)
 	rmobjs .mkdep_objects

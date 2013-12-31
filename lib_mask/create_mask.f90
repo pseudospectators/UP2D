@@ -1,3 +1,7 @@
+module masks
+
+  implicit none
+  contains
 !==============================================================================================================================================
 subroutine create_mask (time)
   use share_vars
@@ -58,3 +62,5 @@ subroutine SmoothStep (f,x,t,h)
     f = 0.0
   endif
 end subroutine SmoothStep
+
+end module masks

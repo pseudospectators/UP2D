@@ -1,5 +1,6 @@
 subroutine time_step 
   use share_vars
+  use masks
   use FieldExport  
   use PerformanceMeasurement
   implicit none
