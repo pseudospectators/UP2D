@@ -1,10 +1,7 @@
 subroutine time_step 
   use share_vars
-  use FieldExport
-  use spectral_solver
-  use spectral_essentials
+  use FieldExport  
   use PerformanceMeasurement
-
   implicit none
   real(kind=pr) :: time, dt1
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2) :: u, uk, nlk

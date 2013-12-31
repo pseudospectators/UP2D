@@ -1,8 +1,3 @@
-module spectral_essentials
-
- contains
-
-
 subroutine cofdx (fk, fk_dx)
 !---------------------------------------------------------------
 !     calculation of d/dx in the fourier-space ==> *ik
@@ -278,6 +273,3 @@ subroutine cal_vis (dt, vis)
   !$omp end parallel do 
 
 end subroutine cal_vis
-
-  
-end module

@@ -1,13 +1,13 @@
 ## Makefile for 2D DNS
 ## Build on Babel and on Duke
 
-MOD_FILES = share_vars gif_util FieldExport PerformanceMeasurement  navier_stokes
+MOD_FILES = share_vars gif_util FieldExport PerformanceMeasurement\
+lib_spectral_operators/spectral_essentials\
+lib_navier_stokes/navier_stokes  
 SUB_FILES = mean_velocity\
 lib_inicond/init_fields\
 params save_fields time_step\
 lib_mask/create_mask\
-lib_navier_stokes/navier_stokes.f90\
-lib_spectral_operators/spectral_essentials\
 lib_spectral_operators/dealiase_mask
 PROG_FILE = dns
 

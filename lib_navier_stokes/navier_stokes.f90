@@ -1,8 +1,3 @@
-module spectral_solver
-  use spectral_essentials
-  implicit none
-  contains
-
 ! ==========================================================================================================================
 function timestep(time, u)
   use share_vars
@@ -165,7 +160,7 @@ subroutine Runge (time, dt,it, u, uk, p, vort, nlk)
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp
   integer :: iy
   integer, intent(in) :: it
-  real(kind=pr) :: drag,lift
+  real(kind=pr) :: drag,lift,timestep
 
   dt = timestep(time, u)
   
@@ -204,8 +199,3 @@ subroutine Runge (time, dt,it, u, uk, p, vort, nlk)
   ! mean flow forcing
   call mean_flow(uk)  
 end subroutine Runge
-
-
-end module spectral_solver
-
-
