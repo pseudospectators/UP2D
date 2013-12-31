@@ -25,9 +25,12 @@ subroutine fft_initialize
   implicit none
   include 'fftw3.f'
 
-  integer :: ierr, init_flag = FFTW_MEASURE, i,id
+  integer :: ierr, init_flag = FFTW_MEASURE, i,id,ix,iy
   real (kind=pr), dimension (0:nx-1, 0:ny-1) ::  fftwdata_r
   complex (kind=pr), dimension(0:nx/2, 0:ny-1) :: fftwdata_c
+  real(kind=pr), dimension(0:nx-1,0:ny-1) :: work1, work2, work3
+  real(kind=pr), dimension(0:nx-1,0:ny-1,1:2) :: u
+  real (kind=pr)::e
 
   !----------------------------------------------------
   ! here, we determine how many thready we have available
@@ -51,7 +54,45 @@ subroutine fft_initialize
     ! backward
     call dfftw_plan_dft_c2r_2d(Desc_Handle_xy_b, nx, ny, fftwdata_c, fftwdata_r, init_flag)
 
+  !-----------------------------------------
+  ! UNIT TESTING
+  !-----------------------------------------  
+  do ix=0,nx-1
+    work1(ix,:) = dsin( dble(ix)*dx*2.d0*pi/xl )
+    work3(ix,:) = dcos( dble(ix)*dx*2.d0*pi/xl )*2.d0*pi/xl
+  enddo
+  
+  call coftxy(work1,work2)
+  call cofdx(work2,work1)
+  call cofitxy(work1,work2)
+  e = sum((work2-work3)**2)*dx*dy
+  write(*,*) "FFT testing error=", e
 
+  if (e >= 1e-10) then
+    write(*,*) "FFT unit test failed..."
+    stop
+  endif
+
+  !-----------------------------------------
+  ! UNIT TESTING (y)
+  !-----------------------------------------  
+  do iy=0,ny-1
+    work1(:,iy) = dsin( dble(iy)*dy*2.d0*pi/yl )
+    work3(:,iy) = dcos( dble(iy)*dy*2.d0*pi/yl )*2.d0*pi/yl
+  enddo
+  
+  call coftxy(work1,work2)
+  call cofdy(work2,work1)
+  call cofitxy(work1,work2)  
+  e = sum((work2-work3)**2)*dx*dy
+  write(*,*) "FFT testing error=", e
+
+  if (e >= 1e-10) then
+    write(*,*) "FFT unit test failed..."
+    stop
+  endif
+    
+  
 end subroutine fft_initialize
 
 

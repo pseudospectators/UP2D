@@ -22,7 +22,7 @@ subroutine create_mask (time)
     !$omp parallel do private(ix,iy,R)
     do ix=0,nx-1  
       do iy=0,ny-1
-        R = sqrt( (real(ix)*dx-x0)**2 +(real(iy)*dy-y0)**2 )
+        R = dsqrt( (dble(ix)*dx-x0)**2 +(dble(iy)*dy-y0)**2 )
         if (R <= 1.d0) then
           mask(ix,iy) = 1.d0
         endif

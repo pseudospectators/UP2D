@@ -19,17 +19,17 @@ function timestep(time, u)
   enddo
   !$omp end parallel do
   
-  u_max = sqrt(maxval(work2))  
-  dt1 = cfl*min(xl/real(nx),yl/real(ny))/u_max
+  u_max = dsqrt(maxval(work2))  
+  dt1 = cfl*min(xl/dble(nx),yl/dble(ny))/u_max
 
   !-- u_max is very small
-  if (u_max <= 1.0e-10) then 
-    dt1 = 1.e-3 
+  if (u_max <= 1.0d-10) then 
+    dt1 = 1.0d-3 
   endif
 
   !-- Time stepping control for volume penalization
-  if ( dt1 >= 0.9*eps ) then
-    dt1 = min(0.9*eps,dt1) ! time step is smaller than eps (Dmitry, 26 feb 08)
+  if ( dt1 >= 0.9d0*eps ) then
+    dt1 = min(0.9d0*eps,dt1) ! time step is smaller than eps (Dmitry, 26 feb 08)
   endif
   
   !-- don't jump past final time

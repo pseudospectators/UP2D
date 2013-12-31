@@ -40,6 +40,13 @@ subroutine cal_nlk (time, u, uk, vor, nlk, penalization)
   !-- NLK to fourier space
   call coftxy ( work1, nlk(:,:,1) )
   call coftxy ( work2, nlk(:,:,2) )  
+  
+  !$omp parallel do private(iy)
+  do iy=0,ny-1
+    nlk(:,iy,1) = nlk(:,iy,1)*dealiase(:,iy)
+    nlk(:,iy,2) = nlk(:,iy,2)*dealiase(:,iy)
+  enddo
+  !$omp end parallel do  
 end subroutine cal_nlk
 
 end module rhs

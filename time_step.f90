@@ -2,17 +2,17 @@ subroutine time_step
   use share_vars
   use masks
   use FieldExport  
+  use RK2_module
   use PerformanceMeasurement
   implicit none
-  real(kind=pr) :: time=0.0d0, dt1=0.0d0
+  real(kind=pr) :: time=0.0d0, dt1=0.0d0, max_divergence
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2) :: u, uk, nlk
   real(kind=pr), dimension(0:nx-1,0:ny-1) :: pk, vort
   real(kind=pr) :: T_lastdrag=0.0d0, T_lastsave=0.0d0, t1, time_left
-  integer :: it=0, iy
+  integer :: it=0, iy,ix
   character(len=17) :: timestring
   character (len=11) :: name
 
-  
   !----------------------------------------------------------------  
   ! Initialize vorticity or read values from a backup file
   !----------------------------------------------------------------
@@ -45,7 +45,6 @@ subroutine time_step
       end select
       
       
-      
       time = time + dt1  ! Advance in time
       it = it + 1
       
@@ -56,7 +55,7 @@ subroutine time_step
         !-- video snapshots
         !----------------------------------------------------------------
         write (timestring,'(i5.5)') nint(time*100.d0)         
-        colorscale = 0.1d0*max(maxval(vort),abs(minval(vort))) 
+        colorscale = 0.25d0*max(maxval(vort),dabs(minval(vort))) 
         call SaveGIF(vort, "vor/"//trim(timestring)//".vor", 1, -colorscale, colorscale)
                         
         write (*,*) "time=", time

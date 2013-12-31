@@ -13,15 +13,15 @@ subroutine cofdx (fk, fk_dx)
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dx   
   real (kind=pr) :: scale1
 
-  scale1 = 2.0*pi/xl
+  scale1 = 2.d0*pi/xl
 
   !$omp parallel do private(kx,ky)
   do ky = 0, ny-1
      do kx = 0, nx-2, 2
-        fk_dx (kx, ky) = -fk (kx+1, ky) * real (kx/2) * scale1
+        fk_dx (kx, ky) = -fk (kx+1, ky) * dble (kx/2) * scale1
      end do  
      do kx = 1, nx-1, 2
-        fk_dx (kx, ky) = fk (kx-1, ky) * real ((kx-1)/2) * scale1
+        fk_dx (kx, ky) = fk (kx-1, ky) * dble ((kx-1)/2) * scale1
      end do
   end do
   !$omp end parallel do
@@ -44,16 +44,16 @@ subroutine cofdy (fk, fk_dy)
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dy   
   real (kind=pr) :: scale1
 
-  scale1 = 2.0*pi/yl
+  scale1 = 2.d0*pi/yl
 
   !$omp parallel do private(kx,ky)
   do kx = 0, nx-1
      do ky = 0, ny-2, 2 ! loop over real parts of the FFT signal
-        fk_dy (kx, ky) = -fk (kx, ky+1) * real (ky/2) * scale1
+        fk_dy (kx, ky) = -fk (kx, ky+1) * dble (ky/2) * scale1
      end do
      do ky = 1, ny-1, 2 ! loop over imaginary parts of the FFT
       ! actually, both (real/imag) have of course the same wavenumber. 
-        fk_dy (kx, ky) = fk (kx, ky-1) * real ((ky-1)/2) * scale1
+        fk_dy (kx, ky) = fk (kx, ky-1) * dble ((ky-1)/2) * scale1
      end do
   end do
   !$omp end parallel do
@@ -76,13 +76,13 @@ subroutine cofdxdx (fk, fk_dxdx)
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dxdx 
   real (kind=pr) :: scale
 
-  scale = (2.0*pi/xl)**2
+  scale = (2.d0*pi/xl)**2
 
   !$omp parallel do private(kx,ky)
   do ky = 0, ny-1
      do kx = 0, nx-2, 2
-        fk_dxdx (kx, ky)   = - fk (kx, ky)   * real (kx/2)**2 * scale
-        fk_dxdx (kx+1, ky) = - fk (kx+1, ky) * real (kx/2)**2 * scale
+        fk_dxdx (kx, ky)   = - fk (kx, ky)   * dble (kx/2)**2 * scale
+        fk_dxdx (kx+1, ky) = - fk (kx+1, ky) * dble (kx/2)**2 * scale
      end do
   end do
   !$omp end parallel do
@@ -105,14 +105,14 @@ subroutine cofdxdy (fk, fk_dxdy)
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dxdy 
   real (kind=pr) :: fac, scale
 
-  scale = (2.0*pi/xl) * (2.0*pi/yl)
+  scale = (2.d0*pi/xl) * (2.d0*pi/yl)
   kx_max = (nx/2-1) 
   ky_max = (ny/2-1)
 
   !$omp parallel do private(kx,ky)
   do ky = 0, ky_max
      do kx = 0, kx_max
-        fac = - real(kx) * real (ky) * scale
+        fac = - dble(kx) * dble (ky) * scale
         fk_dxdy (2*kx, 2*ky)     = fac * fk (2*kx+1, 2*ky+1)
         fk_dxdy (2*kx+1, 2*ky)   = - fac * fk (2*kx, 2*ky+1)
         fk_dxdy (2*kx, 2*ky+1)   = - fac * fk (2*kx+1, 2*ky)
@@ -139,13 +139,13 @@ subroutine cofdydy (fk, fk_dydy)
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dydy 
   real (kind=pr) :: scale
 
-  scale = (2.0*pi/yl)**2
+  scale = (2.d0*pi/yl)**2
 
   !$omp parallel do private(kx,ky)
   do kx = 0, nx-1
      do ky = 0, ny-2, 2
-        fk_dydy (kx, ky)   = - fk (kx, ky)   * real (ky/2)**2 * scale
-        fk_dydy (kx, ky+1) = - fk (kx, ky+1) * real (ky/2)**2 * scale
+        fk_dydy (kx, ky)   = - fk (kx, ky)   * dble (ky/2)**2 * scale
+        fk_dydy (kx, ky+1) = - fk (kx, ky+1) * dble (ky/2)**2 * scale
      end do
   end do
   !$omp end parallel do
@@ -160,20 +160,23 @@ subroutine poisson (f, ans)
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: f
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: ans
   integer :: kx, kx_max, ky, ky_max
-  real (kind=pr) :: quot
-
+  real (kind=pr) :: quot, scalex,scaley
   kx_max = (nx/2-1) 
   ky_max = (ny/2-1)
+  
+  scalex = (2.d0*pi/xl)**2
+  scaley = (2.d0*pi/yl)**2
+
   !$omp parallel do private(kx,ky,quot) 
   do ky = 0, ky_max
      do kx = 0, kx_max
         if ( (kx == 0) .and. (ky == 0) ) then
-           ans (2*kx, 2*ky)     = 0.0
-           ans (2*kx+1, 2*ky)   = 0.0
-           ans (2*kx, 2*ky+1)   = 0.0
-           ans (2*kx+1, 2*ky+1) = 0.0
+           ans (2*kx, 2*ky)     = 0.d0
+           ans (2*kx+1, 2*ky)   = 0.d0
+           ans (2*kx, 2*ky+1)   = 0.d0
+           ans (2*kx+1, 2*ky+1) = 0.d0
         else
-           quot = (real(kx**2)*scalex + real(ky**2)*scaley)
+           quot = (dble(kx**2)*scalex + dble(ky**2)*scaley)
            ans (2*kx, 2*ky)     =  f (2*kx, 2*ky) / quot
            ans (2*kx+1, 2*ky)   =  f (2*kx+1, 2*ky) / quot
            ans (2*kx, 2*ky+1)   =  f (2*kx, 2*ky+1) / quot
@@ -183,6 +186,7 @@ subroutine poisson (f, ans)
   end do
   !$omp end parallel do
 end subroutine poisson
+
 
 
 
@@ -218,21 +222,10 @@ subroutine vorticity2velocity( vortk, uk )
 
   !--Solve poisson equation for stream function
   call poisson (vortk, stream)
-
   !--Calculate x-derivative of stream function
-  call cofdx (stream, work2)
-  call cofitxy (work2, uk(:,:,2)) ! u(:,:,2) here contains -uy = dpsi/dx
-
+  call cofdx (-stream, uk(:,:,2))
   !--Calculate y-derivative of stream function
-  call cofdy (stream, work2)
-  call cofitxy (work2, uk(:,:,1)) ! u(:,:,1) here contains ux = dpsi/dy
-
-  !$omp parallel do private(iy)
-  do iy=0,ny-1
-    uk(:,iy,2) = - uk(:,iy,2)  
-  enddo
-  !$omp end parallel do    
- 
+  call cofdy (stream, uk(:,:,1)) 
 end subroutine vorticity2velocity
 
 
@@ -247,8 +240,11 @@ subroutine cal_vis (dt, vis)
   integer :: kx, kx_max, ky, ky_max
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent(out) :: vis
   real (kind=pr), intent (in) :: dt
-  real (kind=pr) :: coefx, coefy
+  real (kind=pr) :: coefx, coefy,scalex,scaley
 
+  scalex = (2.d0*pi/xl)**2
+  scaley = (2.d0*pi/yl)**2
+  
   kx_max = (nx/2-1) 
   ky_max = (ny/2-1)
   coefx = - dt * nu * scalex
@@ -257,7 +253,7 @@ subroutine cal_vis (dt, vis)
   !$omp parallel do private(kx,ky)
   do ky = 0, ky_max
     do kx = 0, kx_max
-        vis (2*kx, 2*ky) = exp( coefx * real(kx**2) + coefy * real(ky**2) )
+        vis (2*kx, 2*ky) = dexp( coefx * dble(kx**2) + coefy * dble(ky**2) )
     enddo
   enddo
   !$omp end parallel do 
@@ -272,3 +268,16 @@ subroutine cal_vis (dt, vis)
   !$omp end parallel do 
 
 end subroutine cal_vis
+
+
+function max_divergence(uk)
+  use share_vars
+  implicit none
+  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: uk
+  real(kind=pr):: max_divergence
+  real (kind=pr), dimension (0:nx-1, 0:ny-1) :: work1, work2, work3
+  call cofdx( uk(:,:,1),work1 )
+  call cofdy( uk(:,:,2),work2 )
+  call cofitxy(work1+work2,work3)
+  max_divergence = maxval(dabs(work3))
+end function
