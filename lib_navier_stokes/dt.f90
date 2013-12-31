@@ -28,7 +28,7 @@ function timestep(time, u)
   endif
 
   !-- Time stepping control for volume penalization
-  if ( dt1 >= 0.9d0*eps ) then
+  if (( dt1 >= 0.9d0*eps ).and.(iMethod.ne."RK2_implicit")) then
     dt1 = min(0.9d0*eps,dt1) ! time step is smaller than eps (Dmitry, 26 feb 08)
   endif
   

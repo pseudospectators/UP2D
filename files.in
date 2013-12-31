@@ -20,6 +20,7 @@ dns.f90
 
 ./lib_navier_stokes/add_diffusion.f90         
 ./lib_navier_stokes/add_pressure.f90         
+./lib_navier_stokes/add_pressure_grad.f90     
 ./lib_navier_stokes/dt.f90
 ./lib_navier_stokes/RK2.f90
 ./lib_navier_stokes/RK2_implicit.f90

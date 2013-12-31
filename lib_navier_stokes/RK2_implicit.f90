@@ -13,15 +13,15 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp, u_tmp
   integer :: iy
   integer, intent(in) :: it
-  real(kind=pr) :: drag,lift,timestep
+  real(kind=pr) :: timestep
 
   !-- modify: no dt<eps
-  dt = timestep(time, u)
+  dt = timestep(time, u )
   
-  !------------------------------------------------------
+  !-----------------------------------------------------------------------------
   !-- 1st strang step: half time step for penalization
   !-- equation is solved exactly
-  !------------------------------------------------------
+  !-----------------------------------------------------------------------------
   call create_mask(time)
   !$omp parallel do private (iy)
   do iy=0,ny-1
@@ -42,12 +42,11 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   enddo
   !$omp end parallel do   
   
-  
-  !------------------------------------------------------
+  !-----------------------------------------------------------------------------
   !-- 2nd Strang step: a full time step with RK2 and 
   !-- integrating factor, but without the penalization and
   !-- the pressure. So just diffusion and non-linear transport
-  !------------------------------------------------------    
+  !-----------------------------------------------------------------------------
   call cofitxy ( uk(:,:,1),u(:,:,1) )
   call cofitxy ( uk(:,:,2),u(:,:,2) )
   
@@ -79,8 +78,10 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   ! sum up all the terms.
   !$omp parallel do private (iy)
   do iy=0,ny-1
-      uk(:,iy,1) = ( uk(:,iy,1)*workvis(:,iy) + 0.5d0*dt*( nlk(:,iy,1)*workvis(:,iy) + nlk2(:,iy,1) ) )*dealiase(:,iy)      
-      uk(:,iy,2) = ( uk(:,iy,2)*workvis(:,iy) + 0.5d0*dt*( nlk(:,iy,2)*workvis(:,iy) + nlk2(:,iy,2) ) )*dealiase(:,iy)
+      uk(:,iy,1) = (uk(:,iy,1)*workvis(:,iy) &
+          + 0.5d0*dt*(nlk(:,iy,1)*workvis(:,iy) + nlk2(:,iy,1)) )*dealiase(:,iy)      
+      uk(:,iy,2) = (uk(:,iy,2)*workvis(:,iy) &
+          + 0.5d0*dt*(nlk(:,iy,2)*workvis(:,iy) + nlk2(:,iy,2)) )*dealiase(:,iy)
   enddo
   !$omp end parallel do 
   
@@ -90,9 +91,9 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   call cofitxy (uk(:,:,1), u(:,:,1))
   call cofitxy (uk(:,:,2), u(:,:,2))    
   
-  !------------------------------------------------------
+  !-----------------------------------------------------------------------------
   !-- 3rd strang step: half time step for penalization
-  !------------------------------------------------------
+  !-----------------------------------------------------------------------------
   call create_mask(time+dt)
   !$omp parallel do private (iy)
   do iy=0,ny-1
@@ -113,10 +114,10 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   enddo
   !$omp end parallel do 
     
-  !-------------------------------------------------------
+  !-----------------------------------------------------------------------------
   !-- Projection step
-  !-------------------------------------------------------
-  !-- compute divergence
+  !-----------------------------------------------------------------------------
+  !-- compute divergence (of predicted velocity field)
   call cofdx(uk(:,:,1),work1)
   call cofdy(uk(:,:,2),work2)
   !-- fetch pressure increment
@@ -127,44 +128,17 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   
   !$omp parallel do private (iy)
   do iy=0,ny-1
-    uk(:,iy,1) = uk(:,iy,1) - work1(:,iy)
-    uk(:,iy,2) = uk(:,iy,2) - work2(:,iy)
+    uk(:,iy,1) = uk(:,iy,1) + work1(:,iy)
+    uk(:,iy,2) = uk(:,iy,2) + work2(:,iy)
     ! add pressure increment to old pressure
     pk(:,iy) = pk(:,iy) + workvis(:,iy) / dt
   enddo
   !$omp end parallel do   
+  
   ! uk should now be divergence free
-  
-  
-  call cofdx(uk(:,:,1),work1)
-  call cofdy(uk(:,:,2),work2)
-  call cofitxy(work1+work2,workvis)
-  write(*,*) "divergence", maxval(workvis), minval(workvis)
-  
   
   !-- velocity in phys. space (for consistent output)
   call cofitxy (uk(:,:,1), u(:,:,1))
   call cofitxy (uk(:,:,2), u(:,:,2))      
 end subroutine RK2_implicit
 
-
-
-subroutine add_pressure_grad( nlk, pk )
-  use share_vars
-  implicit none
-  real(kind=pr), dimension(0:nx-1,0:ny-1,1:2), intent (inout) :: nlk
-  real(kind=pr), dimension(0:nx-1,0:ny-1), intent (in) :: pk
-  real(kind=pr), dimension(0:nx-1, 0:ny-1) :: work1, work2
-  integer :: iy
-  
-  !-- compute gradient
-  call cofdx (pk, work1)
-  call cofdy (pk, work2)
-  
-  !$omp parallel do private(iy)
-  do iy=0,ny-1
-    nlk(:,iy,1) = nlk(:,iy,1) - work1(:,iy)    
-    nlk(:,iy,2) = nlk(:,iy,2) - work2(:,iy)
-  enddo
-  !$omp end parallel do   
-end subroutine add_pressure_grad
