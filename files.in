@@ -1,10 +1,7 @@
 share_vars.f90  
-gif_util.f90    
-FieldExport.f90     
 PerformanceMeasurement.f90  
 mean_velocity.f90                             
 params.f90                                    
-save_fields.f90                               
 time_step.f90    
 dns.f90      
 
@@ -26,3 +23,7 @@ dns.f90
 ./lib_navier_stokes/RK2_implicit.f90
 ./lib_navier_stokes/cal_nlk.f90
 ./lib_navier_stokes/cal_pressure.f90
+
+./lib_fileIO/gif_util.f90    
+./lib_fileIO/FieldExport.f90     
+./lib_fileIO/save_fields.f90                               
