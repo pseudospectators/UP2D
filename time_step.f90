@@ -6,7 +6,7 @@ subroutine time_step
   real(kind=pr) :: time, dt1
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2) :: u, uk, nlk
   real(kind=pr), dimension(0:nx-1,0:ny-1) :: p, vort
-  real(kind=pr) :: dt, T_lastdrag, T_lastsave, t1, time_left
+  real(kind=pr) :: T_lastdrag, T_lastsave, t1, time_left
   integer :: it=0, iy
   character(len=17) :: timestring
   character (len=11) :: name

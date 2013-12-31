@@ -19,6 +19,9 @@ subroutine init_fields (u, uk, p, vor, nlk)
     uk= 0.0
     vor = 0.0
     p = 0.0
+  case ('lamballais')
+    call lamballais(u,uk,p,vor,nlk)
+  case ('couette')
   case ('turbulent')
     call random_seed()
     do ix=0,nx-1

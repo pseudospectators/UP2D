@@ -6,6 +6,7 @@ lib_spectral_operators/spectral_essentials\
 lib_navier_stokes/navier_stokes  
 SUB_FILES = mean_velocity\
 lib_inicond/init_fields\
+lib_inicond/lamballais\
 params save_fields time_step\
 lib_mask/create_mask\
 lib_spectral_operators/dealiase_mask
