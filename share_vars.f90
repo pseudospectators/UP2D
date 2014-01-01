@@ -1,10 +1,7 @@
 module share_vars
-  implicit none
-  
+  implicit none  
   integer, parameter :: pr = kind (0.d0) 
   
-
-  character (len=40), save :: simulation_name
   integer, save :: nx, ny, nt
   integer, save :: iDealias, iPenalization, iMoving, nPalettes=14
 
@@ -15,6 +12,7 @@ module share_vars
   real(kind=pr), save :: ux_mean, uy_mean
   
   character (len=40), save :: inicond, iMask, iMeanFlow, iMethod
+  character (len=40), save :: simulation_name
   
   integer,parameter :: nlines=2048 ! maximum number of lines in PARAMS-file
 
