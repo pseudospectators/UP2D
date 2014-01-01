@@ -17,7 +17,7 @@ function timestep(time,it, u)
   !$omp end parallel do
   
   u_max = dsqrt(maxval(work2))  
-  dt1 = cfl*min(xl/dble(nx),yl/dble(ny))/u_max
+  dt1 = cfl*min(dx,dy)/u_max
 
   !-- u_max is very small
   if (u_max <= 1.0d-10) then 
@@ -26,10 +26,10 @@ function timestep(time,it, u)
 
   !-- Time stepping control for volume penalization
   if (( dt1 >= 0.9d0*eps ).and.(iMethod.ne."RK2_implicit")) then
-    dt1 = min(0.9d0*eps,dt1) ! time step is smaller than eps (Dmitry, 26 feb 08)
+    dt1 = min(0.9d0*eps,dt1)
   endif
   
-  !-- don't jump past final time
+  !-- Don't jump past final time
   if ((Tmax - time) < dt1) then
     dt1 = Tmax - time
   endif  
