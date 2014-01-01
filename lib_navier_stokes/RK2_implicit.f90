@@ -22,7 +22,7 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   !-- 1st strang step: half time step for penalization
   !-- equation is solved exactly
   !-----------------------------------------------------------------------------
-  call create_mask(time)
+!  call create_mask(time)
   !$omp parallel do private (iy)
   do iy=0,ny-1
     u(:,iy,1) = (u(:,iy,1)-mask(:,iy)*eps*us(:,iy,1))*exp(-0.5d0*dt*mask(:,iy)) &
@@ -94,7 +94,7 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   !-----------------------------------------------------------------------------
   !-- 3rd strang step: half time step for penalization
   !-----------------------------------------------------------------------------
-  call create_mask (time+dt)
+!  call create_mask (time+dt)
   !$omp parallel do private (iy)
   do iy=0,ny-1
     u(:,iy,1) = (u(:,iy,1)-mask(:,iy)*eps*us(:,iy,1))*exp(-0.5*dt*mask(:,iy)) &

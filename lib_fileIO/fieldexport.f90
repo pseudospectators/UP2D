@@ -345,6 +345,7 @@ subroutine LoadField(field, filename)
     character*(*), intent(in) :: filename
     character(len=256) :: dummy !to read from the file
     real (kind=pr), intent (inout) :: field (:,:)
+    real(kind=pr)::xl_file, yl_file
     
     nx1=size(field,1)
     ny1=size(field,2)
@@ -368,8 +369,14 @@ subroutine LoadField(field, filename)
     write (*,'("file: ",i4,"x",i4," field: ",i4,"x",i4)') nx1_file,ny1_file, nx1,ny1
     stop
     endif
-    read (2,*) xl
-    read (2,*) yl
+    read (2,*) xl_file
+    read (2,*) yl_file
+    
+    if ((xl_file.ne.xl).or.(yl_file.ne.yl)) then
+      write (*,*) "domain sizes in file and PARAMS.ini differ"
+      stop
+    endif
+    
     read (2,'(A)') dummy
     read (2,'(A)') dummy
     do j = ny1, 1, -1

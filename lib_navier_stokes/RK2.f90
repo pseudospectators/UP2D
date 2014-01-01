@@ -22,7 +22,7 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   dt = timestep (time,it,u)
   ! compute integrating factor
   call cal_vis (dt, workvis)  
-  call create_mask (time)
+  !call create_mask (time)
   call cal_nlk (time, u, uk, vort, nlk, .true.)
   call add_pressure (nlk)
 
@@ -45,7 +45,7 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   !---------------------------------------------------------------------------------
   ! do second RK2 step (RHS evaluation with the argument defined above)
   !---------------------------------------------------------------------------------
-  call create_mask(time+dt)
+  !call create_mask(time+dt)
   call cal_nlk(time+dt, u_tmp, uk_tmp, vort, nlk2, .true.)  
   call add_pressure(nlk2)
 

@@ -18,8 +18,10 @@ subroutine time_step
   
   !-- create startup mask
   call create_mask (time)
-  call SaveGIF(mask, trim(simulation_name)//"startup_mask", 13)  
- 
+  call SaveGIF(mask, trim(simulation_name)//"startup_mask", 13)   
+  call SaveGif(us(:,:,1),trim(simulation_name)//'usx')
+  call SaveGif(us(:,:,2),trim(simulation_name)//'usy')
+  
   !----------------------------------------------------------------
   ! loop over time steps
   !---------------------------------------------------------------- 

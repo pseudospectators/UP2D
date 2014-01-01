@@ -9,12 +9,14 @@ subroutine cal_pressure (time,u,uk,pk)
   real(kind=pr),dimension (0:nx-1, 0:ny-1) :: work1, work2
   integer :: iy
   
+  !-- compute RHS with penalization
   call cal_nlk (time, u, uk, work1, nlk, .true.)
   
-  ! divergence
+  !-- divergence
   call cofdx ( nlk(:,:,1), work1 )
   call cofdy ( nlk(:,:,2), work2 )
-  ! solve poisson eqn
+  
+  !-- solve poisson eqn
   call poisson ( work1+work2, pk)
      
 end subroutine cal_pressure

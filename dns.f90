@@ -24,6 +24,7 @@ subroutine StartSimulation()
   allocate ( dealiase(0:nx-1,0:ny-1) )
   allocate ( mask(0:nx-1,0:ny-1) )    
   allocate ( us(0:nx-1,0:ny-1,1:2) )
+  allocate ( uex(0:nx-1,0:ny-1,1:2) )
 
   write (*,*) "*** information: allocated memory"
 
@@ -36,7 +37,7 @@ subroutine StartSimulation()
 ! Step forward in time
   write (*,*) "*** information: entering time_step"
   call time_step  !after time_step, the last vort field is saved in mask_sponge
-  deallocate (dealiase, us, mask)
+  deallocate (dealiase, us, mask, uex)
   call fft_free        
 
 end subroutine StartSimulation
