@@ -71,4 +71,12 @@ subroutine time_step
           nint(100.d0*time/Tmax), max_divergence(uk)
       endif
   enddo
+  
+  if (iMask=='lamballais') then
+    call lamballais_error(u)
+    call SaveField(trim(simulation_name)//'ux_final', u(:,:,1),1, xl,yl, 'precision')
+    call SaveField(trim(simulation_name)//'uy_final', u(:,:,2),1, xl,yl, 'precision')
+  endif
+  
+  
 end subroutine time_step

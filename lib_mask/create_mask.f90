@@ -63,9 +63,7 @@ subroutine lamballais_mask
         us(ix,iy,2) = uex(ix,iy,2)
       endif
     enddo
-  enddo
-  
-  
+  enddo  
 end subroutine lamballais_mask
 
 !===============================================================================
