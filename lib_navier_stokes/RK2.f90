@@ -7,7 +7,6 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   use rhs
   use FieldExport
   use masks
-  use PerformanceMeasurement
   implicit none
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2), intent (inout) :: u, uk, nlk
   real(kind=pr), dimension(0:nx-1,0:ny-1), intent (inout) :: vort, p
