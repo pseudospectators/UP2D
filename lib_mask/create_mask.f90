@@ -5,7 +5,6 @@ module masks
 !==============================================================================================================================================
 subroutine create_mask (time)
   use share_vars
-  use FieldExport
   implicit none
   real (kind=pr), intent (in) :: time
   real (kind=pr) :: R

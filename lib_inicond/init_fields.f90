@@ -55,17 +55,6 @@ subroutine init_fields (u, uk, pk, vor, nlk)
     call vorticity2velocity ( vortk, uk )    
     call cofitxy( uk(:,:,1), u(:,:,1))
     call cofitxy( uk(:,:,2), u(:,:,2))
-    
-  case('shit')
-    call random_seed()
-    do ix=0,nx-1
-    do iy=0,ny-1
-       call RANDOM_NUMBER(d)
-       u(ix,iy,1:2) = 200.d0*(2.0d0*d - 1.d0)
-    enddo
-    enddo       
-    call coftxy( u(:,:,1), uk(:,:,1))
-    call coftxy( u(:,:,2), uk(:,:,2))    
   end select
 
   !-- compute initial pressure (for implicit penalization)
