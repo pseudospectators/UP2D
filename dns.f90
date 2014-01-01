@@ -5,7 +5,7 @@ program dns
   implicit none
   
   call get_params("PARAMS.ini")
-  simulation_name='test'
+  simulation_name='test.'
   call StartSimulation()   
 
 end program dns

@@ -86,8 +86,6 @@ subroutine get_params_common(PARAMS,i)
   call GetValue_Int(PARAMS,i,"Dealiasing","iDealias",iDealias, 1)
 
   ! Penalization section
-  call GetValue_Int(PARAMS,i,"Penalization","iPenalization",iPenalization, 0)
-  call GetValue_Int(PARAMS,i,"Penalization","iMoving",iMoving, 0)
   call GetValue_String(PARAMS,i,"Penalization","iMask",iMask, "none")
   call GetValue_Real(PARAMS,i,"Penalization","eps",eps, 1.d-2)
 

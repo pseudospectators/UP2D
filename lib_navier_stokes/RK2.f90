@@ -13,18 +13,18 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   real(kind=pr), dimension(0:nx-1,0:ny-1), intent (inout) :: vort, p
   real(kind=pr), intent (out) :: dt
   real(kind=pr), intent (in) :: time
-  real (kind=pr), dimension (0:nx-1, 0:ny-1) :: work1,work2, workvis
+  real (kind=pr), dimension (0:nx-1, 0:ny-1) :: workvis
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp, u_tmp
   integer :: iy
   integer, intent(in) :: it
   real(kind=pr) :: timestep, max_divergence
 
-  dt = timestep(time, u)
+  dt = timestep (time,it,u)
   ! compute integrating factor
-  call cal_vis(dt, workvis)  
-  call create_mask(time)
-  call cal_nlk(time, u, uk, vort, nlk, .true.)
-  call add_pressure(nlk)
+  call cal_vis (dt, workvis)  
+  call create_mask (time)
+  call cal_nlk (time, u, uk, vort, nlk, .true.)
+  call add_pressure (nlk)
 
    
   !$omp parallel do private (iy)

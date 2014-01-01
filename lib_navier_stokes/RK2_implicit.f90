@@ -16,7 +16,7 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   real(kind=pr) :: timestep
 
   !-- modify: no dt<eps
-  dt = timestep(time, u )
+  dt = timestep(time,it, u )
   
   !-----------------------------------------------------------------------------
   !-- 1st strang step: half time step for penalization
@@ -75,7 +75,7 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   !--add old pressure term
   call add_pressure_grad( nlk2, pk )   
   
-  ! sum up all the terms.
+  !-- sum up all the terms.
   !$omp parallel do private (iy)
   do iy=0,ny-1
       uk(:,iy,1) = (uk(:,iy,1)*workvis(:,iy) &
@@ -94,7 +94,7 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   !-----------------------------------------------------------------------------
   !-- 3rd strang step: half time step for penalization
   !-----------------------------------------------------------------------------
-  call create_mask(time+dt)
+  call create_mask (time+dt)
   !$omp parallel do private (iy)
   do iy=0,ny-1
     u(:,iy,1) = (u(:,iy,1)-mask(:,iy)*eps*us(:,iy,1))*exp(-0.5*dt*mask(:,iy)) &
@@ -135,7 +135,7 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   enddo
   !$omp end parallel do   
   
-  ! uk should now be divergence free
+  !-- uk should now be divergence free
   
   !-- velocity in phys. space (for consistent output)
   call cofitxy (uk(:,:,1), u(:,:,1))

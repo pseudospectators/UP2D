@@ -41,16 +41,6 @@ module fieldexport
 !       flow. In this case, it is very convenient to take the final result from a lower resolution as starting point for higher resolutions. This routine
 !       resizes a field to an arbitrary new resolution, defined by the target array itself.
 !       
-!       
-! 
-! -------------------------------------------------------------------------------------------------------------------------------------------------
-!^		FILE FORMAT FOR RAW DATA
-!	
-!
-! -------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-
 
   
 subroutine ResizeAvg(field_source, field_target)
@@ -72,22 +62,14 @@ subroutine ResizeAvg(field_source, field_target)
   real (kind=pr), intent (out)    :: field_target (0:,0:)
   
   nx1=size(field_source,1)
-  ny1=size(field_source,2)
-  
+  ny1=size(field_source,2)  
   nx2=size(field_target,1)
   ny2=size(field_target,2)   
   
-  !$omp parallel do private(iy)
-  do iy=0,ny2-1
-  field_target(:,iy) = 0.0 
-  enddo
-  !$omp end parallel do
-  
-
+  field_target = 0.0 
   
   ! fill matching points, the points where the finer grid matches the coarser one
-  field_target(0:nx2-1:2,0:ny2-1:2) = field_source 
- 
+  field_target(0:nx2-1:2,0:ny2-1:2) = field_source  
   
   !$omp parallel do private(iy, ix)
   do ix=1,nx2-1,2
@@ -149,12 +131,11 @@ end function GetIndex
     real (kind=pr), dimension (:,:), allocatable :: field_source_k, field_target_k
     integer :: nx1,nx2,ny1,ny2,ix,iy,i,j, nx_tmp,ny_tmp, ix2,iy2,R,RR,L,LL,K
     
-    write (33,*) "source:", shape(field_source)
-    write (33,*) "target:", shape(field_target)
+    write (*,*) "source:", shape(field_source)
+    write (*,*) "target:", shape(field_target)
   
     nx1=size(field_source,1)
-    ny1=size(field_source,2)
-    
+    ny1=size(field_source,2)    
     nx2=size(field_target,1)
     ny2=size(field_target,2)   
     
@@ -249,149 +230,6 @@ end function GetIndex
 end subroutine PolynomUpsampling
 
 !====================================================================================================
-  
-!subroutine SpectralInterpolation(field_source,field_target, field_target_k)
-!    use share_vars
-!    implicit none
-!    real (kind=pr), intent (in )    :: field_source (0:nxs-1,0:nys-1)
-!    real (kind=pr), intent (out)    :: field_target (0:up*nxs-1,0:up*nys-1)
-!    real (kind=pr), intent (out)    :: field_target_k (0:up*nxs-1,0:up*nys-1)
-!    real (kind=pr)                  :: field_source_k(0:nxs-1,0:nys-1)
-!    !--------------------------------------------
-!    !  perform FFT of original field ( size nx1 x ny1 )
-!    !--------------------------------------------    
-!    call coftxy_small(field_source, field_source_k)
-!    !--------------------------------------------
-!    !  copy smaller FFT field into bigger one ( =upsampling )
-!    !--------------------------------------------        
-!    field_target_k = 0.0
-!    field_target_k(0:nxs-1,0:nys-1)=field_source_k
-!    !--------------------------------------------
-!    !  perform iFFT of target field ( size nx2 x ny2 )
-!    !--------------------------------------------    
-!    call cofitxy_big(field_target_k,field_target) 
-       
-!end subroutine SpectralInterpolation  
-
-!====================================================================================================
-
-!subroutine SpectralInterpolation(field_source,field_target)
-!    use share_vars
-!    implicit none
-!    real (kind=pr), intent (in )    :: field_source (:,:)
-!    real (kind=pr), intent (out)    :: field_target (:,:)
-!    real (kind=pr), dimension (:,:), allocatable :: field_source_k, field_target_k
-!    integer :: nx1,nx2,ny1,ny2,ix,iy,i,j, nx_tmp,ny_tmp
-    
-!    write (33,*) "source:", shape(field_source)
-!    write (33,*) "target:", shape(field_target)
-    
-!    nx_tmp=nx ! because the fft works with nx, ny in the shared_vars, we will have to modify these
-!    ny_tmp=ny
-  
-!    nx1=size(field_source,1)
-!    ny1=size(field_source,2)
-!    nx2=size(field_target,1)
-!    ny2=size(field_target,2)
-    
-!    !--------------------------------------------
-!    !  perform FFT of original field ( size nx1 x ny1 )
-!    !--------------------------------------------
-    
-!    nx=nx1 ! because the fft works with nx, ny in the shared_vars, we will have to modify these
-!    ny=ny1    
-!    call fft_free
-!    call fft_initialize    
-!    allocate( field_source_k(1:nx1,1:ny1)  )    
-!    field_source_k = 0.0
-!    call coftxy(field_source, field_source_k)
-    
-!    !--------------------------------------------
-!    !  copy smaller FFT field into bigger one ( =upsampling )
-!    !--------------------------------------------    
-    
-!    allocate( field_target_k(1:nx2,1:ny2)  )    
-!    field_target = 0.0
-!    field_target_k(1:nx1,1:ny1)=field_source_k
-  
-!    !--------------------------------------------
-!    !  perform iFFT of target field ( size nx2 x ny2 )
-!    !--------------------------------------------
-    
-!    call fft_free  
-!    nx=nx2
-!    ny=ny2        
-!    call fft_initialize
-!    call cofitxy(field_target_k,field_target)    
-!    call fft_free
-    
-!    !--------------------------------------------   
-!    ! put FFT memory back to the state it had before
-!    !--------------------------------------------
-    
-!    nx=nx_tmp
-!    ny=ny_tmp
-!    call fft_initialize
-!    write(33,*) "fft",nx,ny
-!end subroutine SpectralInterpolation  
-
-!====================================================================================================
-
-subroutine SavePPM(field, filename, iPalette, minf, maxf)
-    ! ---------------------------------------------------------
-    !  SavePPM - converts a raw data field to PPM. You can, optionally, call SavePNG
-    !  the latter calls "convert" in the linux system to convert the file directly. 
-    !  this does not work when running on DUKE
-    !
-    ! How does it work? Basically, we first generate the FARGE color tables (and some more)
-    ! these give a color table related to the intensity of the scalar field.
-    ! The ConvertFieldToRGB routine then makes a RGB color table out of the raw field, by
-    ! scaling the values. this routine here is actually only the storing of the ppm file. 
-    ! note that SavePPM uses a special format tick ("$") to write binary data.
-    ! ---------------------------------------------------------
-    use share_vars
-    implicit none
-    character*1 :: rgb(3,nx,ny)      ! RGB data array
-    character*(*) :: filename
-    real (kind=pr), dimension(1:nx,1:ny),intent (in) 	::  field
-    real (kind=pr), intent (in) 			::  minf,maxf
-    integer i, j, k,iPalette
-    integer itmp
-    character*14 frmtstr
-    character*2  str    
-
-    call ConvertFieldToRGB(field,rgb,iPalette,minf,maxf)   
-    open(unit=2,file=filename//".ppm",status='unknown')
-    ! header
-    write(2,'(''P6'', 2(1x,i4),'' 255 '',$)') nx, ny
-    ! image data
-    itmp = nx*ny*3
-    write(frmtstr,'(''('',i8.8,''A,$)'')') itmp     ! make output "format"
-    write(2,fmt=frmtstr) (((rgb(k,i,j),k=1,3),i=1,nx),j=ny,1,-1) ! here, j (vertical address) runs from top to bottom.
-    close(2)
-    return
-end subroutine SavePPM
-
-subroutine SavePNG(field, filename, iPalette, minf, maxf)
-    use share_vars
-    implicit none
-    character*1 :: rgb(3,nx,ny)      ! RGB data array
-    character*(*) :: filename
-    real (kind=pr), dimension(1:nx,1:ny),intent (in) 	::  field
-    real (kind=pr), intent (in) 			::  minf,maxf
-    character*12 fnameout
-    integer i, j, k,iPalette
-    integer itmp, icnt
-    character*14 frmtstr
-    character*54 headmsw
-    character*4  byt4
-    character*2  str   
-
-    call SavePPM(field,filename,iPalette,minf,maxf)
-    call system("convert "//trim(filename)//".ppm "//trim(filename)//".png")
-    call system("rm "//trim(filename)//".ppm")
-
-end subroutine SavePNG
 
 subroutine SaveGIF(field, filename, iColorTable, color_min, color_max)
     !-------------------------------------------------------------
@@ -419,11 +257,7 @@ subroutine SaveGIF(field, filename, iColorTable, color_min, color_max)
     integer, dimension(1:nPalettes,1:256*3) 	:: palette  !array for color values for FARGE palettes
     integer, dimension(1:3,0:255) 		:: ColorMap
     integer, allocatable 			:: Pixel(:,:) ! RGB data array    
-    integer i, j, k,iPalette, intensity,nx1,ny1
-    integer itmp
-    character*14 frmtstr
-    character*2  str    
-
+    integer i, j, iPalette, intensity,nx1,ny1
     
     nx1=size(field,1)
     ny1=size(field,2)
@@ -509,7 +343,6 @@ subroutine LoadField(field, filename)
     implicit none
     integer i,j,nx1,ny1,nx1_file,ny1_file
     character*(*), intent(in) :: filename
-    character(len=15) :: format_identifier
     character(len=256) :: dummy !to read from the file
     real (kind=pr), intent (inout) :: field (:,:)
     
@@ -523,16 +356,16 @@ subroutine LoadField(field, filename)
       i=i+1
     end do
     if (dummy.ne."%format1") then
-	close(2)
-	Write (33,*) "Unfortunately I did not find the string 'format1' in the file. This means it does NOT contain the resolution."
-	stop
+      close(2)
+      Write (*,*) "Unfortunately I did not find the string 'format1' in the file. This means it does NOT contain the resolution."
+      stop
     endif
 
     read (2,*) nx1_file
     read (2,*) ny1_file
     if ((nx1_file.ne.nx1).or.(ny1_file.ne.ny1)) then
-    write (33,*) "??? file resolution does not match the field you gave my to read in..."
-    write (33,'("file: ",i4,"x",i4," field: ",i4,"x",i4)') nx1_file,ny1_file, nx1,ny1
+    write (*,*) "??? file resolution does not match the field you gave my to read in..."
+    write (*,'("file: ",i4,"x",i4," field: ",i4,"x",i4)') nx1_file,ny1_file, nx1,ny1
     stop
     endif
     read (2,*) xl
@@ -556,7 +389,6 @@ subroutine GetSize(filename, FileContainsResolution)
     character*(*) :: filename
     character(len=256) :: dummy !to read from the file
     integer :: i=1
-    character(len=15) :: format_identifier
     logical 	     :: FileContainsResolution
     
     open(unit=2,file=filename,status='old')
@@ -569,7 +401,7 @@ subroutine GetSize(filename, FileContainsResolution)
     
     if (dummy.ne."%format1") then
       close(2)
-      Write (33,*) "Unfortunately I did not find the string 'format1' in the file. This means it does NOT contain the resolution."
+      Write (*,*) "Unfortunately I did not find the string 'format1' in the file. This means it does NOT contain the resolution."
       FileContainsResolution=.false. 
     else
       read (2,*) nx
@@ -595,7 +427,7 @@ subroutine ConvertFieldToRGB(field,rgb,n,minf,maxf)
     integer :: ixmin,ixmax,iymin,iymax
 
     if ( (n<0).or.(n>nPalettes) ) then
-	write(33,*) n, "ConvertFieldToRGB:: Unknown Palette. Stop."
+	write(*,*) n, "ConvertFieldToRGB:: Unknown Palette. Stop."
 	stop
     endif
 
@@ -611,27 +443,10 @@ subroutine ConvertFieldToRGB(field,rgb,n,minf,maxf)
       rgb(3,i,j) = char(Palette(n,intensity+512) ) !blue
       rgb(2,i,j) = char(Palette(n,intensity+256) ) !green
       rgb(1,i,j) = char(Palette(n,intensity)     ) !red
-      
-!          !-------experimental
-!    if (mask(i,j)*eps>0.5) then
-!      rgb(3,i,j) = char(255) !blue
-!      rgb(2,i,j) = char(255) !green
-!      rgb(1,i,j) = char(255) !red
-!    endif
+  
     enddo
     enddo
-    
-!    do i = ixmin, ixmax
-!    do j = iymin, iymax
-!    iymax = int( (max( maxval(beam(:,2))+4.0*t_beam, LeadingEdge(2)+2.0*r_cylinder))/dy)
-!    iymin = int( (min( minval(beam(:,2))-4.0*t_beam, LeadingEdge(2)-2.0*r_cylinder))/dy)
-!    ! absolute upper limit for xmin is the leading edge - 4 times thickness
-!    ixmin = int( min( (LeadingEdge(1)-max(2.5*r_cylinder, 4.0*t_beam)), (minval(beam(:,1))-4.0*t_beam) )  /dx)
-!    ! even if the beam is hanging, its minimum x value is the leading edge
-!    ixmax = int( (maxval(beam(:,1))+4.0*t_beam)  /dx)
 
-!    enddo
-!    enddo
 
 end subroutine ConvertFieldToRGB
 
@@ -647,16 +462,16 @@ subroutine ResizeField(field_source, field_target,lx,ly)
   real (kind=pr), intent (in) :: lx,ly
   real (kind=pr) :: dx1,dx2,dy1,dy2,x,y,x1,y1,x2,y2,R1,R2, summe
   integer :: nx1,nx2,ny1,ny2,ix,iy,i,j
-  write (33,*) "----------------- resize field --------------------"
-  write (33,*) "source:", shape(field_source)
-  write (33,*) "target:", shape(field_target)
+  write (*,*) "----------------- resize field --------------------"
+  write (*,*) "source:", shape(field_source)
+  write (*,*) "target:", shape(field_target)
   
   ! the size of assumed-shaped arrays is dynamic. remember that indices always start with 1!
   nx1=size(field_source,1)
   ny1=size(field_source,2)
   nx2=size(field_target,1)
   ny2=size(field_target,2)
-  write(33,'(4(i5,1x))') nx1,ny1,nx2,ny2
+  write(*,'(4(i5,1x))') nx1,ny1,nx2,ny2
 
   ! determine lattice spacing. here, the domain is not periodic so its lx/nx-1
   dx1=lx/real(nx1-1,kind=pr)
@@ -664,7 +479,7 @@ subroutine ResizeField(field_source, field_target,lx,ly)
   dx2=lx/real(nx2-1,kind=pr)
   dy2=ly/real(ny2-1,kind=pr)    
   field_target = 9.0
-  write (33,'(4(F7.4,1x))') dx1,dy1,lx,ly
+  write (*,'(4(F7.4,1x))') dx1,dy1,lx,ly
 
   ! fill target field
   do ix=1,nx2
@@ -695,7 +510,6 @@ subroutine ResizeField(field_source, field_target,lx,ly)
 
     enddo
   enddo
-write (33,*) "-----------------        --------------------"
 end subroutine ResizeField
 
 !=============================================================================================================================================

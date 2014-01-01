@@ -3,7 +3,7 @@ module share_vars
   integer, parameter :: pr = kind (0.d0) 
   
   integer, save :: nx, ny, nt
-  integer, save :: iDealias, iPenalization, iMoving, nPalettes=14
+  integer, save :: iDealias, nPalettes=14
 
   real(kind=pr), save :: colorscale = 0.d0 ! scaling for farge palette (vorticity)
   real(kind=pr), save :: xl,yl,dx,dy,x0,y0
