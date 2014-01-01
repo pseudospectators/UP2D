@@ -1,4 +1,4 @@
-module PerformanceMeasurement
+module timing
   !-------------------------------------------------------
   implicit none
   save 
@@ -46,5 +46,5 @@ module PerformanceMeasurement
 
   
   !----------------------------------------------------------------------------
-end module PerformanceMeasurement
+end module timing
 

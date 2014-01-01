@@ -3,7 +3,7 @@ subroutine time_step
   use masks
   use FieldExport  
   use RK2_module
-  use PerformanceMeasurement
+  use timing
   implicit none
   real(kind=pr) :: time=0.0d0, dt1=0.0d0, max_divergence
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2) :: u, uk, nlk

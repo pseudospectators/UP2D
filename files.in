@@ -1,5 +1,5 @@
 share_vars.f90  
-PerformanceMeasurement.f90  
+timing.f90  
 mean_velocity.f90                             
 params.f90                                    
 time_step.f90    
