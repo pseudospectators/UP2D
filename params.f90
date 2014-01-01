@@ -3,6 +3,8 @@ module parameters
  implicit none
  contains
 
+!=============================================================================== 
+ 
 ! Wrapper to read parameters from an ini file for fsi.  Also reads
 ! parameters which are set in the vars module.
 subroutine get_params(paramsfile) 
@@ -28,6 +30,7 @@ subroutine get_params(paramsfile)
   call get_params_common(PARAMS,i)
 end subroutine get_params
 
+!===============================================================================
 
 ! Read the file paramsfile, count the lines (output in i) and put the
 ! text in PARAMS.
@@ -60,6 +63,7 @@ subroutine read_params_file(PARAMS,i,paramsfile, verbose)
   
 end subroutine read_params_file
 
+!===============================================================================
 
 ! Read individual parameter values from the PARAMS string for the vars
 ! module.
@@ -73,6 +77,7 @@ subroutine get_params_common(PARAMS,i)
   ! Resolution section
   call GetValue_Int(PARAMS,i,"Resolution","nx",nx, 4)
   call GetValue_Int(PARAMS,i,"Resolution","ny",ny, 4)
+  call GetValue_String(PARAMS,i,"Resolution","name",name, "test.")
   call GetValue_Int(PARAMS,i,"Time","nt",nt, 9999999)
   call GetValue_Real(PARAMS,i,"Time","Tmax",Tmax,1.d9)
   call GetValue_Real(PARAMS,i,"Time","CFL",cfl,0.1d0)
@@ -109,6 +114,7 @@ subroutine get_params_common(PARAMS,i)
   dy=yl/dble(ny)
 end subroutine get_params_common
 
+!===============================================================================
 
 !-------------------------------------------------------------------------------
 ! Fetches a REAL VALUED parameter from the PARAMS.ini file.
@@ -148,7 +154,7 @@ subroutine GetValue_real (PARAMS, actual_lines, section, keyword, params_real,de
 end subroutine GetValue_real
 
 
-
+!===============================================================================
 
 !-------------------------------------------------------------------------------
 ! Fetches a STRING VALUED parameter from the PARAMS.ini file.
@@ -191,7 +197,7 @@ subroutine GetValue_string (PARAMS, actual_lines, section, keyword, params_strin
   endif
 end subroutine GetValue_string
 
-
+!===============================================================================
 
 !-------------------------------------------------------------------------------
 ! Fetches a VECTOR VALUED parameter from the PARAMS.ini file.
@@ -232,7 +238,7 @@ subroutine GetValue_vector (PARAMS, actual_lines, section, keyword, params_vecto
   endif
 end subroutine GetValue_vector
 
-
+!===============================================================================
 
 !-------------------------------------------------------------------------------
 ! Fetches a INTEGER VALUED parameter from the PARAMS.ini file.
@@ -275,7 +281,7 @@ subroutine GetValue_Int(PARAMS, actual_lines, section, keyword, params_int,&
 end subroutine GetValue_Int
 
 
-
+!===============================================================================
 
 
 !-------------------------------------------------------------------------------

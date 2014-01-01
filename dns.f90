@@ -3,9 +3,10 @@ program dns
   use FieldExport
   use parameters
   implicit none
+  character(len=40) :: infile
   
-  call get_params("PARAMS.ini")
-  simulation_name='test.'
+  call get_command_argument(1,infile)
+  call get_params(infile)
   call StartSimulation()   
 
 end program dns

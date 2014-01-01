@@ -12,7 +12,7 @@ module share_vars
   real(kind=pr), save :: ux_mean, uy_mean
   
   character (len=40), save :: inicond, iMask, iMeanFlow, iMethod
-  character (len=40), save :: simulation_name
+  character (len=40), save :: name
   
   integer,parameter :: nlines=2048 ! maximum number of lines in PARAMS-file
 

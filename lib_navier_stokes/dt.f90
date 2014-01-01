@@ -36,11 +36,11 @@ function timestep(time,it, u)
 
   if (modulo(it,10)==0) then
     !-- save max and mean velocities
-    open (14, file = trim(simulation_name)//'u_max', status = 'unknown', access = 'append')
+    open (14, file = trim(name)//'u_max', status = 'unknown', access = 'append')
     write (14,'(4(es11.4,1x))') time, u_max, sum(u(:,:,1))*dx*dy, sum(u(:,:,2))*dx*dy
     close (14)   
     !-- save time step
-    open (14, file = trim(simulation_name)//'dt', status = 'unknown', access = 'append')
+    open (14, file = trim(name)//'dt', status = 'unknown', access = 'append')
     write (14,'(es11.4,1x,i6,1x,es11.4)') time, it, dt1
     close (14)
   endif
