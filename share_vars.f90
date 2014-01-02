@@ -18,7 +18,7 @@ module share_vars
 
   ! memory
   real (kind=pr), dimension (:,:), allocatable, save :: dealiase, mask
-  real (kind=pr), dimension (:,:,:), allocatable, save :: us, uex
-  
+  real (kind=pr), dimension (:,:,:), allocatable, save :: us, uex, normals
+  real (kind=pr), dimension (:,:), allocatable, save :: dist
 end module share_vars
 
