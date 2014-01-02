@@ -279,5 +279,5 @@ function max_divergence(uk)
   call cofdx( uk(:,:,1),work1 )
   call cofdy( uk(:,:,2),work2 )
   call cofitxy(work1+work2,work3)
-  max_divergence = maxval(dabs(work3))
+  max_divergence = maxval( dabs((1.0d0-mask*eps)*work3) )
 end function

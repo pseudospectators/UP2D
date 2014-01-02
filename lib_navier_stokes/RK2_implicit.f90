@@ -8,7 +8,7 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   real(kind=pr), dimension(0:nx-1,0:ny-1), intent (inout) :: vort, pk
   real(kind=pr), intent (out) :: dt
   real(kind=pr), intent (in) :: time
-  real (kind=pr), dimension (0:nx-1, 0:ny-1) :: work1,work2, workvis
+  real (kind=pr), dimension (0:nx-1, 0:ny-1) :: work1,work2, workvis,div,divk
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp, u_tmp
   integer :: iy
   integer, intent(in) :: it
@@ -16,7 +16,6 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
 
   !-- modify: no dt<eps
   dt = timestep(time,it, u )
-  
   !-----------------------------------------------------------------------------
   !-- 1st strang step: half time step for penalization
   !-- equation is solved exactly
@@ -119,12 +118,23 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   !-- compute divergence (of predicted velocity field)
   call cofdx(uk(:,:,1),work1)
   call cofdy(uk(:,:,2),work2)
-  !-- fetch pressure increment
-  call poisson ( work1+work2, workvis )
+  divk = work1 + work2  
+  
+  !-----------------------
+!   call cofitxy (divk,div) 
+!   !$omp parallel do private (iy)
+!   do iy=0,ny-1
+!     div(:,iy) = div(:,iy)*(1.d0-mask(:,iy)*eps)  
+!   enddo
+!   !$omp end parallel do
+!   call coftxy  (div,divk)
+  !-----------------------  
+  
+  call poisson ( divk, workvis )
+  
   !-- add pressure gradient
   call cofdx(workvis,work1)
-  call cofdy(workvis,work2)
-  
+  call cofdy(workvis,work2)  
   !$omp parallel do private (iy)
   do iy=0,ny-1
     uk(:,iy,1) = uk(:,iy,1) + work1(:,iy)

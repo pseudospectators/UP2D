@@ -52,10 +52,17 @@ subroutine lamballais_mask
   do ix=0,nx-1
     do iy=0,ny-1
       R = dsqrt( (dble(ix)*dx-x0)**2 + (dble(iy)*dy-y0)**2 )
+      
       if (R <= R1) then
         mask(ix,iy) = 1.d0
         us(ix,iy,:) = 0.d0
       endif
+      
+!       if (R <= R1*0.5d0) then
+!         mask(ix,iy) = 1.d0
+!         us(ix,iy,1) = 2.d0*dcos( 0.5d0*pi * (R / (R1*0.5d0)) )
+!         us(ix,iy,2) = 0.d0
+!       endif
       
       if ((R>=R2).and.(R<=R3)) then
         mask(ix,iy) = 1.d0
