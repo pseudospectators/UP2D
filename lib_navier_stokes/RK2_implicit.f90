@@ -122,7 +122,7 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   
   !-----------------------
 !   call cofitxy (divk,div) 
-!   !$omp parallel do private (iy)
+!   !$omp parallel do private (iy)  
 !   do iy=0,ny-1
 !     div(:,iy) = div(:,iy)*(1.d0-mask(:,iy)*eps)  
 !   enddo

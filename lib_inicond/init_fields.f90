@@ -4,7 +4,7 @@ subroutine init_fields (u, uk, pk, vor, nlk)
   implicit none
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2), intent (inout) :: u, uk, nlk
   real(kind=pr), dimension(0:nx-1,0:ny-1), intent (inout) :: vor, pk
-  real(kind=pr), dimension(0:nx-1,0:ny-1) :: vortk
+  real(kind=pr), dimension(0:nx-1,0:ny-1) :: vortk, work
   real(kind=pr) :: r0,we,d,r1,r2, max_divergence
   integer :: ix,iy
   
@@ -57,8 +57,7 @@ subroutine init_fields (u, uk, pk, vor, nlk)
     call cofitxy( uk(:,:,2), u(:,:,2))
   end select
 
-  !-- compute initial pressure (for implicit penalization)
-  call cal_pressure ( 0.d0, u, uk, pk )  
+  
   write(*,'("inicond=",A," max field divergence ",es12.4)') trim(inicond), max_divergence(uk)
   call add_pressure( uk )
   write(*,'("inicond=",A," max field divergence ",es12.4)') trim(inicond), max_divergence(uk)

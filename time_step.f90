@@ -10,16 +10,21 @@ subroutine time_step
   real(kind=pr), dimension(0:nx-1,0:ny-1) :: pk, vort
   real(kind=pr) :: T_lastdrag=0.0d0, T_lastsave=0.0d0, t1, time_left
   integer :: it=0
-  character(len=5) :: timestring
+  character(len=5) :: timestring    
   
   !-- Initialize vorticity or read values from a backup file
-  call init_fields (u, uk, pk, vort, nlk)
+  call init_fields (u, uk, pk, vort, nlk)  
   
   !-- create startup mask
   call create_mask (time)
   call SaveGIF(mask, trim(name)//"startup_mask", 13)   
   call SaveGIF(us(:,:,1),trim(name)//'usx')
   call SaveGIF(us(:,:,2),trim(name)//'usy')
+  
+  
+  !-- compute initial pressure (for implicit penalization)
+!   call cal_pressure ( time, u, uk, pk )  
+  
   
   !----------------------------------------------------------------
   ! loop over time steps
@@ -73,8 +78,8 @@ subroutine time_step
   
   if (iMask=='lamballais') then
     call lamballais_error(u)
-!     call SaveField(trim(name)//'ux_final', u(:,:,1),1, xl,yl, 'precision')
-!     call SaveField(trim(name)//'uy_final', u(:,:,2),1, xl,yl, 'precision')
+    call SaveField(trim(name)//'ux_final', u(:,:,1),1, xl,yl, 'precision')
+    call SaveField(trim(name)//'uy_final', u(:,:,2),1, xl,yl, 'precision')
   endif
   
   

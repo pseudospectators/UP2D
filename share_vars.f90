@@ -7,7 +7,7 @@ module share_vars
 
   real(kind=pr), save :: colorscale = 0.d0 ! scaling for farge palette (vorticity)
   real(kind=pr), save :: xl,yl,dx,dy,x0,y0
-  real(kind=pr), save :: Tmax, CFL, tsave, tdrag
+  real(kind=pr), save :: Tmax, CFL, tsave, tdrag, dt_fixed
   real(kind=pr), save :: nu, eps, pi
   real(kind=pr), save :: ux_mean, uy_mean
   
