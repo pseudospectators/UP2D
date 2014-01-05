@@ -13,7 +13,7 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   integer :: iy
   integer, intent(in) :: it
   real(kind=pr) :: timestep
-
+  
   !-- modify: no dt<eps
   dt = timestep(time,it, u )
   !-----------------------------------------------------------------------------

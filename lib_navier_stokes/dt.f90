@@ -33,6 +33,10 @@ function timestep(time,it, u)
   if ((Tmax - time) < dt1) then
     dt1 = Tmax - time
   endif  
+  
+  if (dt_fixed>0.d0) then
+    dt1 = dt_fixed
+  endif
 
   if (modulo(it,10)==0) then
     !-- save max and mean velocities
