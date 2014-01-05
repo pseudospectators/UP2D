@@ -34,6 +34,7 @@ function timestep(time,it, u)
     dt1 = Tmax - time
   endif  
   
+  !-- use fixed time step is set in params
   if (dt_fixed>0.d0) then
     dt1 = dt_fixed
   endif

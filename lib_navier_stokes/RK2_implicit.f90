@@ -9,18 +9,21 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   real(kind=pr), intent (out) :: dt
   real(kind=pr), intent (in) :: time
   real (kind=pr), dimension (0:nx-1, 0:ny-1) :: work1,work2, workvis,div,divk
-  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp, u_tmp
+  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp, u_tmp, u_smooth
   integer :: iy
   integer, intent(in) :: it
   real(kind=pr) :: timestep
   
-  !-- modify: no dt<eps
+  !-- determine time step
   dt = timestep(time,it, u )
+  
   !-----------------------------------------------------------------------------
   !-- 1st strang step: half time step for penalization
   !-- equation is solved exactly
   !-----------------------------------------------------------------------------
 !  call create_mask(time)
+  call active_prolongation ( u, u_smooth )
+  us = u_smooth + u_BC
   !$omp parallel do private (iy)
   do iy=0,ny-1
     u(:,iy,1) = (u(:,iy,1)-mask(:,iy)*eps*us(:,iy,1))*exp(-0.5d0*dt*mask(:,iy)) &
@@ -93,6 +96,9 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   !-- 3rd strang step: half time step for penalization
   !-----------------------------------------------------------------------------
 !  call create_mask (time+dt)
+  call active_prolongation ( u, u_smooth )
+  us = u_smooth + u_BC
+  
   !$omp parallel do private (iy)
   do iy=0,ny-1
     u(:,iy,1) = (u(:,iy,1)-mask(:,iy)*eps*us(:,iy,1))*exp(-0.5*dt*mask(:,iy)) &
@@ -121,13 +127,13 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   divk = work1 + work2  
   
   !-----------------------
-!   call cofitxy (divk,div) 
-!   !$omp parallel do private (iy)  
-!   do iy=0,ny-1
-!     div(:,iy) = div(:,iy)*(1.d0-mask(:,iy)*eps)  
-!   enddo
-!   !$omp end parallel do
-!   call coftxy  (div,divk)
+  call cofitxy (divk,div) 
+  !$omp parallel do private (iy)  
+  do iy=0,ny-1
+    div(:,iy) = div(:,iy)*(1.d0-mask(:,iy)*eps)  
+  enddo
+  !$omp end parallel do
+  call coftxy  (div,divk)
   !-----------------------  
   
   call poisson ( divk, workvis )
@@ -148,6 +154,6 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   
   !-- velocity in phys. space (for consistent output)
   call cofitxy (uk(:,:,1), u(:,:,1))
-  call cofitxy (uk(:,:,2), u(:,:,2))      
+  call cofitxy (uk(:,:,2), u(:,:,2))
 end subroutine RK2_implicit
 

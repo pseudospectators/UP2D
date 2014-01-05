@@ -23,4 +23,5 @@ dns.f90
 ./lib_navier_stokes/RK2_implicit.f90
 ./lib_navier_stokes/cal_nlk.f90
 ./lib_navier_stokes/cal_pressure.f90
-                             
+         
+./lib_active_penalization/active_penalization.f90
