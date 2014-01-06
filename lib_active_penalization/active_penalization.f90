@@ -90,20 +90,20 @@ subroutine RHS_central ( field, rhs,  dt )
   !$omp parallel do private(iy,ix,grad_x,grad_y,field_xx,field_yy,laplace)
   do iy=0,ny-1
     do ix=0,nx-1
-     if (mask(ix,iy)>0.d0) then
-      !-- transport term
-      grad_x = (field(getindex(ix+1,nx),iy)-field(getindex(ix-1,nx),iy))/(2.d0*dx)
-      grad_y = (field(ix,getindex(iy+1,ny))-field(ix,getindex(iy-1,ny)))/(2.d0*dy)
-      rhs(ix,iy) = normals(ix,iy,1)*grad_x + normals(ix,iy,2)*grad_y
-      
-      !-- diffusion 
-      field_xx = field(getindex(ix-1,nx),iy)-2.d0*field(ix,iy)+field(getindex(ix+1,nx),iy) 
-      field_yy = field(ix,getindex(iy-1,ny))-2.d0*field(ix,iy)+field(ix,getindex(iy+1,ny))
-      laplace = field_xx/dx**2 + field_yy/dy**2
-      
-      rhs(ix,iy) = rhs(ix,iy) + lambda*laplace
+      if (mask(ix,iy)>0.d0) then
+        !-- transport term
+        grad_x = (field(getindex(ix+1,nx),iy)-field(getindex(ix-1,nx),iy))/(2.d0*dx)
+        grad_y = (field(ix,getindex(iy+1,ny))-field(ix,getindex(iy-1,ny)))/(2.d0*dy)
+        rhs(ix,iy) = normals(ix,iy,1)*grad_x + normals(ix,iy,2)*grad_y
+        
+        !-- diffusion 
+        field_xx = field(getindex(ix-1,nx),iy)-2.d0*field(ix,iy)+field(getindex(ix+1,nx),iy) 
+        field_yy = field(ix,getindex(iy-1,ny))-2.d0*field(ix,iy)+field(ix,getindex(iy+1,ny))
+        laplace = field_xx/dx**2 + field_yy/dy**2
+        
+        rhs(ix,iy) = rhs(ix,iy) + lambda*laplace
       else
-      rhs(ix,iy) = 0.d0
+        rhs(ix,iy) = 0.d0
       endif      
     enddo
   enddo  

@@ -108,7 +108,7 @@ subroutine ResizeAvg(field_source, field_target)
 end subroutine
 
 
-integer function GetIndex(ix,nx)
+integer pure function GetIndex(ix,nx)
   implicit none
   integer, intent (in) :: ix,nx
   integer :: tmp
@@ -521,38 +521,52 @@ end subroutine ResizeField
 
 !=============================================================================================================================================
 
-subroutine SaveField(filename, field, NSave, lx,ly, fieldtype)
+subroutine SaveField(filename, field, NSave, lx,ly)
 ! SEE LOAD_FIELD for details on the format 
   use share_vars
   implicit none
   real (kind=pr), intent (in)   :: field(:,:)
-  real (kind=pr), intent (in)   :: lx,ly
-  integer, intent(in)           :: NSave
-  integer	                :: ix,iy,nx1,ny1
+  real (kind=pr), intent (in), optional   :: lx,ly
+  real (kind=pr) :: llx,lly
+  integer, intent(in), optional          :: NSave
+  integer	                :: ix,iy,nx1,ny1, iSave
   character*(*), intent(in)     :: filename
-  character*(*), intent(in)     :: fieldtype
+  
 
   nx1=size(field,1)
   ny1=size(field,2)  
+
+  if (present(NSave) ) then
+    iSave=NSave
+  else
+    iSave =1
+  endif
+  
+  if (present(lx) ) then
+    llx=lx
+  else
+    llx=xl
+  endif
+  
+  if (present(ly) ) then
+    lly=ly
+  else
+    lly=yl
+  endif
 
   open  (10, file=filename, form='formatted', status='replace')
   write (10,'(A)') "%format1"
   write (10,'(i5.5,3x,A)') nx1, "% nx"
   write (10,'(i5.5,3x,A)') ny1, "% ny"
-  write (10,'(es11.4,3x,A)') lx, "% xl, domain size in x-direction"
-  write (10,'(es11.4,3x,A)') ly, "% yl, domain size in y-direction"
+  write (10,'(es11.4,3x,A)') llx, "% xl, domain size in x-direction"
+  write (10,'(es11.4,3x,A)') lly, "% yl, domain size in y-direction"
   write (10,'(A)') "% The next entry can be used to identify the type of the field: "
-  write (10,'(A)') "% "//fieldtype
+  write (10,'(A)') "% OBSOLETE"
 
-  if (fieldtype == "precision") then 
-      do iy = 0, ny1-1, NSave  
-      write (10, '(es16.9)') (field(ix, ny1-iy) , ix=1,nx1, NSave)
-      end do
-  else
-      do iy = 0, ny1-1, NSave  
-      write (10, '(es11.4)') (field(ix, ny1-iy) , ix=1,nx1, NSave)
-      end do
-  endif
+
+  do iy = 0, ny1-1, iSave  
+  write (10, '(es16.9)') (field(ix, ny1-iy) , ix=1,nx1, iSave)
+  end do
   
   close (10)
 
