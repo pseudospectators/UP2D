@@ -24,11 +24,12 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
 !  call create_mask(time)
   call active_prolongation ( u, u_smooth )
   us = u_smooth + u_BC
+  
   !$omp parallel do private (iy)
   do iy=0,ny-1
-    u(:,iy,1) = (u(:,iy,1)-mask(:,iy)*eps*us(:,iy,1))*exp(-0.5d0*dt*mask(:,iy)) &
+    u(:,iy,1) = (u(:,iy,1)-mask(:,iy)*eps*us(:,iy,1))*dexp(-0.5d0*dt*mask(:,iy)) &
                  + mask(:,iy)*eps*us(:,iy,1)
-    u(:,iy,2) = (u(:,iy,2)-mask(:,iy)*eps*us(:,iy,2))*exp(-0.5d0*dt*mask(:,iy)) &
+    u(:,iy,2) = (u(:,iy,2)-mask(:,iy)*eps*us(:,iy,2))*dexp(-0.5d0*dt*mask(:,iy)) &
                  + mask(:,iy)*eps*us(:,iy,2) 
   enddo
   !$omp end parallel do   
@@ -101,9 +102,9 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   
   !$omp parallel do private (iy)
   do iy=0,ny-1
-    u(:,iy,1) = (u(:,iy,1)-mask(:,iy)*eps*us(:,iy,1))*exp(-0.5*dt*mask(:,iy)) &
+    u(:,iy,1) = (u(:,iy,1)-mask(:,iy)*eps*us(:,iy,1))*dexp(-0.5d0*dt*mask(:,iy)) &
                  + mask(:,iy)*eps*us(:,iy,1)
-    u(:,iy,2) = (u(:,iy,2)-mask(:,iy)*eps*us(:,iy,2))*exp(-0.5*dt*mask(:,iy)) &
+    u(:,iy,2) = (u(:,iy,2)-mask(:,iy)*eps*us(:,iy,2))*dexp(-0.5d0*dt*mask(:,iy)) &
                  + mask(:,iy)*eps*us(:,iy,2) 
   enddo
   !$omp end parallel do   
@@ -126,7 +127,7 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   call cofdy(uk(:,:,2),work2)
   divk = work1 + work2  
   
-  !-----------------------
+  !-- Do not project inside the solid body
   call cofitxy (divk,div) 
   !$omp parallel do private (iy)  
   do iy=0,ny-1
@@ -150,7 +151,7 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   enddo
   !$omp end parallel do   
   
-  !-- uk should now be divergence free
+  !-- uk should now be divergence free (in the fluid domain)
   
   !-- velocity in phys. space (for consistent output)
   call cofitxy (uk(:,:,1), u(:,:,1))

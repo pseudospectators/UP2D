@@ -521,7 +521,7 @@ end subroutine ResizeField
 
 !=============================================================================================================================================
 
-subroutine SaveField(filename, field, NSave, lx,ly)
+subroutine SaveField(field,filename, NSave, lx,ly)
 ! SEE LOAD_FIELD for details on the format 
   use share_vars
   implicit none

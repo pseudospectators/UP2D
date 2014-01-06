@@ -43,11 +43,11 @@ subroutine active_prolongation ( u, u_smooth )
   dt = CFL_act*dx/umax
   Tend = 0.10d0
   nt2 = nint(Tend/dt)
+  
   do it=1, nt2
     call RK4 ( beta(:,:,1), dt )
     call RK4 ( beta(:,:,2), dt )
   enddo
-  
   
   !-----------------------------------------------------------------------------
   !-- construct u_smooth
@@ -56,6 +56,7 @@ subroutine active_prolongation ( u, u_smooth )
   y0=yl/2.d0
   R1=0.50d0
   
+  !$omp parallel do private(iy,ix,R)
   do ix=0,nx-1
   do iy=0,ny-1
     R = dsqrt( (dble(ix)*dx-x0)**2 + (dble(iy)*dy-y0)**2 ) 
@@ -67,6 +68,7 @@ subroutine active_prolongation ( u, u_smooth )
     endif
   enddo
   enddo
+  !$omp end parallel do
 end subroutine active_prolongation
 
 

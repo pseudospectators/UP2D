@@ -78,8 +78,8 @@ subroutine time_step
   
   if (iMask=='lamballais') then
     call lamballais_error(u)
-    call SaveField(trim(name)//'ux_final', u(:,:,1))
-    call SaveField(trim(name)//'uy_final', u(:,:,2))
+    call SaveField( u(:,:,1), trim(name)//'ux_final')
+    call SaveField( u(:,:,2), trim(name)//'uy_final')
   endif
   
   
