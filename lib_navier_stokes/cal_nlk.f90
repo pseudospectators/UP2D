@@ -24,8 +24,8 @@ subroutine cal_nlk (time, u, uk, vor, nlk, penalization)
   if ( penalization ) then
       !$omp parallel do private(iy)
       do iy=0,ny-1
-        work1(:,iy) = +vor(:,iy)*u(:,iy,2) -mask(:,iy)*(u(:,iy,1)-u_BC(:,iy,1))
-        work2(:,iy) = -vor(:,iy)*u(:,iy,1) -mask(:,iy)*(u(:,iy,2)-u_BC(:,iy,2))
+        work1(:,iy) = +vor(:,iy)*u(:,iy,2) -mask(:,iy)*(u(:,iy,1)-us(:,iy,1))
+        work2(:,iy) = -vor(:,iy)*u(:,iy,1) -mask(:,iy)*(u(:,iy,2)-us(:,iy,2))
       enddo
       !$omp end parallel do
   else

@@ -8,20 +8,38 @@ subroutine cofdx (fk, fk_dx)
 !---------------------------------------------------------------
   use share_vars
   implicit none
-  integer kx, ky
+  integer kx, ky, k
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: fk   
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dx   
-  real (kind=pr) :: scale1
+  real (kind=pr) :: scale1, keff
 
   scale1 = 2.d0*pi/xl
-
+  
   !$omp parallel do private(kx,ky)
   do ky = 0, ny-1
+     k = 0
      do kx = 0, nx-2, 2
-        fk_dx (kx, ky) = -fk (kx+1, ky) * dble (kx/2) * scale1
+        if (FD_2nd) then
+          ! second order
+          keff = dsin( dx * dble(k) ) / dx
+          fk_dx (kx, ky) = -fk (kx+1, ky) * keff * scale1
+          k = k+1
+        else
+          ! spectral order        
+          fk_dx (kx, ky) = -fk (kx+1, ky) * dble (kx/2) * scale1
+        endif
      end do  
+     k=0
      do kx = 1, nx-1, 2
-        fk_dx (kx, ky) = fk (kx-1, ky) * dble ((kx-1)/2) * scale1
+        if (FD_2nd) then
+          ! second order
+          keff = dsin( dx * dble(k) ) / dx
+          fk_dx (kx, ky) = fk (kx-1, ky) * keff * scale1
+          k = k+1
+        else
+          ! spectral order        
+          fk_dx (kx, ky) = fk (kx-1, ky) * dble ((kx-1)/2) * scale1
+        endif
      end do
   end do
   !$omp end parallel do
@@ -39,20 +57,36 @@ subroutine cofdy (fk, fk_dy)
 !---------------------------------------------------------------
   use share_vars
   implicit none
-  integer :: kx, ky
+  integer :: kx, ky, k
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: fk   
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dy   
-  real (kind=pr) :: scale1
+  real (kind=pr) :: scale1, keff
 
   scale1 = 2.d0*pi/yl
 
   !$omp parallel do private(kx,ky)
   do kx = 0, nx-1
+     k = 0
      do ky = 0, ny-2, 2 ! loop over real parts of the FFT signal
-        fk_dy (kx, ky) = -fk (kx, ky+1) * dble (ky/2) * scale1
+        if (FD_2nd) then
+          keff = dsin( dy * dble(k) ) / dy
+          fk_dy (kx, ky) = -fk (kx, ky+1) * keff * scale1
+          k = k +1
+        else        
+          fk_dy (kx, ky) = -fk (kx, ky+1) * dble (ky/2) * scale1
+        endif
      end do
+     
+     k = 0
      do ky = 1, ny-1, 2 ! loop over imaginary parts of the FFT
-      ! actually, both (real/imag) have of course the same wavenumber. 
+        if (FD_2nd) then
+          keff = dsin( dy * dble(k) ) / dy
+          fk_dy (kx, ky) = fk (kx, ky-1) * keff * scale1
+          k = k +1
+        else        
+          fk_dy (kx, ky) = -fk (kx, ky+1) * dble (ky/2) * scale1
+        endif
+        ! actually, both (real/imag) have of course the same wavenumber. 
         fk_dy (kx, ky) = fk (kx, ky-1) * dble ((ky-1)/2) * scale1
      end do
   end do
@@ -160,7 +194,7 @@ subroutine poisson (f, ans)
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: f
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: ans
   integer :: kx, kx_max, ky, ky_max
-  real (kind=pr) :: quot, scalex,scaley
+  real (kind=pr) :: quot, scalex,scaley, kx2eff, ky2eff
   kx_max = (nx/2-1) 
   ky_max = (ny/2-1)
   
@@ -176,11 +210,23 @@ subroutine poisson (f, ans)
            ans (2*kx, 2*ky+1)   = 0.d0
            ans (2*kx+1, 2*ky+1) = 0.d0
         else
-           quot = (dble(kx**2)*scalex + dble(ky**2)*scaley)
-           ans (2*kx, 2*ky)     =  f (2*kx, 2*ky) / quot
-           ans (2*kx+1, 2*ky)   =  f (2*kx+1, 2*ky) / quot
-           ans (2*kx, 2*ky+1)   =  f (2*kx, 2*ky+1) / quot
-           ans (2*kx+1, 2*ky+1) =  f (2*kx+1, 2*ky+1) / quot
+          if (FD_2nd) then
+            ! second order 
+            kx2eff = ( 2.0 - 2.0*cos( dx * real(kx) ) ) / dx**2
+            ky2eff = ( 2.0 - 2.0*cos( dy * real(ky) ) ) / dy**2
+            quot = (kx2eff*scalex + ky2eff*scaley)
+            ans (2*kx, 2*ky)     =  f (2*kx, 2*ky) / quot
+            ans (2*kx+1, 2*ky)   =  f (2*kx+1, 2*ky) / quot
+            ans (2*kx, 2*ky+1)   =  f (2*kx, 2*ky+1) / quot
+            ans (2*kx+1, 2*ky+1) =  f (2*kx+1, 2*ky+1) / quot            
+          else
+            ! spectral accuracy
+            quot = (dble(kx**2)*scalex + dble(ky**2)*scaley)
+            ans (2*kx, 2*ky)     =  f (2*kx, 2*ky) / quot
+            ans (2*kx+1, 2*ky)   =  f (2*kx+1, 2*ky) / quot
+            ans (2*kx, 2*ky+1)   =  f (2*kx, 2*ky+1) / quot
+            ans (2*kx+1, 2*ky+1) =  f (2*kx+1, 2*ky+1) / quot
+          end if
         end if
      end do
   end do
@@ -240,7 +286,7 @@ subroutine cal_vis (dt, vis)
   integer :: kx, kx_max, ky, ky_max
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent(out) :: vis
   real (kind=pr), intent (in) :: dt
-  real (kind=pr) :: coefx, coefy,scalex,scaley
+  real (kind=pr) :: coefx, coefy,scalex,scaley, kx2eff, ky2eff
 
   scalex = (2.d0*pi/xl)**2
   scaley = (2.d0*pi/yl)**2
@@ -253,7 +299,15 @@ subroutine cal_vis (dt, vis)
   !$omp parallel do private(kx,ky)
   do ky = 0, ky_max
     do kx = 0, kx_max
-        vis (2*kx, 2*ky) = dexp( coefx * dble(kx**2) + coefy * dble(ky**2) )
+        if (FD_2nd) then
+          ! second order accuracy
+          kx2eff = ( 2.0 - 2.0*cos( dx * real(kx) ) ) / dx**2
+          ky2eff = ( 2.0 - 2.0*cos( dy * real(ky) ) ) / dy**2
+          vis (2*kx, 2*ky) = exp( coefx * kx2eff + coefy * ky2eff )
+        else
+          ! spectral accuracy
+          vis (2*kx, 2*ky) = dexp( coefx * dble(kx**2) + coefy * dble(ky**2) )
+        endif
     enddo
   enddo
   !$omp end parallel do 

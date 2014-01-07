@@ -13,7 +13,7 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   real(kind=pr), intent (out) :: dt
   real(kind=pr), intent (in) :: time
   real (kind=pr), dimension (0:nx-1, 0:ny-1) :: workvis
-  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp, u_tmp
+  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp, u_tmp, u_smooth
   integer :: iy
   integer, intent(in) :: it
   real(kind=pr) :: timestep, max_divergence
@@ -22,6 +22,8 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   ! compute integrating factor
   call cal_vis (dt, workvis)  
   !call create_mask (time)
+  call active_prolongation ( u, u_smooth )
+  us = u_smooth + u_BC
   call cal_nlk (time, u, uk, vort, nlk, .true.)
   call add_pressure (nlk)
 
@@ -45,6 +47,8 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   ! do second RK2 step (RHS evaluation with the argument defined above)
   !---------------------------------------------------------------------------------
   !call create_mask(time+dt)
+  call active_prolongation ( u, u_smooth )
+  us = u_smooth + u_BC
   call cal_nlk(time+dt, u_tmp, uk_tmp, vort, nlk2, .true.)  
   call add_pressure(nlk2)
 

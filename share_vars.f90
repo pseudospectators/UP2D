@@ -14,6 +14,9 @@ module share_vars
   character (len=40), save :: inicond, iMask, iMeanFlow, iMethod
   character (len=40), save :: name
   
+  ! deliberately reduce code to second order FD?
+  logical, save :: FD_2nd = .false.
+  
   integer,parameter :: nlines=2048 ! maximum number of lines in PARAMS-file
 
   ! memory

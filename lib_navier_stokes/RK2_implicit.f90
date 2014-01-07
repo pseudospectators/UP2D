@@ -16,7 +16,7 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   
   !-- determine time step
   dt = timestep(time,it, u )
-  
+  u_smooth = 0.d0
   !-----------------------------------------------------------------------------
   !-- 1st strang step: half time step for penalization
   !-- equation is solved exactly
