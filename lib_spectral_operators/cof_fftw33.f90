@@ -70,7 +70,9 @@ subroutine fft_initialize
 
   if (e >= 1e-10) then
     write(*,*) "FFT unit test failed..."
+    if (FD_2nd.eqv..false.) then
     stop
+    endif
   endif
 
   !-----------------------------------------
@@ -89,7 +91,9 @@ subroutine fft_initialize
 
   if (e >= 1e-10) then
     write(*,*) "FFT unit test failed..."
+    if (FD_2nd.eqv..false.) then
     stop
+    endif
   endif
     
   

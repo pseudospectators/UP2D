@@ -84,10 +84,9 @@ subroutine cofdy (fk, fk_dy)
           fk_dy (kx, ky) = fk (kx, ky-1) * keff * scale1
           k = k +1
         else        
-          fk_dy (kx, ky) = -fk (kx, ky+1) * dble (ky/2) * scale1
+          ! actually, both (real/imag) have of course the same wavenumber. 
+          fk_dy (kx, ky) = fk (kx, ky-1) * dble ((ky-1)/2) * scale1
         endif
-        ! actually, both (real/imag) have of course the same wavenumber. 
-        fk_dy (kx, ky) = fk (kx, ky-1) * dble ((ky-1)/2) * scale1
      end do
   end do
   !$omp end parallel do
