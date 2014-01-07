@@ -12,6 +12,8 @@ subroutine time_step
   integer :: it=0
   character(len=5) :: timestring    
   
+  if (FD_2nd) write (*,*) "!!! ATTENTION; RUNNING IN REDUCED ACCURACY MODE"
+  
   !-- Initialize vorticity or read values from a backup file
   call init_fields (u, uk, pk, vort, nlk)  
   

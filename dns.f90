@@ -31,7 +31,9 @@ subroutine StartSimulation()
   allocate ( u_BC(0:nx-1,0:ny-1,1:2) )
 
   write (*,*) "*** information: allocated memory"
-
+  
+  if (FD_2nd) write (*,*) "!!! ATTENTION; RUNNING IN REDUCED ACCURACY MODE"
+  
 ! Initialize fft
   call fft_initialize
   write (*,*) "*** information: did fft_initialize"
