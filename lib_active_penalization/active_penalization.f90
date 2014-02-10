@@ -10,6 +10,12 @@ subroutine create_us ( time, u, uk )
     !-- use chantalat's method to compute the smooth extension
     call active_prolongation_chantalat ( u, u_smooth )
     us = u_smooth + u_BC
+    
+  elseif (iActive == "dave" ) then
+    !-- use dave's method to compute the smooth extension
+    call active_prolongation_dave ( u, u_smooth )
+    us = u_smooth
+    
   elseif (iActive == "passive" ) then
     !-- us does not depend on u: classic penalization
     us = u_BC
@@ -215,12 +221,12 @@ subroutine active_prolongation_dave ( u, u_smooth )
   call compute_beta_field ( u, beta )
   
   !-- define boundary layer thickness
-  delta = 0.20d0 ! attention fixed value!!!!
+  delta = 0.10d0 ! attention fixed value!!!!
   
   !-----------------------------------------------------------------------------
   ! loop over points in the boundary layer where we intent to construct us
   !-----------------------------------------------------------------------------  
-  !$omp parallel do private(iy,ix)
+  !$omp parallel do private(iy,ix,x,y,xi_x,xi_y,ux_BC_interp,uy_BC_interp,beta_x_interp,beta_y_interp,s,b0,b1)
   do ix=0, nx-1
     do iy=0, ny-1
       if ((phi(ix,iy) >= -delta).and.(phi(ix,iy) <=0.d0) ) then

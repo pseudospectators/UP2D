@@ -80,30 +80,7 @@ subroutine lamballais_mask
   call phi2chi()
   
   !-- compute normal vectors
-  do ix=0,nx-1
-    do iy=0,ny-1
-      normals(ix,iy,1) = (phi(getindex(ix+1,nx),iy) - phi(getindex(ix-1,nx),iy) )/(2.0d0*dx)
-      normals(ix,iy,2) = (phi(ix,getindex(iy+1,ny)) - phi(ix,getindex(iy-1,ny)) )/(2.0d0*dy)
-      !-- normalize
-      normgrad = dsqrt ( normals(ix,iy,1)**2 + normals(ix,iy,2)**2 )
-      if ( normgrad > 1e-10) then
-        normals(ix,iy,1) = normals(ix,iy,1) / normgrad
-        normals(ix,iy,2) = normals(ix,iy,2) / normgrad
-      else
-        normals(ix,iy,1) = 0.d0
-        normals(ix,iy,2) = 0.d0      
-      endif
-      
-      if (iActive == "chantalat") then
-        !-- blending: reduce normal vectors to a BL close to interface
-        !-- the prolongation method based on basis functions handels this 
-        !-- differently, so do it only in the cantalat case.
-        call SmoothStep(blend,dabs(phi(ix,iy)),4.d0*dx,3.d0*dx)
-        normals(ix,iy,1) = normals(ix,iy,1) * blend
-        normals(ix,iy,2) = normals(ix,iy,2) * blend
-      endif
-    enddo
-  enddo
+  call compute_normals()
 end subroutine lamballais_mask
 
 
@@ -182,7 +159,7 @@ subroutine dipole_mask
   implicit none
   integer :: ix,iy
   real(kind=pr) :: p ! exponent for norm
-  real(kind=pr) :: x,y,normgrad, blend
+  real(kind=pr) :: x,y
   
   phi = 0.d0 ! signed distance
   u_BC = 0.d0 ! non-homogeneous dirichlet BC (zero in this case)
@@ -206,10 +183,25 @@ subroutine dipole_mask
   call phi2chi()
   
   !-- compute normal vectors
+  call compute_normals()
+end subroutine dipole_mask
+
+
+!===============================================================================
+
+
+subroutine compute_normals 
+  use share_vars
+  use FieldExport
+  implicit none
+  integer :: ix,iy
+  real(kind=pr) :: normgrad, blend
+  
   do ix=0,nx-1
     do iy=0,ny-1
       normals(ix,iy,1) = (phi(getindex(ix+1,nx),iy) - phi(getindex(ix-1,nx),iy) )/(2.0d0*dx)
       normals(ix,iy,2) = (phi(ix,getindex(iy+1,ny)) - phi(ix,getindex(iy-1,ny)) )/(2.0d0*dy)
+      
       !-- normalize
       normgrad = dsqrt ( normals(ix,iy,1)**2 + normals(ix,iy,2)**2 )
       if ( normgrad > 1e-10) then
@@ -219,18 +211,16 @@ subroutine dipole_mask
         normals(ix,iy,1) = 0.d0
         normals(ix,iy,2) = 0.d0      
       endif
-      !-- blending: reduce normal vectors to a BL close to interface
-      call SmoothStep(blend,dabs(phi(ix,iy)),4.d0*dx,3.d0*dx)
-      normals(ix,iy,1) = normals(ix,iy,1) * blend
-      normals(ix,iy,2) = normals(ix,iy,2) * blend
+      
+      if (iActive == "chantalat") then
+        !-- blending: reduce normal vectors to a BL close to interface
+        call SmoothStep(blend,dabs(phi(ix,iy)),4.d0*dx,3.d0*dx)
+        normals(ix,iy,1) = normals(ix,iy,1) * blend
+        normals(ix,iy,2) = normals(ix,iy,2) * blend
+      endif
     enddo
-  enddo
-  
-end subroutine dipole_mask
-
-
-!===============================================================================
-
+  enddo  
+end subroutine compute_normals
 
 
 
