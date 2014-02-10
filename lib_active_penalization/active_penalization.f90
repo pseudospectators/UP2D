@@ -65,7 +65,7 @@ subroutine active_prolongation_chantalat ( u, u_smooth )
   CFL_act = 0.98d0
   umax = 1.d0
   dt = CFL_act*dx/umax
-  Tend = 0.10d0
+  Tend = 0.05d0
   nt2 = nint(Tend/dt)
   
   do it=1, nt2
@@ -80,19 +80,30 @@ subroutine active_prolongation_chantalat ( u, u_smooth )
   y0=yl/2.d0
   R1=0.50d0
   
-  !$omp parallel do private(iy,ix,R)
-  do ix=0,nx-1
-  do iy=0,ny-1
-    R = dsqrt( (dble(ix)*dx-x0)**2 + (dble(iy)*dy-y0)**2 ) 
-    if (R<=1.25*R1) then
-      u_smooth(ix,iy,1) = (mask(ix,iy)*eps)*phi(ix,iy)*beta(ix,iy,1)
-      u_smooth(ix,iy,2) = (mask(ix,iy)*eps)*phi(ix,iy)*beta(ix,iy,2)
-    else
-      u_smooth(ix,iy,:) = 0.d0
-    endif
-  enddo
-  enddo
-  !$omp end parallel do
+  if (imask == 'lamballais') then ! this case distinguished between outer and inner cylinder
+      !$omp parallel do private(iy,ix,R)
+      do ix=0,nx-1
+      do iy=0,ny-1
+        R = dsqrt( (dble(ix)*dx-x0)**2 + (dble(iy)*dy-y0)**2 ) 
+        if (R<=1.25*R1) then
+          u_smooth(ix,iy,1) = (mask(ix,iy)*eps)*phi(ix,iy)*beta(ix,iy,1)
+          u_smooth(ix,iy,2) = (mask(ix,iy)*eps)*phi(ix,iy)*beta(ix,iy,2)
+        else
+          u_smooth(ix,iy,:) = 0.d0
+        endif
+      enddo
+      enddo
+      !$omp end parallel do
+  else
+      !$omp parallel do private(iy,ix,R)
+      do ix=0,nx-1
+      do iy=0,ny-1
+          u_smooth(ix,iy,1) = (mask(ix,iy)*eps)*phi(ix,iy)*beta(ix,iy,1)
+          u_smooth(ix,iy,2) = (mask(ix,iy)*eps)*phi(ix,iy)*beta(ix,iy,2)
+      enddo
+      enddo
+      !$omp end parallel do  
+  endif
 end subroutine active_prolongation_chantalat
 
 

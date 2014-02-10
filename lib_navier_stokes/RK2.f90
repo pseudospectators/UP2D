@@ -48,8 +48,8 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   ! do second RK2 step (RHS evaluation with the argument defined above)
   !---------------------------------------------------------------------------------
   !-- mask and us
-  call create_mask (time)
-  call create_us (time, u, uk)
+  call create_mask (time+dt)
+  call create_us (time+dt, u_tmp, uk_tmp)
   !-- RHS and pressure
   call cal_nlk (time+dt, u_tmp, uk_tmp, vort, nlk2, .true.)  
   call add_pressure (nlk2, uk_tmp, u_tmp, vort)
