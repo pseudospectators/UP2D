@@ -221,7 +221,7 @@ subroutine active_prolongation_dave ( u, u_smooth )
   call compute_beta_field ( u, beta )
   
   !-- define boundary layer thickness
-  delta = 0.10d0 ! attention fixed value!!!!
+  delta = 0.15d0 ! attention fixed value!!!!
   
   !-----------------------------------------------------------------------------
   ! loop over points in the boundary layer where we intent to construct us

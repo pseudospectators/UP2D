@@ -11,7 +11,8 @@ subroutine time_step
   real(kind=pr) :: T_lastdrag=0.0d0, T_lastsave=0.0d0, t1, time_left
   integer :: it=0
   character(len=5) :: timestring    
-  
+  time = 0.0
+  it = 0
   if (FD_2nd) write (*,*) "!!! ATTENTION; RUNNING IN REDUCED ACCURACY MODE"
   
   !-- create startup mask
@@ -33,6 +34,7 @@ subroutine time_step
   !----------------------------------------------------------------
   ! loop over time steps
   !---------------------------------------------------------------- 
+  write (*,*) "Initializatzion done, looping now"
   do while ((time<Tmax) .and. (it<=nt))
       t1 = Performance("start",1)
       
