@@ -15,7 +15,7 @@ subroutine cofdx (fk, fk_dx)
 
   scale1 = 2.d0*pi/xl
   
-  !$omp parallel do private(kx,ky)
+  !$omp parallel do private(kx,ky,keff,k)
   do ky = 0, ny-1
      k = 0
      do kx = 0, nx-2, 2
@@ -64,7 +64,7 @@ subroutine cofdy (fk, fk_dy)
 
   scale1 = 2.d0*pi/yl
 
-  !$omp parallel do private(kx,ky)
+  !$omp parallel do private(kx,ky,keff,k)
   do kx = 0, nx-1
      k = 0
      do ky = 0, ny-2, 2 ! loop over real parts of the FFT signal
@@ -142,14 +142,14 @@ subroutine cofdxdy (fk, fk_dxdy)
   kx_max = (nx/2-1) 
   ky_max = (ny/2-1)
 
-  !$omp parallel do private(kx,ky)
+  !$omp parallel do private(kx,ky,fac)
   do ky = 0, ky_max
      do kx = 0, kx_max
         fac = - dble(kx) * dble (ky) * scale
-        fk_dxdy (2*kx, 2*ky)     = fac * fk (2*kx+1, 2*ky+1)
-        fk_dxdy (2*kx+1, 2*ky)   = - fac * fk (2*kx, 2*ky+1)
-        fk_dxdy (2*kx, 2*ky+1)   = - fac * fk (2*kx+1, 2*ky)
-        fk_dxdy (2*kx+1, 2*ky+1) = fac * fk (2*kx, 2*ky)
+        fk_dxdy (2*kx, 2*ky)     =  fac * fk (2*kx+1, 2*ky+1)
+        fk_dxdy (2*kx+1, 2*ky)   = -fac * fk (2*kx, 2*ky+1)
+        fk_dxdy (2*kx, 2*ky+1)   = -fac * fk (2*kx+1, 2*ky)
+        fk_dxdy (2*kx+1, 2*ky+1) =  fac * fk (2*kx, 2*ky)
      end do
   end do
   !$omp end parallel do
@@ -200,7 +200,7 @@ subroutine poisson (f, ans)
   scalex = (2.d0*pi/xl)**2
   scaley = (2.d0*pi/yl)**2
 
-  !$omp parallel do private(kx,ky,quot) 
+  !$omp parallel do private(kx,ky,quot,kx2eff,ky2eff) 
   do ky = 0, ky_max
      do kx = 0, kx_max
         if ( (kx == 0) .and. (ky == 0) ) then
@@ -262,7 +262,7 @@ subroutine vorticity2velocity( vortk, uk )
   implicit none
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: uk
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (in)  :: vortk  
-  real (kind=pr), dimension (0:nx-1, 0:ny-1) :: work2, stream
+  real (kind=pr), dimension (0:nx-1, 0:ny-1) :: stream
   integer :: iy
 
   !--Solve poisson equation for stream function
@@ -270,7 +270,7 @@ subroutine vorticity2velocity( vortk, uk )
   !--Calculate x-derivative of stream function
   call cofdx (-stream, uk(:,:,2))
   !--Calculate y-derivative of stream function
-  call cofdy (stream, uk(:,:,1)) 
+  call cofdy ( stream, uk(:,:,1)) 
 end subroutine vorticity2velocity
 
 

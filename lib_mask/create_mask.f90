@@ -45,7 +45,7 @@ subroutine lamballais_mask
   use share_vars
   use fieldexport
   implicit none
-  real(kind=pr) :: R,R1,R2,R3,normgrad, blend
+  real(kind=pr) :: R,R1,R2,R3,normgrad,blend
   real(kind=pr) :: phis(1:3)
   integer :: ix,iy
   integer :: i
