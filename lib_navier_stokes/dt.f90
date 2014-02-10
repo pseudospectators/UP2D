@@ -4,7 +4,7 @@ function timestep(time,it, u)
   implicit none
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: u
   real (kind=pr), dimension (0:nx-1, 0:ny-1) :: work2
-  real (kind=pr) :: dt1, u_max,timestep
+  real (kind=pr) :: dt1, u_max, timestep
   real (kind=pr), intent (in) :: time
   integer, intent (in) :: it
   integer :: iy

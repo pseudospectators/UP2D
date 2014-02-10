@@ -12,7 +12,7 @@ module share_vars
   real(kind=pr), save :: ux_mean, uy_mean
   
   character (len=40), save :: inicond, iMask, iMeanFlow, iMethod
-  character (len=40), save :: name
+  character (len=40), save :: name, ipressure, iActive
   
   ! deliberately reduce code to second order FD?
   logical, save :: FD_2nd = .false.

@@ -14,15 +14,17 @@ subroutine time_step
   
   if (FD_2nd) write (*,*) "!!! ATTENTION; RUNNING IN REDUCED ACCURACY MODE"
   
-  !-- Initialize vorticity or read values from a backup file
-  call init_fields (u, uk, pk, vort, nlk)  
-  
   !-- create startup mask
   call create_mask (time)
-  call SaveGIF(mask, trim(name)//"startup_mask", 13)   
-  call SaveGIF(us(:,:,1),trim(name)//'usx')
-  call SaveGIF(us(:,:,2),trim(name)//'usy')
   
+  !-- Initialize vorticity or read values from a backup file
+  call init_fields (u, uk, pk, vort, nlk)    
+  
+  call SaveGIF (mask, trim(name)//"startup_mask", 13)   
+  call SaveGIF (us(:,:,1),trim(name)//'usx')
+  call SaveGIF (us(:,:,2),trim(name)//'usy')
+  call SaveGIF (normals(:,:,1),trim(name)//'normal_x')
+  call SaveGIF (normals(:,:,2),trim(name)//'normal_y')
   
   !-- compute initial pressure (for implicit penalization)
 !   call cal_pressure ( time, u, uk, pk )  
@@ -78,10 +80,24 @@ subroutine time_step
       endif
   enddo
   
+  !-- compute error for lambaallais case
   if (iMask=='lamballais') then
     call lamballais_error(u)
     call SaveField( u(:,:,1), trim(name)//'ux_final')
     call SaveField( u(:,:,2), trim(name)//'uy_final')
+  endif
+  
+  !-- save terminal flow field in the dipole-case
+  if ( iMask == "dipole") then
+    write (timestring,'(i5.5)') nint(time*100.d0)         
+    colorscale = 0.25d0*max(maxval(vort),dabs(minval(vort))) 
+    call SaveGIF(vort, "vor/"//trim(timestring)//".vor", 1, -colorscale, colorscale)
+    call SaveField( u(:,:,1), trim(name)//'ux_final')
+    call SaveField( u(:,:,2), trim(name)//'uy_final')
+    call curl (uk, pk)
+    call cofitxy(pk,vort)
+    call SaveField( u(:,:,2), trim(name)//'vor_final')
+            
   endif
   
   

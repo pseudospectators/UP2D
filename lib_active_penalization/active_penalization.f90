@@ -1,4 +1,28 @@
-subroutine active_prolongation ( u, u_smooth )
+subroutine create_us ( time, u, uk )
+  use share_vars
+  use FieldExport
+  implicit none
+  real (kind=pr), intent(in) :: time
+  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: u, uk
+  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: u_smooth
+
+  if ( iActive == "chantalat" ) then
+    !-- use chantalat's method to compute the smooth extension
+    call active_prolongation_chantalat ( u, u_smooth )
+    us = u_smooth + u_BC
+  elseif (iActive == "passive" ) then
+    !-- us does not depend on u: classic penalization
+    us = u_BC
+  else
+    write (*,*) "error: iactive is wrong."
+    stop
+  endif
+  
+end subroutine create_us
+
+!===============================================================================
+
+subroutine active_prolongation_chantalat ( u, u_smooth )
   use share_vars
   use FieldExport
   implicit none
@@ -6,7 +30,7 @@ subroutine active_prolongation ( u, u_smooth )
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: u_smooth
   real (kind=pr), dimension (0:nx-1, 0:ny-1) :: ux_x,ux_y, uy_x,uy_y
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: beta
-  real(kind=pr) :: CFL_act, umax=1.d0, Tend, dt,R,R1
+  real (kind=pr) :: CFL_act, umax=1.d0, Tend, dt,R,R1
   integer :: ix,iy,nt2,it
   
   !----------------------------------------------------------------------------- 
@@ -69,10 +93,10 @@ subroutine active_prolongation ( u, u_smooth )
   enddo
   enddo
   !$omp end parallel do
-end subroutine active_prolongation
+end subroutine active_prolongation_chantalat
 
 
-
+!===============================================================================
 
 
 
@@ -113,7 +137,7 @@ subroutine RHS_central ( field, rhs,  dt )
 end subroutine RHS_central
 
 
-
+!===============================================================================
 
 subroutine RK4 ( field, dt )
   use share_vars

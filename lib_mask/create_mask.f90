@@ -9,29 +9,34 @@ subroutine create_mask (time)
   real (kind=pr), intent (in) :: time
   real (kind=pr) :: R
   integer :: ix, iy
-
-  mask = 0.d0
-  us   = 0.d0
-  
-  select case (iMask)
-  case('cylinder')
-    call cylinder()
-  case('lamballais')
-    call lamballais_mask()
-  case('couette')
-    call couette_mask()
-  case('none')
+  ! time dependent masks currently not in  
+  ! this function does nothing when called after time=0.d0
+  if (time == 0.d0) then
     mask = 0.d0
-  case default
-    write (*,*) "mask not defnd", iMask
-    stop    
-  end select  
-  
-  !$omp parallel do private(iy)
-  do iy=0,ny-1
-    mask(:,iy) = mask(:,iy) / eps
-  enddo
-  !$omp end parallel do  
+    us   = 0.d0
+    
+    select case (iMask)
+    case('cylinder')
+      call cylinder()
+    case('lamballais')
+      call lamballais_mask()
+    case('couette')
+      call couette_mask()
+    case('dipole')
+      call dipole_mask()      
+    case('none')
+      mask = 0.d0
+    case default
+      write (*,*) "mask not defnd", iMask
+      stop    
+    end select  
+    
+    !$omp parallel do private(iy)
+    do iy=0,ny-1
+      mask(:,iy) = mask(:,iy) / eps
+    enddo
+    !$omp end parallel do    
+  endif
 end subroutine create_mask
 
 !===============================================================================
@@ -55,6 +60,7 @@ subroutine lamballais_mask
   do ix=0,nx-1
     do iy=0,ny-1
       R = dsqrt( (dble(ix)*dx-x0)**2 + (dble(iy)*dy-y0)**2 )      
+      ! phi functions for all three interfaces
       phis(1) = (R-R1)
       phis(2) =-(R-R2)
       phis(3) = (R-R3)
@@ -163,5 +169,64 @@ subroutine SmoothStep (f,x,t,h)
 end subroutine SmoothStep
 
 !===============================================================================
+
+
+subroutine dipole_mask
+  use share_vars
+  use fieldexport
+  implicit none
+  integer :: ix,iy
+  real(kind=pr) :: p ! exponent for norm
+  real(kind=pr) :: x,y,normgrad, blend
+  
+  phi = 0.d0 ! signed distance
+  u_BC = 0.d0 ! non-homogeneous dirichlet BC (zero in this case)
+  
+  x0 = 0.5d0*xl
+  y0 = 0.5d0*yl
+  ! exponent. phi converges to rectangle in the limit p->\infty
+  p = 20.d0
+  
+  !-- compute signed distance function
+  do ix=0,nx-1
+    do iy=0,ny-1
+      ! dipole-wall case: we have only one phi-function
+      x = dble(ix)*dx
+      y = dble(iy)*dy
+      phi (ix,iy) = - (((x-x0)**p + (y-y0)**p)**(1.d0/p) - 1.d0)
+    enddo
+  enddo    
+  
+  !-- compute chi function (traditional mask function)
+  call phi2chi()
+  
+  !-- compute normal vectors
+  do ix=0,nx-1
+    do iy=0,ny-1
+      normals(ix,iy,1) = (phi(getindex(ix+1,nx),iy) - phi(getindex(ix-1,nx),iy) )/(2.0d0*dx)
+      normals(ix,iy,2) = (phi(ix,getindex(iy+1,ny)) - phi(ix,getindex(iy-1,ny)) )/(2.0d0*dy)
+      !-- normalize
+      normgrad = dsqrt ( normals(ix,iy,1)**2 + normals(ix,iy,2)**2 )
+      if ( normgrad > 1e-10) then
+        normals(ix,iy,1) = normals(ix,iy,1) / normgrad
+        normals(ix,iy,2) = normals(ix,iy,2) / normgrad
+      else
+        normals(ix,iy,1) = 0.d0
+        normals(ix,iy,2) = 0.d0      
+      endif
+      !-- blending: reduce normal vectors to a BL close to interface
+      call SmoothStep(blend,dabs(phi(ix,iy)),4.d0*dx,3.d0*dx)
+      normals(ix,iy,1) = normals(ix,iy,1) * blend
+      normals(ix,iy,2) = normals(ix,iy,2) * blend
+    enddo
+  enddo
+  
+end subroutine dipole_mask
+
+
+!===============================================================================
+
+
+
 
 end module masks

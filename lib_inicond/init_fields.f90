@@ -59,7 +59,10 @@ subroutine init_fields (u, uk, pk, vor, nlk)
 
   
   write(*,'("inicond=",A," max field divergence ",es12.4)') trim(inicond), max_divergence(uk)
-  call add_pressure( uk )
+  if ( ipressure == "classic") then
+    ! there's a problem doing this with "modified"
+    call add_pressure( uk, uk, u, vor )
+  endif
   write(*,'("inicond=",A," max field divergence ",es12.4)') trim(inicond), max_divergence(uk)
 
 end subroutine 

@@ -12,23 +12,23 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   real(kind=pr), dimension(0:nx-1,0:ny-1), intent (inout) :: vort, p
   real(kind=pr), intent (out) :: dt
   real(kind=pr), intent (in) :: time
-  real (kind=pr), dimension (0:nx-1, 0:ny-1) :: workvis
-  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp, u_tmp, u_smooth
+  real(kind=pr), dimension (0:nx-1, 0:ny-1) :: workvis
+  real(kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp, u_tmp
   integer :: iy
   integer, intent(in) :: it
   real(kind=pr) :: timestep, max_divergence
 
   dt = timestep (time,it,u)
-  ! compute integrating factor
+  !-- compute integrating factor
   call cal_vis (dt, workvis)  
-  !call create_mask (time)
-!   call active_prolongation ( u, u_smooth )
-!   us = u_smooth + u_BC
-  us = u_BC
+  !-- mask and us
+  call create_mask (time)
+  call create_us (time, u, uk)
+  !-- RHS and pressure
   call cal_nlk (time, u, uk, vort, nlk, .true.)
-  call add_pressure (nlk)
+  call add_pressure (nlk, uk, u, vort)
 
-   
+  !-- do the euler step 
   !$omp parallel do private (iy)
   do iy=0,ny-1
     uk_tmp(:,iy,1) = (uk(:,iy,1)+dt*nlk(:,iy,1))*dealiase(:,iy)*workvis(:,iy)
@@ -36,8 +36,8 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   enddo
   !$omp end parallel do 
   
-  ! mean flow forcing
-  call mean_flow(uk_tmp)
+  !-- mean flow forcing
+  call mean_flow (uk_tmp)
   
   !-- velocity in phys. space
   call cofitxy (uk_tmp(:,:,1), u_tmp(:,:,1))
@@ -47,13 +47,14 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   !---------------------------------------------------------------------------------
   ! do second RK2 step (RHS evaluation with the argument defined above)
   !---------------------------------------------------------------------------------
-  !call create_mask(time+dt)
-!   call active_prolongation ( u, u_smooth )
-!   us = u_smooth + u_BC
-  call cal_nlk(time+dt, u_tmp, uk_tmp, vort, nlk2, .true.)  
-  call add_pressure(nlk2)
+  !-- mask and us
+  call create_mask (time)
+  call create_us (time, u, uk)
+  !-- RHS and pressure
+  call cal_nlk (time+dt, u_tmp, uk_tmp, vort, nlk2, .true.)  
+  call add_pressure (nlk2, uk_tmp, u_tmp, vort)
 
-  ! sum up all the terms.
+  !-- sum up all the terms (final step)
   !$omp parallel do private (iy)
   do iy=0,ny-1
       uk(:,iy,1) = ( uk(:,iy,1)*workvis(:,iy) + 0.5d0*dt*( nlk(:,iy,1)*workvis(:,iy) + nlk2(:,iy,1) ) )*dealiase(:,iy)      
@@ -62,7 +63,7 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   !$omp end parallel do 
   
   !-- mean flow forcing
-  call mean_flow(uk)     
+  call mean_flow (uk)     
   !-- velocity in phys. space
   call cofitxy (uk(:,:,1), u(:,:,1))
   call cofitxy (uk(:,:,2), u(:,:,2))
