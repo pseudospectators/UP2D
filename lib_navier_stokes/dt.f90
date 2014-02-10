@@ -22,7 +22,6 @@ function timestep(time,it, u)
   if (isnan(dt1)) then
     write(*,*) "Warning: dt_CFL = NaN"
     write(*,*) u_max, cfl, dt1
-    write(*,*) isnan(work2)
     stop
   endif
   

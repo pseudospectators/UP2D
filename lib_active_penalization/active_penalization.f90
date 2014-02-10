@@ -6,6 +6,8 @@ subroutine create_us ( time, u, uk )
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: u, uk
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: u_smooth
 
+  u_smooth = 0.d0
+  
   if ( iActive == "chantalat" ) then
     !-- use chantalat's method to compute the smooth extension
     call active_prolongation_chantalat ( u, u_smooth )
@@ -19,6 +21,7 @@ subroutine create_us ( time, u, uk )
   elseif (iActive == "passive" ) then
     !-- us does not depend on u: classic penalization
     us = u_BC
+    
   else
     write (*,*) "error: iactive is wrong."
     stop
