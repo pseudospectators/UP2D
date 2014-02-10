@@ -207,10 +207,98 @@ subroutine active_prolongation_dave ( u, u_smooth )
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: u
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: u_smooth
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: beta
-  real (kind=pr) :: CFL_act, umax=1.d0, Tend, dt,R,R1
-  integer :: ix,iy,nt2,it
+  real (kind=pr) :: delta, s, b0, b1,ux_BC_interp,uy_BC_interp
+  real (kind=pr) :: beta_x_interp,beta_y_interp, xi_x, xi_y,x,y,LinearInterpolation
+  integer :: ix,iy
   
   !-- compute the field of normal derivatives
   call compute_beta_field ( u, beta )
   
+  !-- define boundary layer thickness
+  delta = 0.20d0 ! attention fixed value!!!!
+  
+  !-----------------------------------------------------------------------------
+  ! loop over points in the boundary layer where we intent to construct us
+  !-----------------------------------------------------------------------------  
+  !$omp parallel do private(iy,ix)
+  do ix=0, nx-1
+    do iy=0, ny-1
+      if ((phi(ix,iy) >= -delta).and.(phi(ix,iy) <=0.d0) ) then
+        !-- this point lies inside the obstacle and in the neighborhood of the 
+        !-- interface
+        
+        !-- coordinates of current point
+        x = dble(ix)*dx
+        y = dble(iy)*dy
+        
+        !-- coordinates of closest point on the interface
+        xi_x = x - normals(ix,iy,1)*phi(ix,iy)
+        xi_y = y - normals(ix,iy,2)*phi(ix,iy)
+        
+        !---------------------------------------
+        ! interpolate values of beta
+        !---------------------------------------
+        ! inhomogeneous dirichlet:
+        ux_BC_interp = 0.d0
+        uy_BC_interp = 0.d0
+        ! normal derivative
+        beta_x_interp = LinearInterpolation ( xi_x,xi_y,beta(:,:,1),0.d0,0.d0,xl-dx,yl-dy )
+        beta_y_interp = LinearInterpolation ( xi_x,xi_y,beta(:,:,2),0.d0,0.d0,xl-dx,yl-dy )
+        
+        !-- s is the dimensionless boundary layer coordinate
+        s = -phi(ix,iy) / delta
+        
+        !-- basis functions: (they differ from dave's work)
+        b0 = 3.d0*s**4 -4.d0*s**3+1.d0
+        b1 = s**3 -2.d0*s**2 + s
+           
+        !-- construct us using both basis functions
+        u_smooth(ix,iy,1) = ux_BC_interp*b0 - delta*b1*beta_x_interp
+        u_smooth(ix,iy,2) = uy_BC_interp*b0 - delta*b1*beta_y_interp
+      endif
+    enddo
+  enddo
+  !$omp end parallel do 
 end subroutine active_prolongation_dave
+
+
+
+real (kind=pr) function LinearInterpolation (x_target, y_target, field2, x1_box, y1_box, x2_box, y2_box )
+!  LINEAR Interpolation in a field. The field is of automatic size, indices starting with 0 both. The domain is 
+!  defined by x1_box,y1_box and x2_box,y2_box. The target coordinates should lie within that box.
+!  NOTE: attention on the upper point of the box. In the rest of the code, which is periodic, the grid is 0:nx-1
+!        but the lattice spacing is yl/nx. This means that the point (nx-1) has NOT the coordinate yl but yl-dx
+!        (otherwise this point would exist two times!)
+!  NOTE3: Coordinates in the box are a constant source for errors. be careful and note that x1_box is NOT ZERO
+  use share_vars
+  implicit none
+  integer :: i,j
+  real (kind=pr) :: x,y,x_1,y_1,x_2,y_2,dx1, dy1, R1,R2
+  real (kind=pr), intent (in) :: field2(0:nx-1,0:ny-1), x_target, y_target, x1_box, y1_box, x2_box, y2_box
+
+  dx1 = (x2_box-x1_box)/real(size(field2,1)-1 )
+  dy1 = (y2_box-y1_box)/real(size(field2,2)-1 )
+
+
+  if ( (x_target > x2_box).or.(x_target < x1_box).or.(y_target > y2_box).or.(y_target < y1_box) ) then
+    write(*,'("target: (",es11.4,"|",es11.4,") but box: (",es11.4,"|",es11.4,") x (",es11.4,"|",es11.4,")")') &
+    x_target, y_target, x1_box, y1_box, x2_box, y2_box
+    write (*,*) "!!! LinearInterpolation: target coordinates not in the field."
+    stop
+  endif
+
+  i=int((x_target-x1_box)/dx1)  ! attention on index shift because of automatic array
+  j=int((y_target-y1_box)/dy1)
+
+  x_1= real(i)*dx1 + x1_box
+  y_1= real(j)*dy1 + y1_box
+  x_2= dx1*real(i+1) + x1_box
+  y_2= dy1*real(j+1) + y1_box
+  R1 = (x_2-x_target)*field2(i,j)/dx1   + (x_target-x_1)*field2(i+1,j)/dx1
+  R2 = (x_2-x_target)*field2(i,j+1)/dx1 + (x_target-x_1)*field2(i+1,j+1)/dx1
+
+  LinearInterpolation = (y_2-y_target)*R1/dy1 + (y_target-y_1)*R2/dy1
+
+  return
+
+end function LinearInterpolation

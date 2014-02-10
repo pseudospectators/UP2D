@@ -3,7 +3,7 @@ timing.f90
 mean_velocity.f90                             
 params.f90                                    
 time_step.f90    
-dns.f90      
+dns.f90   
 ./lib_fileIO/gif_util.f90    
 ./lib_fileIO/fieldexport.f90     
 ./lib_fileIO/save_fields.f90  

@@ -93,10 +93,15 @@ subroutine lamballais_mask
         normals(ix,iy,1) = 0.d0
         normals(ix,iy,2) = 0.d0      
       endif
-      !-- blending: reduce normal vectors to a BL close to interface
-      call SmoothStep(blend,dabs(phi(ix,iy)),4.d0*dx,3.d0*dx)
-      normals(ix,iy,1) = normals(ix,iy,1) * blend
-      normals(ix,iy,2) = normals(ix,iy,2) * blend
+      
+      if (iActive == "chantalat") then
+        !-- blending: reduce normal vectors to a BL close to interface
+        !-- the prolongation method based on basis functions handels this 
+        !-- differently, so do it only in the cantalat case.
+        call SmoothStep(blend,dabs(phi(ix,iy)),4.d0*dx,3.d0*dx)
+        normals(ix,iy,1) = normals(ix,iy,1) * blend
+        normals(ix,iy,2) = normals(ix,iy,2) * blend
+      endif
     enddo
   enddo
 end subroutine lamballais_mask
