@@ -2,7 +2,8 @@ module share_vars
   implicit none  
   integer, parameter :: pr = kind (0.d0) 
   
-  integer, save :: nx, ny, nt
+  integer, save :: nx, ny
+  integer(kind=8), save :: nt
   integer, save :: iDealias, nPalettes=14
 
   real(kind=pr), save :: colorscale = 0.d0 ! scaling for farge palette (vorticity)

@@ -18,7 +18,7 @@ module timing
     integer*8 :: rate, dummy, time_current
     real :: performance
     character (len=*), intent(in) :: Start
-    
+    performance = 0.0
     if (Start == "start") then
       !-- save start time to the "start_times"-array (there's only one value per channel)
       call system_clock(start_times(channel), rate, dummy) 
