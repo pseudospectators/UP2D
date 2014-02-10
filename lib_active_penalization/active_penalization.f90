@@ -20,7 +20,55 @@ subroutine create_us ( time, u, uk )
   
 end subroutine create_us
 
+
+
 !===============================================================================
+
+
+
+subroutine compute_beta_field (u, beta)
+! computes the BETA field, which is the normal derivatives
+! beta = (n \cdot \nabla) u
+  use share_vars
+  use FieldExport
+  implicit none 
+  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: u
+  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: beta
+  real (kind=pr), dimension (0:nx-1, 0:ny-1) :: ux_x,ux_y,uy_x,uy_y
+  integer :: ix,iy
+  
+  !----------------------------------------------------------------------------- 
+  !-- compute beta field
+  !-----------------------------------------------------------------------------
+  !$omp parallel do private(ix)
+  do ix=0,nx-1
+    ux_x(ix,:) = (u(getindex(ix+1,nx),:,1)-u(getindex(ix-1,nx),:,1))/(2.d0*dx)
+    uy_x(ix,:) = (u(getindex(ix+1,nx),:,2)-u(getindex(ix-1,nx),:,2))/(2.d0*dx)
+  enddo  
+  !$omp end parallel do
+  
+  !$omp parallel do private(iy)
+  do iy=0,ny-1
+    ux_y(:,iy) = (u(:,getindex(iy+1,ny),1)-u(:,getindex(iy-1,ny),1))/(2.d0*dy)
+    uy_y(:,iy) = (u(:,getindex(iy+1,ny),2)-u(:,getindex(iy-1,ny),2))/(2.d0*dy)
+  enddo  
+  !$omp end parallel do
+  
+  !$omp parallel do private(iy)
+  do iy=0,ny-1
+    beta(:,iy,1) = (normals(:,iy,1)*ux_x(:,iy) + normals(:,iy,2)*ux_y(:,iy))
+    beta(:,iy,2) = (normals(:,iy,1)*uy_x(:,iy) + normals(:,iy,2)*uy_y(:,iy))
+    beta(:,iy,1) = beta(:,iy,1)*(1.d0-mask(:,iy)*eps)
+    beta(:,iy,2) = beta(:,iy,2)*(1.d0-mask(:,iy)*eps)
+  enddo  
+  !$omp end parallel do  
+end subroutine compute_beta_field
+
+
+
+!===============================================================================
+
+
 
 subroutine active_prolongation_chantalat ( u, u_smooth )
   use share_vars
@@ -28,36 +76,13 @@ subroutine active_prolongation_chantalat ( u, u_smooth )
   implicit none
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: u
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: u_smooth
-  real (kind=pr), dimension (0:nx-1, 0:ny-1) :: ux_x,ux_y, uy_x,uy_y
+  
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: beta
   real (kind=pr) :: CFL_act, umax=1.d0, Tend, dt,R,R1
   integer :: ix,iy,nt2,it
   
-  !----------------------------------------------------------------------------- 
-  !-- compute beta field
-  !-----------------------------------------------------------------------------
-  !$omp parallel do private(ix)
-  do ix=0,nx-1
-     ux_x(ix,:) = (u(getindex(ix+1,nx),:,1)-u(getindex(ix-1,nx),:,1))/(2.d0*dx)
-     uy_x(ix,:) = (u(getindex(ix+1,nx),:,2)-u(getindex(ix-1,nx),:,2))/(2.d0*dx)
-  enddo  
-  !$omp end parallel do
-  
-  !$omp parallel do private(iy)
-  do iy=0,ny-1
-     ux_y(:,iy) = (u(:,getindex(iy+1,ny),1)-u(:,getindex(iy-1,ny),1))/(2.d0*dy)
-     uy_y(:,iy) = (u(:,getindex(iy+1,ny),2)-u(:,getindex(iy-1,ny),2))/(2.d0*dy)
-  enddo  
-  !$omp end parallel do
-  
-  !$omp parallel do private(iy)
-  do iy=0,ny-1
-      beta(:,iy,1) = (normals(:,iy,1)*ux_x(:,iy) + normals(:,iy,2)*ux_y(:,iy))
-      beta(:,iy,2) = (normals(:,iy,1)*uy_x(:,iy) + normals(:,iy,2)*uy_y(:,iy))
-      beta(:,iy,1) = beta(:,iy,1)*(1.d0-mask(:,iy)*eps)
-      beta(:,iy,2) = beta(:,iy,2)*(1.d0-mask(:,iy)*eps)
-  enddo  
-  !$omp end parallel do
+  !-- compute the field of normal derivatives
+  call compute_beta_field ( u, beta )
   
   !-----------------------------------------------------------------------------
   !-- prolongate beta field using advection/diffusion
@@ -171,3 +196,21 @@ subroutine RK4 ( field, dt )
   enddo  
   !$omp end parallel do    
 end subroutine RK4
+
+
+!===============================================================================
+
+subroutine active_prolongation_dave ( u, u_smooth )
+  use share_vars
+  use FieldExport
+  implicit none
+  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: u
+  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: u_smooth
+  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: beta
+  real (kind=pr) :: CFL_act, umax=1.d0, Tend, dt,R,R1
+  integer :: ix,iy,nt2,it
+  
+  !-- compute the field of normal derivatives
+  call compute_beta_field ( u, beta )
+  
+end subroutine active_prolongation_dave
