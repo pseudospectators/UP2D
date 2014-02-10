@@ -19,6 +19,13 @@ function timestep(time,it, u)
   u_max = dsqrt(maxval(work2))  
   dt1 = cfl*min(dx,dy)/u_max
 
+  if (isnan(dt1)) then
+    write(*,*) "Warning: dt_CFL = NaN"
+    write(*,*) u_max, cfl, dt1
+    write(*,*) isnan(work2)
+    stop
+  endif
+  
   !-- u_max is very small
   if (u_max <= 1.0d-10) then 
     dt1 = 1.0d-3 
@@ -51,3 +58,19 @@ function timestep(time,it, u)
   endif
   timestep = dt1
 end function  
+
+
+subroutine checknan(field)
+use share_vars
+implicit none
+real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: field
+integer :: ix,iy
+do ix=0,nx-1
+do iy=0,ny-1
+if (isnan(field(ix,iy))) then
+write (*,'("NaN! ix=",i4," iy=",i4)') ix,iy
+stop
+endif
+enddo
+enddo
+end subroutine

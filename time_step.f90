@@ -9,7 +9,7 @@ subroutine time_step
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2) :: u, uk, nlk
   real(kind=pr), dimension(0:nx-1,0:ny-1) :: pk, vort
   real(kind=pr) :: T_lastdrag=0.0d0, T_lastsave=0.0d0, t1, time_left
-  integer(kind=8) :: it=0
+  integer :: it=0
   character(len=5) :: timestring    
   time = 0.0
   it = 0
@@ -34,8 +34,10 @@ subroutine time_step
   !----------------------------------------------------------------
   ! loop over time steps
   !---------------------------------------------------------------- 
-  write (*,'("Initializatzion done, looping now. time=",es12.4," Tmax=",es12.4," it=",i2)'), &
-    time, Tmax, it
+  write (*,'("Initializatzion done, looping now.")')
+  write (*,'("time=",es12.4," Tmax=",es12.4," it=",i2," nt=",i9)'), &
+    time, Tmax, it, nt
+    
   do while ((time<Tmax) .and. (it<=nt))
       t1 = Performance("start",1)
       
