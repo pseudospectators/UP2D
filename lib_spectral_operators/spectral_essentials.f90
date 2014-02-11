@@ -256,6 +256,26 @@ end subroutine
 
 
 
+subroutine divergence( uk, divuk )  
+  use share_vars
+  implicit none
+  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: uk
+  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out)  :: divuk  
+  real (kind=pr), dimension (0:nx-1, 0:ny-1) :: work1, work2
+  integer :: iy
+  
+  call cofdx(uk(:,:,1), work1)
+  call cofdy(uk(:,:,2), work2)
+  
+  !$omp parallel do private(iy)
+  do iy=0,ny-1
+      divuk(:,iy) = work1(:,iy) + work2(:,iy)
+  enddo
+  !$omp end parallel do    
+end subroutine
+
+
+
 subroutine vorticity2velocity( vortk, uk )
   ! this routine computes the streamfunction and the velocity field given a vorticity in fourier space
   use share_vars

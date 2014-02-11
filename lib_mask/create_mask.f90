@@ -201,11 +201,13 @@ subroutine compute_normals
   integer :: ix,iy
   real(kind=pr) :: normgrad, blend
   
+  normals = 0.d0
+  
   !$omp parallel do private(ix,iy,normgrad,blend)
-  do ix=0,nx-1
-    do iy=0,ny-1
-      normals(ix,iy,1) = (phi(getindex(ix+1,nx),iy) - phi(getindex(ix-1,nx),iy) )/(2.0d0*dx)
-      normals(ix,iy,2) = (phi(ix,getindex(iy+1,ny)) - phi(ix,getindex(iy-1,ny)) )/(2.0d0*dy)
+  do ix=1,nx-2 ! skip first and last point
+    do iy=1,ny-2 ! skip first and last point
+      normals(ix,iy,1) = (phi(ix+1,iy) - phi(ix-1,iy) )/(2.0d0*dx)
+      normals(ix,iy,2) = (phi(ix,iy+1) - phi(ix,iy-1) )/(2.0d0*dy)
       
       !-- normalize
       normgrad = dsqrt ( normals(ix,iy,1)**2 + normals(ix,iy,2)**2 )

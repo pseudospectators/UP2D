@@ -62,9 +62,13 @@ subroutine time_step
         !----------------------------------------------------------------
         write (timestring,'(i5.5)') nint(time*100.d0)         
         colorscale = 0.25d0*max(maxval(vort),dabs(minval(vort))) 
-        call SaveGIF(vort, "vor/"//trim(timestring)//".vor", 1, -colorscale, colorscale)
-                        
+        call SaveGIF(vort, "vor/"//trim(timestring)//".vor", 1, -colorscale, colorscale)        
         write (*,'("Snapshot. time=",es12.4," vormax=",es12.4)') time, max(maxval(vort),dabs(minval(vort))) 
+        if (ipressure == "modified") then
+          call divergence( uk, pk )
+          call cofitxy( pk, vort )
+          call SaveGIF( vort, "vor/"//trim(timestring)//".divu" )
+        endif
         T_lastdrag=time
       endif
  

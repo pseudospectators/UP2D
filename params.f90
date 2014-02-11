@@ -100,6 +100,7 @@ subroutine get_params_common(PARAMS,i)
   ! Geometry section
   call GetValue_Real(PARAMS,i,"Geometry","xl",xl, 1.d0)
   call GetValue_Real(PARAMS,i,"Geometry","yl",yl, 1.d0)
+  call GetValue_Real(PARAMS,i,"Geometry","delta",delta, 0.1d0)
 
   ! saving section
   call GetValue_Real(PARAMS,i,"Saving","tsave",tsave, 1.d0)

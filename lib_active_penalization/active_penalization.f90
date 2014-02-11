@@ -99,9 +99,9 @@ subroutine active_prolongation_chantalat ( u, u_smooth )
   !-----------------------------------------------------------------------------
   CFL_act = 0.98d0
   umax = 1.d0
-  dt = CFL_act*dx/umax
-  Tend = 0.05d0
-  nt2 = nint(Tend/dt)
+  dt   = CFL_act*dx/umax
+  Tend = delta / umax
+  nt2  = nint(Tend/dt)
   
   do it=1, nt2
     call RK4 ( beta(:,:,1), dt )
@@ -217,16 +217,13 @@ subroutine active_prolongation_dave ( u, u_smooth )
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: u
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: u_smooth
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: beta
-  real (kind=pr) :: delta, s, b0, b1,ux_BC_interp,uy_BC_interp
+  real (kind=pr) :: s, b0, b1,ux_BC_interp,uy_BC_interp
   real (kind=pr) :: beta_x_interp,beta_y_interp, xi_x, xi_y,x,y,LinearInterpolation
   integer :: ix,iy
   
   !-- compute the field of normal derivatives
   call compute_beta_field ( u, beta )
-  
-  !-- define boundary layer thickness
-  delta = 0.15d0 ! attention fixed value!!!!
-  
+     
   !-----------------------------------------------------------------------------
   ! loop over points in the boundary layer where we intent to construct us
   !-----------------------------------------------------------------------------  
@@ -234,8 +231,7 @@ subroutine active_prolongation_dave ( u, u_smooth )
   do ix=0, nx-1
     do iy=0, ny-1
       if ((phi(ix,iy) >= -delta).and.(phi(ix,iy) <=0.d0) ) then
-        !-- this point lies inside the obstacle and in the neighborhood of the 
-        !-- interface
+        !-- this point lies inside the obstacle and in the neighborhood of the interface
         
         !-- coordinates of current point
         x = dble(ix)*dx
