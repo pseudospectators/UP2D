@@ -16,8 +16,8 @@ subroutine lamballais(u, uk, p, vor, nlk)
 
   write(*,*) 'Lamballais: loaded exact solution.'
 
-  u = 0.d0
-  uk = 0.d0
+  u   = 0.d0
+  uk  = 0.d0
   vor = 0.d0
   
 end subroutine lamballais
@@ -32,13 +32,13 @@ subroutine lamballais_error(u)
   real(kind=pr) :: R,R1,R2,R3, e1,e2, diffu, uabs
   integer :: ix, iy
 
-  R1=0.50d0
-  R2=1.75d0
-  R3=2.25d0
-  x0=xl/2.d0
-  y0=yl/2.d0
-  e1=0.d0
-  e2=0.d0
+  R1 = 0.50d0
+  R2 = 1.75d0
+  R3 = 2.25d0
+  x0 = xl/2.d0
+  y0 = yl/2.d0
+  e1 = 0.d0
+  e2 = 0.d0
   
   do ix=0,nx-1
     do iy=0,ny-1
@@ -48,13 +48,13 @@ subroutine lamballais_error(u)
                 dsqrt(uex(ix,iy,1)**2+uex(ix,iy,2)**2)
         uabs  = dsqrt(uex(ix,iy,1)**2+uex(ix,iy,2)**2)
      
-        e1 = e1 + diffu**2
-        e2 = e2 + uabs**2
+        e1 = e1 + diffu**2 ! absolute error
+        e2 = e2 + uabs**2  ! normalization
       endif
     enddo
   enddo
   
-  e1 = dsqrt(e1) / dsqrt(e2)
+  e1 = dsqrt(e1) / dsqrt(e2) ! relative error
   
   open (14, file = trim(name)//'error', status = 'unknown', access = 'append')
   write (14,'(i4,1x,i4,1x,es12.4,1x,es12.4,1x,f4.2,1x,es15.8,1x,A)') nx, ny, eps, Tmax, CFL, e1, iMethod

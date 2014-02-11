@@ -1,4 +1,3 @@
-! ==========================================================================================================================
 function timestep(time,it, u)
   use share_vars
   implicit none
@@ -31,16 +30,17 @@ function timestep(time,it, u)
   endif
 
   !-- Time stepping control for volume penalization
-  if (( dt1 >= 0.9d0*eps ).and.(iMethod.ne."RK2_implicit")) then
+!   if (( dt1 >= 0.9d0*eps ).and.(iMethod.ne."RK2_implicit")) then
+  if ( dt1 >= 0.9d0*eps ) then
     dt1 = min(0.9d0*eps,dt1)
   endif
   
-  !-- Don't jump past final time
+  !-- Don't jump past final time        
   if ((Tmax - time) < dt1) then
     dt1 = Tmax - time
   endif  
   
-  !-- use fixed time step is set in params
+  !-- use fixed time step if set in params
   if (dt_fixed>0.d0) then
     dt1 = dt_fixed
   endif
@@ -56,20 +56,4 @@ function timestep(time,it, u)
     close (14)
   endif
   timestep = dt1
-end function  
-
-
-subroutine checknan(field)
-use share_vars
-implicit none
-real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: field
-integer :: ix,iy
-do ix=0,nx-1
-do iy=0,ny-1
-if (isnan(field(ix,iy))) then
-write (*,'("NaN! ix=",i4," iy=",i4)') ix,iy
-stop
-endif
-enddo
-enddo
-end subroutine
+end function

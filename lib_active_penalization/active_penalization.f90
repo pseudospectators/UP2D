@@ -7,6 +7,7 @@ subroutine create_us ( time, u, uk )
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: u_smooth
 
   u_smooth = 0.d0
+  us = 0.d0
   
   if ( iActive == "chantalat" ) then
     !-- use chantalat's method to compute the smooth extension
@@ -36,8 +37,8 @@ end subroutine create_us
 
 
 subroutine compute_beta_field (u, beta)
-! computes the BETA field, which is the normal derivatives
-! beta = (n \cdot \nabla) u
+  ! computes the BETA field, which is the normal derivatives
+  ! beta = (n \cdot \nabla) u
   use share_vars
   use FieldExport
   implicit none 
@@ -129,7 +130,7 @@ subroutine active_prolongation_chantalat ( u, u_smooth )
       enddo
       !$omp end parallel do
   else
-      !$omp parallel do private(iy,ix,R)
+      !$omp parallel do private(iy,ix)
       do ix=0,nx-1
       do iy=0,ny-1
           u_smooth(ix,iy,1) = (mask(ix,iy)*eps)*phi(ix,iy)*beta(ix,iy,1)

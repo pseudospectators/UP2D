@@ -4,25 +4,32 @@ subroutine init_fields (u, uk, pk, vor, nlk)
   implicit none
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2), intent (inout) :: u, uk, nlk
   real(kind=pr), dimension(0:nx-1,0:ny-1), intent (inout) :: vor, pk
-  real(kind=pr), dimension(0:nx-1,0:ny-1) :: vortk, work
+  real(kind=pr), dimension(0:nx-1,0:ny-1) :: vortk
   real(kind=pr) :: r0,we,d,r1,r2, max_divergence
   integer :: ix,iy
   
-  u = 0.d0
-  uk = 0.d0
+  u   = 0.d0
+  uk  = 0.d0
   vor = 0.d0
-  pk = 0.d0
+  pk  = 0.d0
   
   select case (inicond)
+  !*****************
   case ('quiescent')
+  !*****************
     u = 0.d0
     uk= 0.d0
     vor = 0.d0
     pk = 0.d0
+  
+  !*******************
   case ('lamballais')
+  !*******************
     call lamballais(u,uk,pk,vor,nlk)
-  case ('couette')
+    
+  !*****************
   case ('turbulent')
+  !*****************
     call random_seed()
     do ix=0,nx-1
     do iy=0,ny-1
@@ -35,13 +42,15 @@ subroutine init_fields (u, uk, pk, vor, nlk)
     call vorticity2velocity ( vortk, uk )    
     call cofitxy( uk(:,:,1), u(:,:,1))
     call cofitxy( uk(:,:,2), u(:,:,2))
-    
+  
+  !*****************
   case ('dipole')  
+  !*****************
     x0 = 0.5d0*xl
     y0 = 0.5d0*yl
     r0 = 0.1d0
     we = 299.528385375226d0
-    d = 0.1d0
+    d  = 0.1d0
     
     do ix=0,nx-1
     do iy=0,ny-1
@@ -58,6 +67,9 @@ subroutine init_fields (u, uk, pk, vor, nlk)
   end select
 
   
+  !-----------------------------------------------------------------------------
+  ! ensure the initial field is divergence-free 
+  !-----------------------------------------------------------------------------
   write(*,'("inicond=",A," max field divergence ",es12.4)') trim(inicond), max_divergence(uk)
   if ( ipressure == "classic") then
     ! there's a problem doing this with "modified"

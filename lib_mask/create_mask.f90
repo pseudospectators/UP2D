@@ -14,21 +14,23 @@ subroutine create_mask (time)
   if (time == 0.d0) then
     mask = 0.d0
     us   = 0.d0
+    u_BC = 0.d0
+    phi  = 0.d0
     
     select case (iMask)
-    case('cylinder')
-      call cylinder()
-    case('lamballais')
-      call lamballais_mask()
-    case('couette')
-      call couette_mask()
-    case('dipole')
-      call dipole_mask()      
-    case('none')
-      mask = 0.d0
-    case default
-      write (*,*) "mask not defnd", iMask
-      stop    
+      case('cylinder')
+        call cylinder()
+      case('lamballais')
+        call lamballais_mask()
+      case('couette')
+        call couette_mask()
+      case('dipole')
+        call dipole_mask()      
+      case('none')
+        mask = 0.d0
+      case default
+        write (*,*) "mask not defnd", iMask
+        stop    
     end select  
     
     !$omp parallel do private(iy)
@@ -92,6 +94,7 @@ subroutine phi2chi
   implicit none
   integer :: ix,iy
   
+  !$omp parallel do private(ix,iy)
   do ix=0,nx-1
     do iy=0,ny-1
       if (phi(ix,iy)<=0.0) then
@@ -99,6 +102,7 @@ subroutine phi2chi
       endif
     enddo
   enddo    
+  !$omp end parallel do
   
 end subroutine phi2chi
 
@@ -197,6 +201,7 @@ subroutine compute_normals
   integer :: ix,iy
   real(kind=pr) :: normgrad, blend
   
+  !$omp parallel do private(ix,iy,normgrad,blend)
   do ix=0,nx-1
     do iy=0,ny-1
       normals(ix,iy,1) = (phi(getindex(ix+1,nx),iy) - phi(getindex(ix-1,nx),iy) )/(2.0d0*dx)
@@ -220,6 +225,7 @@ subroutine compute_normals
       endif
     enddo
   enddo  
+  !$omp end parallel do
 end subroutine compute_normals
 
 

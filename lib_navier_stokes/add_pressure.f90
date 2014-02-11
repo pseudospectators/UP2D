@@ -10,9 +10,10 @@ subroutine add_pressure (nlk, uk, u, vor)
   real(kind=pr)::max_divergence
   
   if (ipressure == "classic") then
-    !--------------------------------------------
+  
+    !---------------------------------------------------------------------------
     ! classic pressure projects all source terms
-    !-------------------------------------------
+    !---------------------------------------------------------------------------
     ! divergence
     call cofdx ( nlk(:,:,1), work1 )
     call cofdy ( nlk(:,:,2), work2 )
@@ -55,6 +56,7 @@ subroutine add_pressure (nlk, uk, u, vor)
     
     !---------------------------------------------------------------------------
     !-- penalized divergence of velocity field (1-chi)*(div(u))
+    !---------------------------------------------------------------------------
     call cofdx(uk(:,:,1),work1)
     call cofdy(uk(:,:,2),work2)
     !-- div to phys space
@@ -78,6 +80,7 @@ subroutine add_pressure (nlk, uk, u, vor)
     
     !---------------------------------------------------------------------------
     !-- solve poisson eqn
+    !---------------------------------------------------------------------------
     call poisson (work3, work1)
     !-- gradient
     call cofdx (work1, work3)

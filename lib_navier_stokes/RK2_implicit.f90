@@ -9,14 +9,13 @@ subroutine RK2_implicit (time, dt,it, u, uk, pk, vort, nlk)
   real(kind=pr), intent (out) :: dt
   real(kind=pr), intent (in) :: time
   real (kind=pr), dimension (0:nx-1, 0:ny-1) :: work1,work2, workvis,div,divk
-  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp, u_tmp, u_smooth
+  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp, u_tmp
   integer :: iy
   integer, intent(in) :: it
   real(kind=pr) :: timestep
   
   !-- determine time step
   dt = timestep(time,it, u )
-  u_smooth = 0.d0
   !-----------------------------------------------------------------------------
   !-- 1st strang step: half time step for penalization
   !-- equation is solved exactly

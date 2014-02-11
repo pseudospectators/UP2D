@@ -10,9 +10,8 @@ subroutine time_step
   real(kind=pr), dimension(0:nx-1,0:ny-1) :: pk, vort
   real(kind=pr) :: T_lastdrag=0.0d0, T_lastsave=0.0d0, t1, time_left
   integer :: it=0
-  character(len=5) :: timestring    
-  time = 0.0
-  it = 0
+  character(len=5) :: timestring 
+  
   if (FD_2nd) write (*,*) "!!! ATTENTION; RUNNING IN REDUCED ACCURACY MODE"
   
   !-- create startup mask
