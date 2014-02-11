@@ -5,6 +5,7 @@ subroutine create_us ( time, u, uk )
   real (kind=pr), intent(in) :: time
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: u, uk
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: u_smooth
+  real (kind=pr) :: R
 
   u_smooth = 0.d0
   us = 0.d0
@@ -17,7 +18,7 @@ subroutine create_us ( time, u, uk )
   elseif (iActive == "dave" ) then
     !-- use dave's method to compute the smooth extension
     call active_prolongation_dave ( u, u_smooth )
-    us = u_smooth
+    us = u_smooth + u_BC
     
   elseif (iActive == "passive" ) then
     !-- us does not depend on u: classic penalization
@@ -217,8 +218,8 @@ subroutine active_prolongation_dave ( u, u_smooth )
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: u
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: u_smooth
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: beta
-  real (kind=pr) :: s, b0, b1,ux_BC_interp,uy_BC_interp
-  real (kind=pr) :: beta_x_interp,beta_y_interp, xi_x, xi_y,x,y,LinearInterpolation
+  real (kind=pr) :: s, b0, b1,ux_BC_interp,uy_BC_interp,R
+  real (kind=pr) :: beta_x_interp,beta_y_interp, xi_x, xi_y,LinearInterpolation
   integer :: ix,iy
   
   !-- compute the field of normal derivatives
@@ -227,26 +228,21 @@ subroutine active_prolongation_dave ( u, u_smooth )
   !-----------------------------------------------------------------------------
   ! loop over points in the boundary layer where we intent to construct us
   !-----------------------------------------------------------------------------  
-  !$omp parallel do private(iy,ix,x,y,xi_x,xi_y,ux_BC_interp,uy_BC_interp,beta_x_interp,beta_y_interp,s,b0,b1)
+  !$omp parallel do private(iy,ix,xi_x,xi_y,ux_BC_interp,uy_BC_interp,beta_x_interp,beta_y_interp,s,b0,b1)
   do ix=0, nx-1
     do iy=0, ny-1
-      if ((phi(ix,iy) >= -delta).and.(phi(ix,iy) <=0.d0) ) then
-        !-- this point lies inside the obstacle and in the neighborhood of the interface
-        
-        !-- coordinates of current point
-        x = dble(ix)*dx
-        y = dble(iy)*dy
-        
+      !-- this point lies inside the obstacle and in the neighborhood of the interface
+      if ((phi(ix,iy) >= -delta).and.(phi(ix,iy) <=0.d0) ) then                
         !-- coordinates of closest point on the interface
-        xi_x = x - normals(ix,iy,1)*phi(ix,iy)
-        xi_y = y - normals(ix,iy,2)*phi(ix,iy)
+        xi_x = dble(ix)*dx - normals(ix,iy,1)*phi(ix,iy)
+        xi_y = dble(iy)*dy - normals(ix,iy,2)*phi(ix,iy)
         
         !---------------------------------------
         ! interpolate values of beta
         !---------------------------------------
         ! inhomogeneous dirichlet:
-        ux_BC_interp = 0.d0
-        uy_BC_interp = 0.d0
+        ux_BC_interp = 0.d0!LinearInterpolation ( xi_x,xi_y,u_BC(:,:,1),0.d0,0.d0,xl-dx,yl-dy )
+        uy_BC_interp = 0.d0!LinearInterpolation ( xi_x,xi_y,u_BC(:,:,2),0.d0,0.d0,xl-dx,yl-dy )
         ! normal derivative
         beta_x_interp = LinearInterpolation ( xi_x,xi_y,beta(:,:,1),0.d0,0.d0,xl-dx,yl-dy )
         beta_y_interp = LinearInterpolation ( xi_x,xi_y,beta(:,:,2),0.d0,0.d0,xl-dx,yl-dy )
@@ -265,6 +261,21 @@ subroutine active_prolongation_dave ( u, u_smooth )
     enddo
   enddo
   !$omp end parallel do 
+  
+  if ( iMask == "lamballais" ) then
+    !$omp parallel do private(ix,iy,R)
+    do ix=0,nx-1
+      do iy=0,ny-1
+        R = dsqrt( (dble(ix)*dx-x0)**2 + (dble(iy)*dy-y0)**2 )
+        if (R > 1.0d0) then
+          u_smooth(ix,iy,:) = 0.d0
+        endif
+      enddo
+    enddo
+    !$omp end parallel do
+  endif  
+  
+  
 end subroutine active_prolongation_dave
 
 
