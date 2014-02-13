@@ -170,8 +170,8 @@ subroutine dipole_mask
   phi = 0.d0 ! signed distance
   u_BC = 0.d0 ! non-homogeneous dirichlet BC (zero in this case)
   
-  x0 = 0.5d0*xl + 0.5*dx
-  y0 = 0.5d0*yl + 0.5*dy
+  x0 = 0.5d0*xl
+  y0 = 0.5d0*yl
   ! exponent. phi converges to rectangle in the limit p->\infty
   p = 20.d0
   
@@ -181,7 +181,7 @@ subroutine dipole_mask
       ! dipole-wall case: we have only one phi-function
       x = dble(ix)*dx
       y = dble(iy)*dy
-      phi (ix,iy) = -( ((x-x0)**p + (y-y0)**p)**(1.d0/p) - 1.d0)
+      phi (ix,iy) = -( ((x-x0)**p + (y-y0)**p)**(1.d0/p) - 1.d0 )
     enddo
   enddo    
   

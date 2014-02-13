@@ -259,8 +259,8 @@ subroutine active_prolongation_dave ( u, u_smooth )
   ! loop over points in the boundary layer where we intent to construct us
   !-----------------------------------------------------------------------------  
   !$omp parallel do private(iy,ix,xi_x,xi_y,ux_BC_interp,uy_BC_interp,beta_x_interp,beta_y_interp,s,b0,b1)
-  do ix=0, nx-1
-    do iy=0, ny-1
+  do ix=1, nx-2
+    do iy=1, ny-2
       !-- this point lies inside the obstacle and in the neighborhood of the interface
       if ((phi(ix,iy) >= -delta).and.(phi(ix,iy) <=0.d0) ) then                
         !-- coordinates of closest point on the interface
