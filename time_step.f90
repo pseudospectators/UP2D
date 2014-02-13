@@ -16,6 +16,7 @@ subroutine time_step
   
   !-- create startup mask
   call create_mask (time)
+  call SaveField( mask, trim(name)//'mask')
   
   !-- Initialize vorticity or read values from a backup file
   call init_fields (u, uk, pk, vort, nlk)    
@@ -64,11 +65,11 @@ subroutine time_step
         colorscale = 0.25d0*max(maxval(vort),dabs(minval(vort))) 
         call SaveGIF(vort, "vor/"//trim(timestring)//".vor", 1, -colorscale, colorscale)        
         write (*,'("Snapshot. time=",es12.4," vormax=",es12.4)') time, max(maxval(vort),dabs(minval(vort))) 
-        if (ipressure == "modified") then
-          call divergence( uk, pk )
-          call cofitxy( pk, vort )
-          call SaveGIF( vort, "vor/"//trim(timestring)//".divu" )
-        endif
+!         if (ipressure == "modified") then
+!           call divergence( uk, pk )
+!           call cofitxy( pk, vort )
+!           call SaveGIF( vort, "vor/"//trim(timestring)//".divu" )
+!         endif
         T_lastdrag=time
       endif
  

@@ -89,8 +89,6 @@ subroutine compute_beta_field (u, beta)
   do iy=0,ny-1
     beta(:,iy,1) = normals(:,iy,1)*ux_x(:,iy) + normals(:,iy,2)*ux_y(:,iy)
     beta(:,iy,2) = normals(:,iy,1)*uy_x(:,iy) + normals(:,iy,2)*uy_y(:,iy)
-!     beta(:,iy,1) = beta(:,iy,1)*(1.d0-mask(:,iy)*eps)
-!     beta(:,iy,2) = beta(:,iy,2)*(1.d0-mask(:,iy)*eps)
   enddo  
   !$omp end parallel do  
 end subroutine compute_beta_field
@@ -115,6 +113,15 @@ subroutine active_prolongation_chantalat ( u, u_smooth )
   
   !-- compute the field of normal derivatives
   call compute_beta_field ( u, beta )
+  
+  !-- delete beta field inside solid body
+  !-- experiments showed that this increases the error.
+!   !$omp parallel do private(iy)
+!   do iy=0,ny-1
+!     beta(:,iy,1) = beta(:,iy,1)*(1.d0-mask(:,iy)*eps)
+!     beta(:,iy,2) = beta(:,iy,2)*(1.d0-mask(:,iy)*eps)
+!   enddo  
+!   !$omp end parallel do    
   
   !-----------------------------------------------------------------------------
   !-- prolongate beta field using advection/diffusion

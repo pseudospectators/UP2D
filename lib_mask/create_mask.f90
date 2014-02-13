@@ -47,7 +47,7 @@ subroutine lamballais_mask
   use share_vars
   use fieldexport
   implicit none
-  real(kind=pr) :: R,R1,R2,R3,normgrad,blend
+  real(kind=pr) :: R,R1,R2,R3
   real(kind=pr) :: phis(1:3)
   integer :: ix,iy
   integer :: i
@@ -93,6 +93,8 @@ subroutine phi2chi
   use fieldexport
   implicit none
   integer :: ix,iy
+  
+  mask = 0.d0
   
   !$omp parallel do private(ix,iy)
   do ix=0,nx-1
@@ -168,8 +170,8 @@ subroutine dipole_mask
   phi = 0.d0 ! signed distance
   u_BC = 0.d0 ! non-homogeneous dirichlet BC (zero in this case)
   
-  x0 = 0.5d0*xl
-  y0 = 0.5d0*yl
+  x0 = 0.5d0*xl + 0.5*dx
+  y0 = 0.5d0*yl + 0.5*dy
   ! exponent. phi converges to rectangle in the limit p->\infty
   p = 20.d0
   
@@ -179,7 +181,7 @@ subroutine dipole_mask
       ! dipole-wall case: we have only one phi-function
       x = dble(ix)*dx
       y = dble(iy)*dy
-      phi (ix,iy) = - (((x-x0)**p + (y-y0)**p)**(1.d0/p) - 1.d0)
+      phi (ix,iy) = -( ((x-x0)**p + (y-y0)**p)**(1.d0/p) - 1.d0)
     enddo
   enddo    
   
