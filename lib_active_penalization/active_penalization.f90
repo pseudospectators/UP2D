@@ -46,10 +46,11 @@ subroutine compute_beta_field (u, beta)
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: u
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: beta
   real (kind=pr), dimension (0:nx-1, 0:ny-1) :: ux_x,ux_y,uy_x,uy_y
+  real (kind=pr), dimension (0:nx-1, 0:ny-1) :: work, work2
   integer :: ix,iy
   
   !----------------------------------------------------------------------------- 
-  !-- compute beta field
+  !-- compute beta field (finite differences)
   !-----------------------------------------------------------------------------
   !$omp parallel do private(ix)
   do ix=0,nx-1
@@ -65,12 +66,31 @@ subroutine compute_beta_field (u, beta)
   enddo  
   !$omp end parallel do
   
+  !----------------------------------------------------------------------------- 
+  !-- compute beta field (spectral)
+  !-----------------------------------------------------------------------------  
+!   call coftxy(u(:,:,1),work)
+!   call cofdx(work, work2)
+!   call cofitxy(work2,ux_x)
+!   
+!   call coftxy(u(:,:,1),work)
+!   call cofdy(work, work2)
+!   call cofitxy(work2,ux_y)
+!     
+!   call coftxy(u(:,:,2),work)
+!   call cofdy(work, work2)
+!   call cofitxy(work2,uy_y)
+!   
+!   call coftxy(u(:,:,2),work)
+!   call cofdx(work, work2)
+!   call cofitxy(work2,uy_x)
+  
   !$omp parallel do private(iy)
   do iy=0,ny-1
-    beta(:,iy,1) = (normals(:,iy,1)*ux_x(:,iy) + normals(:,iy,2)*ux_y(:,iy))
-    beta(:,iy,2) = (normals(:,iy,1)*uy_x(:,iy) + normals(:,iy,2)*uy_y(:,iy))
-    beta(:,iy,1) = beta(:,iy,1)*(1.d0-mask(:,iy)*eps)
-    beta(:,iy,2) = beta(:,iy,2)*(1.d0-mask(:,iy)*eps)
+    beta(:,iy,1) = normals(:,iy,1)*ux_x(:,iy) + normals(:,iy,2)*ux_y(:,iy)
+    beta(:,iy,2) = normals(:,iy,1)*uy_x(:,iy) + normals(:,iy,2)*uy_y(:,iy)
+!     beta(:,iy,1) = beta(:,iy,1)*(1.d0-mask(:,iy)*eps)
+!     beta(:,iy,2) = beta(:,iy,2)*(1.d0-mask(:,iy)*eps)
   enddo  
   !$omp end parallel do  
 end subroutine compute_beta_field
@@ -86,11 +106,12 @@ subroutine active_prolongation_chantalat ( u, u_smooth )
   use FieldExport
   implicit none
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: u
-  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: u_smooth
-  
+  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: u_smooth  
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: beta
   real (kind=pr) :: CFL_act, umax=1.d0, Tend, dt,R,R1
   integer :: ix,iy,nt2,it
+  
+  u_smooth = 0.d0
   
   !-- compute the field of normal derivatives
   call compute_beta_field ( u, beta )
@@ -112,9 +133,9 @@ subroutine active_prolongation_chantalat ( u, u_smooth )
   !-----------------------------------------------------------------------------
   !-- construct u_smooth
   !-----------------------------------------------------------------------------  
-  x0=xl/2.d0
-  y0=yl/2.d0
-  R1=0.50d0
+  x0 = xl/2.d0
+  y0 = yl/2.d0
+  R1 = 0.50d0
   
   if (imask == 'lamballais') then ! this case distinguished between outer and inner cylinder
       !$omp parallel do private(iy,ix,R)
@@ -221,6 +242,8 @@ subroutine active_prolongation_dave ( u, u_smooth )
   real (kind=pr) :: s, b0, b1,ux_BC_interp,uy_BC_interp,R
   real (kind=pr) :: beta_x_interp,beta_y_interp, xi_x, xi_y,LinearInterpolation
   integer :: ix,iy
+  
+  u_smooth = 0.d0
   
   !-- compute the field of normal derivatives
   call compute_beta_field ( u, beta )
