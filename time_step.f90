@@ -108,7 +108,12 @@ subroutine time_step
     call curl (uk, pk)
     call cofitxy(pk,vort)
     call SaveField( u(:,:,2), trim(name)//'vor_final')
-            
+    open (14, file = trim(name)//'divus', status = 'unknown', access = 'append')
+    write (14,'(i4,1x,i4,1x,es12.4,1x,es12.4,1x,f4.2,1x,es15.8,1x,A)') &
+    nx, ny, eps, Tmax, CFL, max_divergence(uk), trim(iMethod)//" "//trim(iPressure)//" "//trim(iActive)
+    write (*,'(i4,1x,i4,1x,es12.4,1x,es12.4,1x,f4.2,1x,es15.8,1x,A)') &
+    nx, ny, eps, Tmax, CFL, max_divergence(uk), trim(iMethod)//" "//trim(iPressure)//" "//trim(iActive)
+    close (14)              
   endif
   
   
