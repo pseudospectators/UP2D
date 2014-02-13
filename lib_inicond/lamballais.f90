@@ -56,7 +56,7 @@ subroutine lamballais_error(u)
   
   e1 = dsqrt(e1) / dsqrt(e2) ! relative error
   
-  open (14, file = trim(name)//'error', status = 'unknown', access = 'append')
+  open (14, file = 'lamballais.error', status = 'unknown', access = 'append')
   write (14,'(i4,1x,i4,1x,es12.4,1x,es12.4,1x,f4.2,1x,es15.8,1x,A)') nx, ny, eps, Tmax, CFL, e1, iMethod
   write (*,'(i4,1x,i4,1x,es12.4,1x,es12.4,1x,f4.2,1x,es15.8,1x,A)') nx, ny, eps, Tmax, CFL, e1, iMethod
   close (14)  
