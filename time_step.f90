@@ -51,6 +51,7 @@ subroutine time_step
         call RK2_implicit (time, dt1,it, u, uk, pk, vort, nlk) 
       case default
         write (*,*) "Error: iMethod undefined"
+        stop
       end select
       
       
