@@ -34,8 +34,7 @@ endif
 ifeq ($(shell $(FC) --version 2>&1 | head -n 1 | head -c 3),GNU)
 # Specify directory for compiled modules:
 FFLAGS += -J$(OBJDIR) # specify directory for modules.
-FFLAGS += -Wall # warn for unused and uninitialzied variables
-#FFLAGS += -Werror # warnings are errors
+#FFLAGS += -Wall # warn for unused and uninitialzied variables
 FFLAGS += -fopenmp -lpthread
 FFLAGS += -O3
 PPFLAG= -cpp #preprocessor flag
@@ -70,9 +69,9 @@ FFT_INC = $(FFT_ROOT)/include
 HDF_LIB = $(HDF_ROOT)/lib
 HDF_INC = $(HDF_ROOT)/include
 
-LDFLAGS = -L$(FFT_LIB) -lfftw3_threads -lm
+LDFLAGS = -L$(FFT_LIB) -lfftw3_threads -lfftw3 -lm
 LDFLAGS += $(HDF5_FLAGS) -L$(HDF_LIB) -lhdf5_fortran -lhdf5 -lz -ldl
-LDFLAGS += -llapack
+LDFLAGS += -llapack -lm 
 FFLAGS += -I$(HDF_INC) -I$(FFT_INC) $(PPFLAG) $(DIFORT)
 
 
