@@ -3,26 +3,26 @@ module parameters
  implicit none
  contains
 
-!=============================================================================== 
- 
+!===============================================================================
+
 ! Wrapper to read parameters from an ini file for fsi.  Also reads
 ! parameters which are set in the vars module.
-subroutine get_params(paramsfile) 
+subroutine get_params(paramsfile)
   use share_vars
 
   character (len=*) :: paramsfile  ! The file we read the PARAMS from
-  integer :: i  
+  integer :: i
   character PARAMS(nlines)*256 ! this array will contain the ascii-params file
   logical :: exist1
-  
+
   ! check if the specified file exists
   inquire ( file=paramsfile, exist=exist1 )
-  
+
   if ((paramsfile=="").or.(exist1.eqv..false.)) then
     write(*,*) "PARAMS file not found!"
     stop
   endif
-  
+
   ! Read the paramsfile and put the length i and the text in PARAMS
   call read_params_file(PARAMS,i,paramsfile,.true.)
 
@@ -37,7 +37,7 @@ end subroutine get_params
 subroutine read_params_file(PARAMS,i,paramsfile, verbose)
   use share_vars
   implicit none
-  
+
   integer,intent(out) :: i
   integer :: io_error
   ! This array will contain the ascii-params file
@@ -53,14 +53,14 @@ subroutine read_params_file(PARAMS,i,paramsfile, verbose)
     write (*,*) "*************************************************"
   endif
   i = 1
-  open(unit=14,file=trim(adjustl(paramsfile)),action='read',status='old')    
+  open(unit=14,file=trim(adjustl(paramsfile)),action='read',status='old')
   do while ((io_error==0).and.(i<=nlines))
-      read (14,'(A)',iostat=io_error) PARAMS(i)  
+      read (14,'(A)',iostat=io_error) PARAMS(i)
       i = i+1
   enddo
   close (14)
   i = i-1 ! counted one too far
-  
+
 end subroutine read_params_file
 
 !===============================================================================
@@ -84,8 +84,8 @@ subroutine get_params_common(PARAMS,i)
   call GetValue_String(PARAMS,i,"Time","iPressure",iPressure,"classic")
   call GetValue_String(PARAMS,i,"Time","iActive",iActive,"passive")
   call GetValue_String(PARAMS,i,"Time","iMethod",iMethod,"RK2")
-  call GetValue_Real(PARAMS,i,"Time","dt_fixed",dt_fixed,0.0)
-  call GetValue_Real(PARAMS,i,"ReynoldsNumber","nu",nu,1.d-2)  
+  call GetValue_Real(PARAMS,i,"Time","dt_fixed",dt_fixed,0.0d0)
+  call GetValue_Real(PARAMS,i,"ReynoldsNumber","nu",nu,1.d-2)
 
   ! Initial conditions section
   call GetValue_String(PARAMS,i,"InitialCondition","inicond",inicond, "none")
@@ -110,14 +110,14 @@ subroutine get_params_common(PARAMS,i)
   call GetValue_String(PARAMS,i,"MeanFlow","iMeanFlow",iMeanFlow, "none")
   call GetValue_Real(PARAMS,i,"MeanFlow","ux_mean",ux_mean, 0.d0)
   call GetValue_Real(PARAMS,i,"MeanFlow","uy_mean",uy_mean, 0.d0)
-  
+
   ! Set other parameters (all procs)
   pi=4.d0 *datan(1.d0)
   ! lattice spacing is global
   dx=xl/dble(nx)
   dy=yl/dble(ny)
-  
-  
+
+
 end subroutine get_params_common
 
 !===============================================================================
@@ -142,13 +142,13 @@ subroutine GetValue_real (PARAMS, actual_lines, section, keyword, params_real,de
   character keyword*(*)   ! what keyword do you look for? for example nx=128
   character (len=80)  value    ! returns the value
   character PARAMS(nlines)*256  ! this is the complete PARAMS.ini file
-  real (kind=pr) :: params_real, defaultvalue 
+  real (kind=pr) :: params_real, defaultvalue
   integer actual_lines
 
   ! Root rank fetches value from PARAMS.ini file (which is in PARAMS)
   call GetValue(PARAMS, actual_lines, section, keyword, value)
   if (value .ne. '') then
-    read (value, *) params_real    
+    read (value, *) params_real
     write (value,'(g10.3)') params_real
     write (*,*) "read "//trim(section)//"::"//trim(keyword)//" = "//adjustl(trim(value))
   else
@@ -156,7 +156,7 @@ subroutine GetValue_real (PARAMS, actual_lines, section, keyword, params_real,de
     write (*,*) "read "//trim(section)//"::"//trim(keyword)//" = "//adjustl(trim(value))//&
           " (THIS IS THE DEFAULT VALUE!)"
     params_real = defaultvalue
-  endif    
+  endif
 end subroutine GetValue_real
 
 
@@ -178,13 +178,13 @@ end subroutine GetValue_real
 subroutine GetValue_string (PARAMS, actual_lines, section, keyword, params_string, defaultvalue)
   use share_vars
   implicit none
-  
+
   character section*(*) ! what section do you look for? for example [Resolution]
   character keyword*(*)   ! what keyword do you look for? for example nx=128
   character (len=80)  value    ! returns the value
   character PARAMS(nlines)*256  ! this is the complete PARAMS.ini file
   character (len=*), intent (inout) :: params_string
-  character (len=*), intent (in) :: defaultvalue 
+  character (len=*), intent (in) :: defaultvalue
   integer actual_lines
 
   ! Root rank fetches value from PARAMS.ini file (which is in PARAMS)
@@ -193,7 +193,7 @@ subroutine GetValue_string (PARAMS, actual_lines, section, keyword, params_strin
     params_string = value
     ! its a bit dirty but it avoids filling the screen with "nothing" anytime we check
     ! the runtime control file
-    if (keyword.ne."runtime_control") then 
+    if (keyword.ne."runtime_control") then
     write (*,*) "read "//trim(section)//"::"//trim(keyword)//" = "//adjustl(trim(value))
     endif
   else
@@ -312,7 +312,7 @@ subroutine GetValue (PARAMS, actual_lines, section, keyword, value)
   character keyword*(*)   ! what keyword do you look for? for example nx=128
   character value*(*)   ! returns the value
   character PARAMS(nlines)*256  ! this is the complete PARAMS.ini file
-  integer actual_lines   ! how many lines did you actually read?  
+  integer actual_lines   ! how many lines did you actually read?
   integer :: maxline = 256  ! how many characters per line?
   integer i, j,k
   logical foundsection
@@ -336,20 +336,20 @@ subroutine GetValue (PARAMS, actual_lines, section, keyword, value)
                  endif
               endif
            enddo
-        else      
+        else
            if (foundsection .eqv. .true.) then  ! yes we found the section, now we're looking for the keyword
               do j=1, maxline    ! scan the line
                  if (PARAMS(i)(j:j) == '=') then  ! found the '='
                     if (keyword == PARAMS(i)(1:j-1)) then ! is this the keyword you're looking for?
                        do k = j+1, maxline   ! everything behind the '=' and before ';' is the value
                           if (PARAMS(i)(k:k) == ';') then  ! found the delimiter
-                             value = PARAMS(i)(j+1:k-1)  ! value is between '=', and ';'   
+                             value = PARAMS(i)(j+1:k-1)  ! value is between '=', and ';'
                              exit
                           endif
                        enddo
                        if ((value == '')) then
-                          write (*,'(A)') "??? Though found the keyword, I'm unable to find value for variable --> "& 
-                               //trim(keyword)//" <-- maybe missing delimiter (;)?"    
+                          write (*,'(A)') "??? Though found the keyword, I'm unable to find value for variable --> "&
+                               //trim(keyword)//" <-- maybe missing delimiter (;)?"
                        endif
                     endif
                  endif
