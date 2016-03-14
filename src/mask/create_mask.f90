@@ -16,6 +16,8 @@ subroutine create_mask (time)
   select case (iMask)
     case('cylinder')
       call cylinder()
+    case('moving_cylinder')
+      call moving_cylinder(time)
     case('none')
       mask = 0.d0
     case default
@@ -33,7 +35,7 @@ end subroutine create_mask
 
 !===============================================================================
 
-subroutine cylinder
+subroutine cylinder()
   use share_vars
   implicit none
   integer :: ix,iy
@@ -52,6 +54,34 @@ subroutine cylinder
   enddo
   !$omp end parallel do
 end subroutine cylinder
+
+!===============================================================================
+
+subroutine moving_cylinder(time)
+  use share_vars
+  implicit none
+  real(kind=pr),intent(in) :: time
+  integer :: ix,iy
+  real(kind=pr) :: R, R0, smooth
+  R0 = 0.5d0
+  smooth = 2.d0*max(dx,dy)
+  x0 = xl/2.d0 + sin(2.d0*pi*time)
+  y0 = yl/2.d0
+
+  !$omp parallel do private(ix,iy,R)
+  do ix=0,nx-1
+    do iy=0,ny-1
+      R = dsqrt( (dble(ix)*dx-x0)**2 +(dble(iy)*dy-y0)**2 )
+      call SmoothStep(mask(ix,iy), R, R0, smooth)
+      if (mask(ix,iy) > 0.d0) then
+        us(ix,iy,1) = 2.d0*pi*cos(2.d0*pi*time)
+        us(ix,iy,2) = 0.d0
+      endif
+    enddo
+  enddo
+  !$omp end parallel do
+end subroutine moving_cylinder
+
 
 !===============================================================================
 
