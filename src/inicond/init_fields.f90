@@ -7,6 +7,7 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
   real(kind=pr), dimension(0:nx-1,0:ny-1), intent (inout) :: vor, pk
   real(kind=pr), dimension(0:nx-1,0:ny-1) :: vortk
   real(kind=pr) :: r0,we,d,r1,r2, max_divergence, dummy1,dummy2,dummy3
+  character(len=80) :: file
   integer :: ix,iy
   time = 0.d0
   u   = 0.d0
@@ -45,16 +46,6 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
     call cofitxy( uk(:,:,2), u(:,:,2))
 
   !*****************
-  case ('bckp')
-  !*****************
-    call Fetch_attributes_2d_openmp( 'vor_00071.h5', ix, iy, dummy1, dummy2, time, dummy3 )
-    call read_flusi_hdf5_2d_openmp( 'vor_00071.h5', vor )
-    call coftxy ( vor, vortk )
-    call vorticity2velocity ( vortk, uk )
-    call cofitxy( uk(:,:,1), u(:,:,1))
-    call cofitxy( uk(:,:,2), u(:,:,2))
-
-  !*****************
   case ('dipole')
   !*****************
     x0 = 0.5d0*xl
@@ -75,6 +66,31 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
     call vorticity2velocity ( vortk, uk )
     call cofitxy( uk(:,:,1), u(:,:,1))
     call cofitxy( uk(:,:,2), u(:,:,2))
+
+  case default
+       if(inicond(1:8) == "backup::") then
+         !--------------------------------------------------
+         ! read from backup ( read a vorticity file )
+         !--------------------------------------------------
+         file = inicond(9:len(inicond))
+         write (*,*) "*** inicond: resuming backup "//file
+         call Fetch_attributes_2d_openmp( file, ix, iy, dummy1, dummy2, time, dummy3 )
+         call read_flusi_hdf5_2d_openmp( file, vor )
+         call coftxy ( vor, vortk )
+         call vorticity2velocity ( vortk, uk )
+         call cofitxy( uk(:,:,1), u(:,:,1))
+         call cofitxy( uk(:,:,2), u(:,:,2))
+
+       else
+          !--------------------------------------------------
+          ! unknown inicond : error
+          !--------------------------------------------------
+          write (*,*) inicond
+          write (*,*) '??? ERROR: Invalid initial condition'
+          stop
+       endif
+
+
   end select
 
 

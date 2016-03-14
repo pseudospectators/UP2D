@@ -88,7 +88,7 @@ subroutine write_flusi_hdf5_2d_openmp( time, filename, field_out)
   call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
   call h5pset_chunk_f(plist_id, rank, chunking_dims, error)
   ! Output files in single precision
-  call h5dcreate_f(file_id, get_dsetname(filename), H5T_NATIVE_REAL, filespace, &
+  call h5dcreate_f(file_id, get_dsetname(filename), H5T_NATIVE_DOUBLE, filespace, &
        dset_id, error, plist_id)
   call h5sclose_f(filespace, error)
 
@@ -319,7 +319,6 @@ subroutine read_flusi_hdf5_2d_openmp( filename, field )
 
   ! Create property list for collective dataset read
   call h5pcreate_f(H5P_DATASET_XFER_F, plist_id, error)
-  ! call h5pset_dxpl_mpio_f(plist_id, H5FD_MPIO_COLLECTIVE_F, error)
 
   call h5dread_f( dset_id, H5T_NATIVE_DOUBLE, field, dimensions_local, error, &
   mem_space_id = memspace, file_space_id = filespace, xfer_prp = plist_id )
