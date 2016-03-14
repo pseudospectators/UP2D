@@ -14,9 +14,9 @@ module share_vars
   real(kind=pr), save :: ux_mean, uy_mean
 
   character (len=strlen), save :: inicond, iMask, iMeanFlow, iMethod
-  character (len=strlen), save :: name, ipressure, iActive
+  character (len=strlen), save :: ipressure, iActive
 
-  integer, save :: iSaveVelocity, iSaveVorticity, iSaveMask
+  integer, save :: iSaveVelocity, iSaveVorticity, iSaveMask, iSavePressure
 
   ! deliberately reduce code to second order FD?
   logical, save :: FD_2nd = .false.

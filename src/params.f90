@@ -13,7 +13,6 @@ subroutine get_params(paramsfile)
   ! Resolution section
   call read_param(PARAMS,"Resolution","nx",nx, 4)
   call read_param(PARAMS,"Resolution","ny",ny, 4)
-  call read_param(PARAMS,"Resolution","name",name, "test.")
   call read_param(PARAMS,"Time","nt",nt, 9999999)
   call read_param(PARAMS,"Time","Tmax",Tmax,1.d9)
   call read_param(PARAMS,"Time","CFL",cfl,0.1d0)
@@ -44,6 +43,7 @@ subroutine get_params(paramsfile)
   call read_param(PARAMS,"Saving","iSaveVorticity",iSaveVorticity, 1)
   call read_param(PARAMS,"Saving","iSaveVelocity",iSaveVelocity, 1)
   call read_param(PARAMS,"Saving","iSaveMask",iSaveMask, 1)
+  call read_param(PARAMS,"Saving","iSavePressure",iSavePressure, 1)
 
   ! mean flow
   call read_param(PARAMS,"MeanFlow","iMeanFlow",iMeanFlow, "none")

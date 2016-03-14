@@ -36,7 +36,7 @@ subroutine time_step
 
       if (time-T_lastsave >= tsave) then
         ! save output fields to disk
-        call save_fields(time, u, vort)
+        call save_fields(time, u, uk, vort)
         T_lastsave=time
       endif
 
