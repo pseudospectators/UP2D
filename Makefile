@@ -8,14 +8,15 @@ lamballais.f90  mean_velocity.f90 \
 add_diffusion.f90 add_pressure.f90 add_pressure_grad.f90 cal_pressure.f90 \
 dt.f90 RK2.f90 RK2_implicit.f90 \
 cof_fftw33.f90 dealiase_mask.f90 spectral_essentials.f90 \
-time_step.f90 hdf_wrapper.f90
+time_step.f90 hdf_wrapper.f90 params.f90
 
 # Object and module directory:
 OBJDIR=obj
 OBJS := $(FFILES:%.f90=$(OBJDIR)/%.o)
 
 # Files that create modules:
-MFILES = timing.f90 share_vars.f90 params.f90 cal_nlk.f90 fieldexport.f90 gif_util.f90 create_mask.f90
+MFILES = timing.f90 share_vars.f90 cal_nlk.f90 fieldexport.f90 gif_util.f90 \
+create_mask.f90 ini_files_parser.f90
 MOBJS := $(MFILES:%.f90=$(OBJDIR)/%.o)
 
 # Source code directories (colon-separated):
@@ -90,11 +91,11 @@ $(OBJDIR)/gif_util.o: gif_util.f90
 	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/timing.o: timing.f90 $(OBJDIR)/share_vars.o
 	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
+$(OBJDIR)/ini_files_parser.o: ini_files_parser.f90 $(OBJDIR)/share_vars.o
+	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/create_mask.o: create_mask.f90 $(OBJDIR)/share_vars.o $(OBJDIR)/fieldexport.o
 	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/fieldexport.o: fieldexport.f90 $(OBJDIR)/share_vars.o $(OBJDIR)/gif_util.o
-	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/params.o: params.f90 $(OBJDIR)/share_vars.o
 	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/cal_nlk.o: cal_nlk.f90 $(OBJDIR)/share_vars.o $(OBJDIR)/fieldexport.o
 	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)

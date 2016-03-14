@@ -1,12 +1,13 @@
 program dns
   use share_vars
   use FieldExport
-  use parameters
   implicit none
   character(len=40) :: infile
 
+  ! read parameters from ini file
   call get_command_argument(1,infile)
   call get_params(infile)
+  ! and run the simulation
   call StartSimulation()
 
 end program dns

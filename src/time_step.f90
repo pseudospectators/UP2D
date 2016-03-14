@@ -14,16 +14,11 @@ subroutine time_step
 
   if (FD_2nd) write (*,*) "!!! ATTENTION; RUNNING IN REDUCED ACCURACY MODE"
 
-  !-- Initialize vorticity or read values from a backup file
+  !-- Initialize fields or read values from a backup file
   call init_fields (time, u, uk, pk, vort, nlk)
 
-  !-- create startup mask
-  call create_mask(time)
-  call SaveField(time, 'mask_000.h5', mask)
-
-  write (*,'("Initializatzion done, looping now.")')
-  write (*,'("time=",es12.4," Tmax=",es12.4," it=",i2," nt=",i9)'), &
-    time, Tmax, it, nt
+  write (*,'("Initialization done, looping now.")')
+  write (*,'("time=",es12.4," Tmax=",es12.4," it=",i2," nt=",i9)') time, Tmax, it, nt
 
   !----------------------------------------------------------------
   ! loop over time steps
@@ -43,8 +38,8 @@ subroutine time_step
         !----------------------------------------------------------------
         !-- video snapshots
         !----------------------------------------------------------------
-        write (timestring,'(i5.5)') nint(time*100.d0)
-        write (*,'("Snapshot. time=",es12.4," vormax=",es12.4)') time, maxval(vort)
+        write(timestring,'(i5.5)') nint(time*100.d0)
+        write(*,'("Snapshot. time=",es12.4," vormax=",es12.4)') time, maxval(vort)
         write(*,*) trim(timestring)
         call SaveField( time, "vor_"//trim(timestring), vort)
         T_lastdrag=time
