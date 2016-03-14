@@ -1,3 +1,16 @@
+subroutine SaveField( time, filename, field_out)
+  use share_vars
+  use hdf5
+  implicit none
+
+  ! The field to be written to disk:
+  real(kind=pr),intent(in) :: field_out(0:nx-1,0:ny-1)
+  real(kind=pr),intent(in) :: time
+  character(len=*), intent (in) :: filename
+
+  call write_flusi_hdf5_2d_openmp( time, filename, field_out)
+end subroutine
+
 ! subroutine save_fields (n1, time, dt1, vortk, nlk, workvis, nbackup, beam, bpressure, ivideo, u, press, tau_beam_old)
 ! !======================================================================
 ! !     fields are stored in one file per time step

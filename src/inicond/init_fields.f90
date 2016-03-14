@@ -24,11 +24,6 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
     vor = 0.d0
     pk = 0.d0
 
-  !*******************
-  case ('lamballais')
-  !*******************
-    call lamballais(u,uk,pk,vor,nlk)
-
   !*****************
   case ('turbulent')
   !*****************

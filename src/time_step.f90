@@ -18,44 +18,23 @@ subroutine time_step
   call init_fields (time, u, uk, pk, vort, nlk)
 
   !-- create startup mask
-  call create_mask (time)
-  call SaveField( mask, trim(name)//'mask')
+  call create_mask(time)
+  call SaveField(time, 'mask_000.h5', mask)
 
-
-
-  call SaveGIF (mask, trim(name)//"startup_mask", 13)
-  call SaveGIF (us(:,:,1),trim(name)//'usx')
-  call SaveGIF (us(:,:,2),trim(name)//'usy')
-  call SaveGIF (normals(:,:,1),trim(name)//'normal_x')
-  call SaveGIF (normals(:,:,2),trim(name)//'normal_y')
-
-  !-- compute initial pressure (for implicit penalization)
-!   call cal_pressure ( time, u, uk, pk )
-
-
-  !----------------------------------------------------------------
-  ! loop over time steps
-  !----------------------------------------------------------------
   write (*,'("Initializatzion done, looping now.")')
   write (*,'("time=",es12.4," Tmax=",es12.4," it=",i2," nt=",i9)'), &
     time, Tmax, it, nt
 
+  !----------------------------------------------------------------
+  ! loop over time steps
+  !----------------------------------------------------------------
   do while ((time<Tmax) .and. (it<=nt))
       t1 = Performance("start",1)
 
       !----------------------------------------------------------------
       !-- Actual time step
       !----------------------------------------------------------------
-      select case (iMethod)
-      case ('RK2')
-        call RK2 (time, dt1,it, u, uk, pk, vort, nlk)
-      case ('RK2_implicit')
-        call RK2_implicit (time, dt1,it, u, uk, pk, vort, nlk)
-      case default
-        write (*,*) "Error: iMethod undefined"
-        stop
-      end select
-
+      call RK2 (time, dt1, it, u, uk, pk, vort, nlk)
 
       time = time + dt1  ! Advance in time
       it = it + 1
@@ -65,16 +44,9 @@ subroutine time_step
         !-- video snapshots
         !----------------------------------------------------------------
         write (timestring,'(i5.5)') nint(time*100.d0)
-        colorscale = 0.25d0*max(maxval(vort),dabs(minval(vort)))
-        call SaveGIF(vort, "vor/"//trim(timestring)//".vor", 1, -colorscale, colorscale)
-        write (*,'("Snapshot. time=",es12.4," vormax=",es12.4)') time, max(maxval(vort),dabs(minval(vort)))
+        write (*,'("Snapshot. time=",es12.4," vormax=",es12.4)') time, maxval(vort)
         write(*,*) trim(timestring)
-        call write_flusi_hdf5_2d_openmp( time, "vor_"//trim(timestring), vort)
-!         if (ipressure == "modified") then
-!           call divergence( uk, pk )
-!           call cofitxy( pk, vort )
-!           call SaveGIF( vort, "vor/"//trim(timestring)//".divu" )
-!         endif
+        call SaveField( time, "vor_"//trim(timestring), vort)
         T_lastdrag=time
       endif
 
@@ -95,31 +67,4 @@ subroutine time_step
   enddo
 
   write (*,*) "Loop done."
-
-  !-- compute error for lambaallais case
-  if (iMask=='lamballais') then
-    call lamballais_error(u)
-    call SaveField( u(:,:,1), trim(name)//'ux_final')
-    call SaveField( u(:,:,2), trim(name)//'uy_final')
-  endif
-
-  !-- save terminal flow field in the dipole-case
-  if ( iMask == "dipole") then
-    write (timestring,'(i5.5)') nint(time*100.d0)
-    colorscale = 0.25d0*max(maxval(vort),dabs(minval(vort)))
-    call SaveGIF(vort, "vor/"//trim(timestring)//".vor", 1, -colorscale, colorscale)
-    call SaveField( u(:,:,1), trim(name)//'ux_final')
-    call SaveField( u(:,:,2), trim(name)//'uy_final')
-    call curl (uk, pk)
-    call cofitxy(pk,vort)
-    call SaveField( u(:,:,2), trim(name)//'vor_final')
-    open (14, file = 'dipole.divu', status = 'unknown', access = 'append')
-    write (14,'(i4,1x,i4,1x,es12.4,1x,es12.4,1x,f4.2,1x,es15.8,1x,A)') &
-    nx, ny, eps, Tmax, CFL, max_divergence(uk), trim(iMethod)//" "//trim(iPressure)//" "//trim(iActive)
-    write (*,'(i4,1x,i4,1x,es12.4,1x,es12.4,1x,f4.2,1x,es15.8,1x,A)') &
-    nx, ny, eps, Tmax, CFL, max_divergence(uk), trim(iMethod)//" "//trim(iPressure)//" "//trim(iActive)
-    close (14)
-  endif
-
-
 end subroutine time_step

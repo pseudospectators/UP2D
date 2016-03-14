@@ -5,7 +5,6 @@ module RK2_module
 subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   use share_vars
   use rhs
-  use FieldExport
   use masks
   implicit none
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2), intent (inout) :: u, uk, nlk
@@ -18,14 +17,15 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   integer, intent(in) :: it
   real(kind=pr) :: timestep, max_divergence
 
+  !-- determine time step
   dt = timestep (time,it,u)
+
   !-- compute integrating factor
   call cal_vis (dt, workvis)
   !-- mask and us
   call create_mask (time)
-  call create_us (time, u, uk)
   !-- RHS and pressure
-  call cal_nlk (time, u, uk, vort, nlk, .true.)
+  call cal_nlk (time, u, uk, vort, nlk)
   call add_pressure (nlk, uk, u, vort)
 
   !-- do the euler step
@@ -49,9 +49,8 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   !---------------------------------------------------------------------------------
   !-- mask and us
   call create_mask (time+dt)
-  call create_us (time+dt, u_tmp, uk_tmp)
   !-- RHS and pressure
-  call cal_nlk (time+dt, u_tmp, uk_tmp, vort, nlk2, .true.)
+  call cal_nlk (time+dt, u_tmp, uk_tmp, vort, nlk2)
   call add_pressure (nlk2, uk_tmp, u_tmp, vort)
 
   !-- sum up all the terms (final step)
