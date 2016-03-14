@@ -1,7 +1,7 @@
 subroutine time_step
   use share_vars
   use masks
-  use FieldExport
+  use hdf5_wrapper
   use RK2_module
   use timing
   implicit none
@@ -34,15 +34,10 @@ subroutine time_step
       time = time + dt1  ! Advance in time
       it = it + 1
 
-      if (time-T_lastdrag>tdrag) then
-        !----------------------------------------------------------------
-        !-- video snapshots
-        !----------------------------------------------------------------
-        write(timestring,'(i5.5)') nint(time*100.d0)
-        write(*,'("Snapshot. time=",es12.4," vormax=",es12.4)') time, maxval(vort)
-        write(*,*) trim(timestring)
-        call SaveField( time, "vor_"//trim(timestring), vort)
-        T_lastdrag=time
+      if (time-T_lastsave >= tsave) then
+        ! save output fields to disk
+        call save_fields(time, u, vort)
+        T_lastsave=time
       endif
 
       t1 = Performance("stop",1)

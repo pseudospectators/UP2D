@@ -1,3 +1,10 @@
+module hdf5_wrapper
+
+  use hdf5
+  use share_vars, only : nx,ny,xl,yl,nu,pr,strlen,eps
+
+contains
+
 !-------------------------------------------------------------------------------
 ! this subroutine writes an array (and just one) to a HDF5 file according to FLUSI
 ! conventions. Thus, e.g., mask_0000000.h5 is an array at time t=000.000 and con-
@@ -5,8 +12,6 @@
 ! "viscosity"
 !-------------------------------------------------------------------------------
 subroutine write_flusi_hdf5_2d_openmp( time, filename, field_out)
-  use share_vars
-  use hdf5
   implicit none
 
   ! The field to be written to disk:
@@ -88,7 +93,7 @@ subroutine write_flusi_hdf5_2d_openmp( time, filename, field_out)
   call h5pcreate_f(H5P_DATASET_CREATE_F, plist_id, error)
   call h5pset_chunk_f(plist_id, rank, chunking_dims, error)
   ! Output files in single precision
-  call h5dcreate_f(file_id, get_dsetname(filename), H5T_NATIVE_DOUBLE, filespace, &
+  call h5dcreate_f(file_id, get_dsetname(filename), H5T_NATIVE_REAL, filespace, &
        dset_id, error, plist_id)
   call h5sclose_f(filespace, error)
 
@@ -141,8 +146,6 @@ end subroutine write_flusi_hdf5_2d_openmp
 ! Write a given attribute with attribute name aname and dimensions
 ! adims/dims to a given dataset identifier dset_id. Double version.
 subroutine write_attribute_dble(adims,aname,attribute,dim,dset_id)
-  use share_vars
-  use hdf5
   implicit none
 
   integer, intent(in) :: dim
@@ -173,8 +176,6 @@ end subroutine write_attribute_dble
 ! Write a given attribute with attribute name aname and dimensions
 ! adims/dims to a given dataset identifier dset_id. Integer version.
 subroutine write_attribute_int(adims,aname,attribute,dim,dset_id)
-  use share_vars
-  use hdf5
   implicit none
 
   integer, intent(in) :: dim
@@ -206,8 +207,6 @@ end subroutine write_attribute_int
 ! note you need to know the dimensions and domain decomposition before
 ! calling it.
 subroutine read_flusi_hdf5_2d_openmp( filename, field )
-  use share_vars
-  use hdf5
   implicit none
 
   character(len=*),intent(in) :: filename
@@ -343,26 +342,6 @@ subroutine read_flusi_hdf5_2d_openmp( filename, field )
 end subroutine read_flusi_hdf5_2d_openmp
 
 
-
-
-! checks if a given file ("fname") exists. if not, code is stopped brutally
-subroutine check_file_exists(fname)
-  implicit none
-
-  character (len=*), intent(in) :: fname
-  logical :: exist1
-
-  inquire ( file=fname, exist=exist1 )
-
-  if ( exist1 .eqv. .false.) then
-    write (*,'("ERROR! file: ",A," not found")') trim(adjustl(fname))
-    stop
-  endif
-
-end subroutine check_file_exists
-
-
-
 !----------------------------------------------------
 ! This routine fetches the resolution, the domain size and the time
 ! form a *.h5 file
@@ -375,8 +354,6 @@ end subroutine check_file_exists
 !           but especially the attributes "nxyz", "time", "domain_size"
 !----------------------------------------------------
 subroutine Fetch_attributes_2d_openmp( filename, nx, ny, xl, yl, time, viscosity )
-  use hdf5
-  use share_vars, only : get_dsetname
   implicit none
 
   integer, parameter :: pr = 8
@@ -485,3 +462,18 @@ subroutine Fetch_attributes_2d_openmp( filename, nx, ny, xl, yl, time, viscosity
   CALL h5fclose_f(file_id, error) ! Close the file.
   CALL h5close_f(error)  ! Close FORTRAN interface.
 end subroutine Fetch_attributes_2d_openmp
+
+
+!-----------------------------------------------------------------------------
+! This function returns, to a given filename, the corresponding dataset name
+! in the hdf5 file, following flusi conventions (folder/ux_0000.h5 -> "ux")
+!-----------------------------------------------------------------------------
+character(len=strlen)  function get_dsetname(fname)
+  implicit none
+  character(len=*), intent(in) :: fname
+  ! extract dsetname (from "/" until "_", excluding both)
+  get_dsetname  = fname  ( index(fname,'/',.true.)+1:index( fname, '_',.true. )-1 )
+  return
+end function get_dsetname
+
+end module
