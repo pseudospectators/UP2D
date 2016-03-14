@@ -1,7 +1,7 @@
 module masks
   implicit none
   contains
-  
+
 !===============================================================================
 subroutine create_mask (time)
   use share_vars
@@ -9,36 +9,34 @@ subroutine create_mask (time)
   real (kind=pr), intent (in) :: time
   real (kind=pr) :: R
   integer :: ix, iy
-  ! time dependent masks currently not in  
-  ! this function does nothing when called after time=0.d0
-  if (time == 0.d0) then
-    mask = 0.d0
-    us   = 0.d0
-    u_BC = 0.d0
-    phi  = 0.d0
-    
-    select case (iMask)
-      case('cylinder')
-        call cylinder()
-      case('lamballais')
-        call lamballais_mask()
-      case('couette')
-        call couette_mask()
-      case('dipole')
-        call dipole_mask()      
-      case('none')
-        mask = 0.d0
-      case default
-        write (*,*) "mask not defnd", iMask
-        stop    
-    end select  
-    
-    !$omp parallel do private(iy)
-    do iy=0,ny-1
-      mask(:,iy) = mask(:,iy) / eps
-    enddo
-    !$omp end parallel do    
-  endif
+
+  mask = 0.d0
+  us   = 0.d0
+  u_BC = 0.d0
+  phi  = 0.d0
+
+  select case (iMask)
+    case('cylinder')
+      call cylinder()
+    case('lamballais')
+      call lamballais_mask()
+    case('couette')
+      call couette_mask()
+    case('dipole')
+      call dipole_mask()
+    case('none')
+      mask = 0.d0
+    case default
+      write (*,*) "mask not defnd", iMask
+      stop
+  end select
+
+  !$omp parallel do private(iy)
+  do iy=0,ny-1
+    mask(:,iy) = mask(:,iy) / eps
+  enddo
+  !$omp end parallel do
+
 end subroutine create_mask
 
 !===============================================================================
@@ -57,11 +55,11 @@ subroutine lamballais_mask
   R3=2.25d0
   x0=xl/2.d0
   y0=yl/2.d0
-  
-  !-- compute signed distance function   
+
+  !-- compute signed distance function
   do ix=0,nx-1
     do iy=0,ny-1
-      R = dsqrt( (dble(ix)*dx-x0)**2 + (dble(iy)*dy-y0)**2 )      
+      R = dsqrt( (dble(ix)*dx-x0)**2 + (dble(iy)*dy-y0)**2 )
       ! phi functions for all three interfaces
       phis(1) = (R-R1)
       phis(2) =-(R-R2)
@@ -69,18 +67,18 @@ subroutine lamballais_mask
       !-- closest interface, but with correct sign
       i = minloc( abs(phis), 1 )
       phi(ix,iy) = phis(i)
-      
+
       !-- outside the cylinder, force exact solution in the ring
       if ( R > R1+dx) then
         u_BC(ix,iy,1) = uex(ix,iy,1)
         u_BC(ix,iy,2) = uex(ix,iy,2)
       endif
     enddo
-  enddo  
-  
+  enddo
+
   !-- compute chi function (traditional mask function)
   call phi2chi()
-  
+
   !-- compute normal vectors
   call compute_normals()
 end subroutine lamballais_mask
@@ -93,9 +91,9 @@ subroutine phi2chi
   use fieldexport
   implicit none
   integer :: ix,iy
-  
+
   mask = 0.d0
-  
+
   !$omp parallel do private(ix,iy)
   do ix=0,nx-1
     do iy=0,ny-1
@@ -103,9 +101,9 @@ subroutine phi2chi
         mask(ix,iy) = 1.d0
       endif
     enddo
-  enddo    
+  enddo
   !$omp end parallel do
-  
+
 end subroutine phi2chi
 
 !===============================================================================
@@ -114,7 +112,7 @@ subroutine couette_mask
   use share_vars
   use fieldexport
   implicit none
-  
+
 end subroutine couette_mask
 
 !===============================================================================
@@ -126,15 +124,15 @@ subroutine cylinder
   real(kind=pr)::R
   x0 = xl/2.d0
   y0 = yl/2.d0
-  
+
   !$omp parallel do private(ix,iy,R)
-  do ix=0,nx-1  
+  do ix=0,nx-1
     do iy=0,ny-1
       R = dsqrt( (dble(ix)*dx-x0)**2 +(dble(iy)*dy-y0)**2 )
       if (R <= 1.d0) then
         mask(ix,iy) = 1.d0
       endif
-    enddo      
+    enddo
   enddo
   !$omp end parallel do
 end subroutine cylinder
@@ -166,15 +164,15 @@ subroutine dipole_mask
   integer :: ix,iy
   real(kind=pr) :: p ! exponent for norm
   real(kind=pr) :: x,y
-  
+
   phi = 0.d0 ! signed distance
   u_BC = 0.d0 ! non-homogeneous dirichlet BC (zero in this case)
-  
+
   x0 = 0.5d0*xl
   y0 = 0.5d0*yl
   ! exponent. phi converges to rectangle in the limit p->\infty
   p = 20.d0
-  
+
   !-- compute signed distance function
   do ix=0,nx-1
     do iy=0,ny-1
@@ -183,11 +181,11 @@ subroutine dipole_mask
       y = dble(iy)*dy
       phi (ix,iy) = -( ((x-x0)**p + (y-y0)**p)**(1.d0/p) - 1.d0 )
     enddo
-  enddo    
-  
+  enddo
+
   !-- compute chi function (traditional mask function)
   call phi2chi()
-  
+
   !-- compute normal vectors
   call compute_normals()
 end subroutine dipole_mask
@@ -196,21 +194,21 @@ end subroutine dipole_mask
 !===============================================================================
 
 
-subroutine compute_normals 
+subroutine compute_normals
   use share_vars
   use FieldExport
   implicit none
   integer :: ix,iy
   real(kind=pr) :: normgrad, blend
-  
+
   normals = 0.d0
-  
+
   !$omp parallel do private(ix,iy,normgrad,blend)
   do ix=1,nx-2 ! skip first and last point
     do iy=1,ny-2 ! skip first and last point
       normals(ix,iy,1) = (phi(ix+1,iy) - phi(ix-1,iy) )/(2.0d0*dx)
       normals(ix,iy,2) = (phi(ix,iy+1) - phi(ix,iy-1) )/(2.0d0*dy)
-      
+
       !-- normalize
       normgrad = dsqrt ( normals(ix,iy,1)**2 + normals(ix,iy,2)**2 )
       if ( normgrad > 1e-10) then
@@ -218,9 +216,9 @@ subroutine compute_normals
         normals(ix,iy,2) = normals(ix,iy,2) / normgrad
       else
         normals(ix,iy,1) = 0.d0
-        normals(ix,iy,2) = 0.d0      
+        normals(ix,iy,2) = 0.d0
       endif
-      
+
       if (iActive == "chantalat") then
         !-- blending: reduce normal vectors to a BL close to interface
         call SmoothStep(blend,dabs(phi(ix,iy)),4.d0*dx,3.d0*dx)
@@ -228,7 +226,7 @@ subroutine compute_normals
         normals(ix,iy,2) = normals(ix,iy,2) * blend
       endif
     enddo
-  enddo  
+  enddo
   !$omp end parallel do
 end subroutine compute_normals
 

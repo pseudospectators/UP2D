@@ -8,7 +8,7 @@ lamballais.f90  mean_velocity.f90 \
 add_diffusion.f90 add_pressure.f90 add_pressure_grad.f90 cal_pressure.f90 \
 dt.f90 RK2.f90 RK2_implicit.f90 \
 cof_fftw33.f90 dealiase_mask.f90 spectral_essentials.f90 \
-time_step.f90
+time_step.f90 hdf_wrapper.f90
 
 # Object and module directory:
 OBJDIR=obj
@@ -71,7 +71,7 @@ HDF_INC = $(HDF_ROOT)/include
 
 LDFLAGS = -L$(FFT_LIB) -lfftw3_threads -lfftw3 -lm
 LDFLAGS += $(HDF5_FLAGS) -L$(HDF_LIB) -lhdf5_fortran -lhdf5 -lz -ldl
-LDFLAGS += -llapack -lm 
+LDFLAGS += -llapack -lm
 FFLAGS += -I$(HDF_INC) -I$(FFT_INC) $(PPFLAG) $(DIFORT)
 
 
