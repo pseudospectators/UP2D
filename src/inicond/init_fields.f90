@@ -94,10 +94,5 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
   ! ensure the initial field is divergence-free
   !-----------------------------------------------------------------------------
   write(*,'("inicond=",A," max field divergence ",es12.4)') trim(inicond), max_divergence(uk)
-  if ( ipressure == "classic") then
-    ! there's a problem doing this with "modified"
-    call add_pressure( uk, uk, u, vor )
-  endif
-  write(*,'("inicond=",A," max field divergence ",es12.4)') trim(inicond), max_divergence(uk)
 
 end subroutine

@@ -1,7 +1,8 @@
 module ini_files_parser
   use share_vars
 
-  integer, parameter :: maxcolumns=1024
+  integer,parameter :: maxcolumns=1024
+  integer,parameter :: nlines=2048 ! maximum number of lines in PARAMS-file
 
   ! type definition of an inifile type. it contains an allocatable string array
   ! of maxcolumns length. we will allocate the array, then fill it with what we
