@@ -11,11 +11,16 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   real(kind=pr), dimension(0:nx-1,0:ny-1), intent (inout) :: vort, p
   real(kind=pr), intent (out) :: dt
   real(kind=pr), intent (in) :: time
-  real(kind=pr), dimension (0:nx-1, 0:ny-1) :: workvis
-  real(kind=pr), dimension (0:nx-1, 0:ny-1,1:2) :: nlk2, uk_tmp, u_tmp
+  real(kind=pr), dimension (:,:), allocatable :: workvis
+  real(kind=pr), dimension (:,:,:), allocatable :: nlk2, uk_tmp, u_tmp
+
   integer :: iy
   integer, intent(in) :: it
   real(kind=pr) :: timestep, max_divergence
+
+  allocate(nlk2(0:nx-1, 0:ny-1,1:2), uk_tmp(0:nx-1, 0:ny-1,1:2), u_tmp(0:nx-1, 0:ny-1,1:2))
+  allocate(workvis(0:nx-1, 0:ny-1))
+
 
   !-- determine time step
   dt = timestep (time,it,u)
@@ -71,6 +76,8 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   !-- velocity in phys. space
   call cofitxy (uk(:,:,1), u(:,:,1))
   call cofitxy (uk(:,:,2), u(:,:,2))
+
+  deallocate(nlk2, uk_tmp, u_tmp,workvis)
 
 !  at the end of the time step, we consistently return u and uk
 end subroutine RK2

@@ -10,8 +10,10 @@ subroutine add_pressure (nlk)
   use fieldexport
   implicit none
   real(kind=pr), dimension (0:nx-1,0:ny-1,1:2), intent (inout) :: nlk
-  real(kind=pr), dimension (0:nx-1,0:ny-1) :: work1, work2, work3
+  real(kind=pr), dimension(:,:), allocatable :: work1, work2, work3
   integer :: iy
+
+  allocate ( work1(0:nx-1,0:ny-1), work2(0:nx-1,0:ny-1), work3(0:nx-1,0:ny-1) )
 
   !---------------------------------------------------------------------------
   ! classic pressure projects all source terms
@@ -32,4 +34,5 @@ subroutine add_pressure (nlk)
   enddo
   !$omp end parallel do
 
+  deallocate(work1,work2,work3)
 end subroutine add_pressure

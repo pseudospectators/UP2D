@@ -6,10 +6,13 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
   real(kind=pr), intent(out) :: time
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2), intent (inout) :: u, uk, nlk
   real(kind=pr), dimension(0:nx-1,0:ny-1), intent (inout) :: vor, pk
-  real(kind=pr), dimension(0:nx-1,0:ny-1) :: vortk
+  real(kind=pr), dimension(:,:), allocatable :: vortk
   real(kind=pr) :: r0,we,d,r1,r2, max_divergence, dummy1,dummy2,dummy3
   character(len=80) :: file
   integer :: ix,iy
+
+  allocate(vortk(0:nx-1,0:ny-1))
+
   time = 0.d0
   u   = 0.d0
   uk  = 0.d0
@@ -25,6 +28,9 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
     vor = 0.d0
     pk = 0.d0
 
+  case ('meanflow')
+    u(:,:,1) = 1.d0
+    call coftxy(u(:,:,1),uk(:,:,1))
   !*****************
   case ('turbulent')
   !*****************
@@ -95,4 +101,5 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
   !-----------------------------------------------------------------------------
   write(*,'("inicond=",A," max field divergence ",es12.4)') trim(inicond), max_divergence(uk)
 
+  deallocate(vortk)
 end subroutine

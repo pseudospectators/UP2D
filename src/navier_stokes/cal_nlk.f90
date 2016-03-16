@@ -16,8 +16,10 @@ subroutine cal_nlk (time, u, uk, vor, nlk)
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: 	u
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: 	uk
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: 	nlk
-  real (kind=pr), dimension (0:nx-1, 0:ny-1) :: work1, work2
+  real (kind=pr), dimension (:,:), allocatable :: work1, work2
   integer :: iy
+
+  allocate(work1(0:nx-1, 0:ny-1), work2(0:nx-1, 0:ny-1))
 
   !-- compute vorticity
   call curl (uk, work1)
@@ -41,6 +43,8 @@ subroutine cal_nlk (time, u, uk, vor, nlk)
     nlk(:,iy,2) = nlk(:,iy,2)*dealiase(:,iy)
   enddo
   !$omp end parallel do
+
+  deallocate(work1, work2)
 end subroutine cal_nlk
 
 end module rhs

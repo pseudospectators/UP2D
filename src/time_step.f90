@@ -6,11 +6,14 @@ subroutine time_step
   use timing
   implicit none
   real(kind=pr) :: time=0.0d0, dt1=0.0d0, max_divergence
-  real(kind=pr), dimension(0:nx-1,0:ny-1,1:2) :: u, uk, nlk
-  real(kind=pr), dimension(0:nx-1,0:ny-1) :: pk, vort
+  real(kind=pr), dimension(:,:,:), allocatable :: u, uk, nlk
+  real(kind=pr), dimension(:,:), allocatable :: pk, vort
   real(kind=pr) :: T_lastdrag=0.0d0, T_lastsave=0.0d0, t1, time_left
   integer :: it=0
   character(len=5) :: timestring
+
+  allocate( pk(0:nx-1,0:ny-1), vort(0:nx-1,0:ny-1), u(0:nx-1,0:ny-1,1:2) )
+  allocate( uk(0:nx-1,0:ny-1,1:2),nlk(0:nx-1,0:ny-1,1:2) )
 
   if (FD_2nd) write (*,*) "!!! ATTENTION; RUNNING IN REDUCED ACCURACY MODE"
 
@@ -55,6 +58,7 @@ subroutine time_step
           nint(100.d0*time/Tmax), max_divergence(uk)
       endif
   enddo
-
+  call save_fields(time, u, uk, vort)
+  deallocate( pk,vort,u,uk,nlk)
   write (*,*) "Loop done."
 end subroutine time_step
