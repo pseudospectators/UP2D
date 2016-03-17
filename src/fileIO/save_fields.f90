@@ -1,15 +1,19 @@
-subroutine save_fields(time, u, uk, vort)
+subroutine save_fields(time, it, u, uk, vort)
   use share_vars
   implicit none
 
   real(kind=pr), intent (in) :: time
+  integer, intent(in) :: it
   real(kind=pr), dimension (0:nx-1, 0:ny-1, 1:2), intent (in) :: u,uk
   real(kind=pr), dimension(0:nx-1,0:ny-1), intent(in) :: vort
 
-  real(kind=pr),dimension (0:nx-1, 0:ny-1) :: work, pk
+  real(kind=pr),dimension (:,:), allocatable :: work, pk
   character(len=strlen) :: timestring
 
+  allocate(work(0:nx-1, 0:ny-1), pk(0:nx-1, 0:ny-1))
+
   write(timestring,'(i6.6)') nint(time*100.d0)
+  write(timestring,'(i6.6)') it
   write(*,'("Saving. time=",es12.4," vormax=",es12.4," fname=",A)') time, maxval(vort), timestring
 
 
@@ -32,6 +36,7 @@ subroutine save_fields(time, u, uk, vort)
     call SaveField( time, "p_"//trim(timestring), work)
   endif
 
+  deallocate(work, pk)
 end subroutine
 
 

@@ -38,17 +38,20 @@ subroutine time_step
       it = it + 1
 
       if (time-T_lastsave >= tsave) then
-        ! save output fields to disk
-        call save_fields(time, u, uk, vort)
+      ! if (modulo(it,5)==0) then
+        !save output fields to disk
+        call save_fields(time, it, u, uk, vort)
         T_lastsave=time
       endif
+      ! endif
 
       t1 = Performance("stop",1)
       !----------------------------------------------------------------
       !-- remaining time
       !----------------------------------------------------------------
-      if (modulo(it,200)==0) then
+      if (modulo(it,1)==0) then
         time_left = t1*(Tmax-time)/dt1
+        time_left = (nt-it)*t1
         write (*,'("time left=",i3,"d ",i2,"h ",i2,"m ",i2,"s (",es8.2," s/dt) [",i2,"%] divu=",es12.4)') &
           floor(time_left/(24.d0*3600.d0)),&
           floor(mod(time_left,24.d0*3600.d0)/3600.d0),&
@@ -58,7 +61,7 @@ subroutine time_step
           nint(100.d0*time/Tmax), max_divergence(uk)
       endif
   enddo
-  call save_fields(time, u, uk, vort)
+  call save_fields(time, it, u, uk, vort)
   deallocate( pk,vort,u,uk,nlk)
   write (*,*) "Loop done."
 end subroutine time_step

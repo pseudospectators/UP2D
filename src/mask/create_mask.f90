@@ -39,17 +39,18 @@ subroutine cylinder()
   use share_vars
   implicit none
   integer :: ix,iy
-  real(kind=pr)::R
+  real(kind=pr)::R,R0,smooth
+
   x0 = xl/2.d0
   y0 = yl/2.d0
+  R0 = 1.0d0
+  smooth = 2.d0*max(dx,dy)
 
   !$omp parallel do private(ix,iy,R)
   do ix=0,nx-1
     do iy=0,ny-1
       R = dsqrt( (dble(ix)*dx-x0)**2 +(dble(iy)*dy-y0)**2 )
-      if (R <= 1.d0) then
-        mask(ix,iy) = 1.d0
-      endif
+      call SmoothStep(mask(ix,iy), R, R0, smooth)
     enddo
   enddo
   !$omp end parallel do
