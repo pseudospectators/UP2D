@@ -19,6 +19,7 @@ subroutine time_step
 
   !-- Initialize fields or read values from a backup file
   call init_fields (time, u, uk, pk, vort, nlk)
+  call sponge_mask(time)
 
   write (*,'("Initialization done, looping now.")')
   write (*,'("time=",es12.4," Tmax=",es12.4," it=",i2," nt=",i9)') time, Tmax, it, nt

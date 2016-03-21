@@ -23,6 +23,12 @@ subroutine StartSimulation()
   allocate ( mask(0:nx-1,0:ny-1) )
   allocate ( us(0:nx-1,0:ny-1,1:2) )
 
+  if (use_sponge==1) allocate ( mask_sponge(0:nx-1,0:ny-1) )
+  ! for safety:
+  mask_sponge = 0.d0
+  mask = 0.d0
+  us = 0.d0
+
   write (*,*) "*** information: allocated memory"
 
   if (FD_2nd) write (*,*) "!!! ATTENTION; RUNNING IN REDUCED ACCURACY MODE"
@@ -39,4 +45,5 @@ subroutine StartSimulation()
   deallocate (dealiase, us, mask)
   call fft_free
 
+  if (use_sponge==1) deallocate ( mask_sponge )
 end subroutine StartSimulation

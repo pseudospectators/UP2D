@@ -44,6 +44,12 @@ subroutine get_params(paramsfile)
   call read_param(PARAMS,"Saving","iSaveMask",iSaveMask, 1)
   call read_param(PARAMS,"Saving","iSavePressure",iSavePressure, 1)
 
+  ! sponge
+  call read_param(PARAMS,"Sponge","iSpongeType",iSpongeType, "none")
+  call read_param(PARAMS,"Sponge","use_sponge",use_sponge, 0)
+  call read_param(PARAMS,"Sponge","eps_sponge",eps_sponge, 1.0d0)
+
+
   ! mean flow
   call read_param(PARAMS,"MeanFlow","iMeanFlow",iMeanFlow, "none")
   call read_param(PARAMS,"MeanFlow","ux_mean",ux_mean, 0.d0)
