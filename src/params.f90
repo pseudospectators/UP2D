@@ -37,6 +37,7 @@ subroutine get_params(paramsfile)
 
   ! saving section
   call read_param(PARAMS,"Saving","tsave",tsave, 1.d0)
+  call read_param(PARAMS,"Saving","itsave",itsave, 999999)
   call read_param(PARAMS,"Saving","tdrag",tdrag, 1.d0)
   call read_param(PARAMS,"Saving","iSaveVorticity",iSaveVorticity, 1)
   call read_param(PARAMS,"Saving","iSaveVelocity",iSaveVelocity, 1)

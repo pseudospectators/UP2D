@@ -12,6 +12,7 @@ module share_vars
   real(kind=pr), save :: Tmax, CFL, tsave, tdrag, dt_fixed
   real(kind=pr), save :: nu, eps, pi
   real(kind=pr), save :: ux_mean, uy_mean
+  integer, save :: itsave
 
   character (len=strlen), save :: inicond, iMask, iMeanFlow, iMethod
 

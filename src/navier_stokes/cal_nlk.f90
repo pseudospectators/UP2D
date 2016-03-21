@@ -17,10 +17,12 @@ subroutine cal_nlk (time, u, uk, vor, nlk)
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: 	uk
   real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: 	nlk
   real (kind=pr), dimension (:,:), allocatable :: work1, work2
+  real (kind=pr), dimension (:,:,:), allocatable :: uk_tmp
   integer :: ix,iy
-  real(kind=pr) :: theta, u_parallel
+  real(kind=pr) :: theta, u_parallel, eps_sponge
 
   allocate(work1(0:nx-1, 0:ny-1), work2(0:nx-1, 0:ny-1))
+  allocate( uk_tmp(0:nx-1, 0:ny-1,1:2) )
 
   !-- compute vorticity
   call curl (uk, work1)
@@ -50,6 +52,14 @@ subroutine cal_nlk (time, u, uk, vor, nlk)
   call coftxy ( work1, nlk(:,:,1) )
   call coftxy ( work2, nlk(:,:,2) )
 
+  ! sponge term
+  ! eps_sponge = 10.d0*eps
+  ! work1 = -vor/eps_sponge ! we delete all vorticity
+  ! call coftxy(work1,work2)
+  ! call vorticity2velocity( work2, uk_tmp )
+  !
+  ! nlk = nlk + uk_tmp
+
   !$omp parallel do private(iy)
   do iy=0,ny-1
     nlk(:,iy,1) = nlk(:,iy,1)*dealiase(:,iy)
@@ -57,7 +67,10 @@ subroutine cal_nlk (time, u, uk, vor, nlk)
   enddo
   !$omp end parallel do
 
+
+
   deallocate(work1, work2)
+  deallocate(uk_tmp)
 end subroutine cal_nlk
 
 end module rhs

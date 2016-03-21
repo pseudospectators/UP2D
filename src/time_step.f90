@@ -37,13 +37,11 @@ subroutine time_step
       time = time + dt1  ! Advance in time
       it = it + 1
 
-      if (time-T_lastsave >= tsave) then
-      ! if (modulo(it,5)==0) then
+      if ((time-T_lastsave >= tsave) .or. (modulo(it,itsave)==0)) then
         !save output fields to disk
         call save_fields(time, it, u, uk, vort)
         T_lastsave=time
       endif
-      ! endif
 
       t1 = Performance("stop",1)
       !----------------------------------------------------------------
