@@ -39,9 +39,8 @@ subroutine time_step
       it = it + 1
 
       ! compute lift/drag
-      open (14, file = 'forces.t', status = 'unknown', access = 'append')
-      write (14,'(es11.4,2(1x,es15.8))') time, &
-      sum( mask*(u(:,:,1)-us(:,:,1)) )*dx*dy,sum( mask*(u(:,:,2)-us(:,:,2)) )*dx*dy
+      open (14, file = 'ekin.t', status = 'unknown', access = 'append')
+      write (14,'(2(es15.8,1x))') time, sum( (u(:,:,1)**2 + u(:,:,2)**2)/2.d0 )*dx*dy
       close (14)
 
       if ((time-T_lastsave >= tsave) .or. (modulo(it,itsave)==0)) then
@@ -54,7 +53,7 @@ subroutine time_step
       !----------------------------------------------------------------
       !-- remaining time
       !----------------------------------------------------------------
-      if (modulo(it,7)==0) then
+      if (modulo(it,5)==0) then
         ! time left due to Tmax
         time_left = t1*(Tmax-time)/dt1
         ! time left due to nt (choose whichever is smaller)

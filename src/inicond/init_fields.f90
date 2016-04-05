@@ -101,6 +101,7 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
     call init_empty_file('forces.t')
     call init_empty_file('dt.t')
     call init_empty_file('u_max.t')
+    call init_empty_file('ekin.t')
   endif
 
   !-----------------------------------------------------------------------------
