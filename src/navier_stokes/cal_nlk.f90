@@ -70,8 +70,6 @@ subroutine cal_nlk (time, u, uk, vor, nlk)
   enddo
   !$omp end parallel do
 
-
-
   deallocate(work1, work2)
   deallocate(sp_tmp)
 end subroutine cal_nlk

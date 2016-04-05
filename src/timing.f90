@@ -2,7 +2,7 @@ module timing
   !-------------------------------------------------------
   implicit none
   save
-  integer, parameter                        :: N_avg =5 ! each measurement is average of N_avg individual measurements
+  integer, parameter                        :: N_avg =10 ! each measurement is average of N_avg individual measurements
   integer, parameter                        :: N_chans = 20 ! how many channels?
   real, dimension (1:N_chans, 1:N_avg)      :: time_measurements = 0.0 !contains N_avg values for each channel (for averaging)
   integer*8, dimension (1:N_chans)          :: start_times = 0  !contains the time when the measurement started, for each channel

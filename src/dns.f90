@@ -25,7 +25,6 @@ subroutine StartSimulation()
 
   if (use_sponge==1) allocate ( mask_sponge(0:nx-1,0:ny-1) )
   ! for safety:
-  mask_sponge = 0.d0
   mask = 0.d0
   us = 0.d0
 

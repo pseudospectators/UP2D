@@ -95,6 +95,13 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
 
   end select
 
+  if(inicond(1:8) == "backup::") then
+    write(*,*) "backup resuming...leave *.t files untouched"
+  else
+    call init_empty_file('forces.t')
+    call init_empty_file('dt.t')
+    call init_empty_file('u_max.t')
+  endif
 
   !-----------------------------------------------------------------------------
   ! ensure the initial field is divergence-free

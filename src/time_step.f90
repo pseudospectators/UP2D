@@ -38,6 +38,12 @@ subroutine time_step
       time = time + dt1  ! Advance in time
       it = it + 1
 
+      ! compute lift/drag
+      open (14, file = 'forces.t', status = 'unknown', access = 'append')
+      write (14,'(es11.4,2(1x,es15.8))') time, &
+      sum( mask*(u(:,:,1)-us(:,:,1)) )*dx*dy,sum( mask*(u(:,:,2)-us(:,:,2)) )*dx*dy
+      close (14)
+
       if ((time-T_lastsave >= tsave) .or. (modulo(it,itsave)==0)) then
         !save output fields to disk
         call save_fields(time, it, u, uk, vort)
@@ -48,10 +54,13 @@ subroutine time_step
       !----------------------------------------------------------------
       !-- remaining time
       !----------------------------------------------------------------
-      if (modulo(it,1)==0) then
+      if (modulo(it,7)==0) then
+        ! time left due to Tmax
         time_left = t1*(Tmax-time)/dt1
-        time_left = (nt-it)*t1
-        write (*,'("time left=",i3,"d ",i2,"h ",i2,"m ",i2,"s (",es8.2," s/dt) [",i2,"%] divu=",es12.4)') &
+        ! time left due to nt (choose whichever is smaller)
+        time_left = min( (nt-it)*t1, time_left)
+        write (*,'("t=",g10.2," time left=",i3,"d ",i2,"h ",i2,"m ",i2,"s (",es8.2," s/dt) [",i2,"%] divu=",es12.4)') &
+          time, &
           floor(time_left/(24.d0*3600.d0)),&
           floor(mod(time_left,24.d0*3600.d0)/3600.d0),&
           floor(mod(time_left,3600.d0)/60.d0),&
