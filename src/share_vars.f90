@@ -14,7 +14,7 @@ module share_vars
   real(kind=pr), save :: ux_mean, uy_mean
   integer, save :: itsave
 
-  character (len=strlen), save :: inicond, iMask, iMeanFlow, iMethod
+  character (len=strlen), save :: inicond, iMask, iMeanFlow, iMethod, iParallel
 
   integer, save :: iSaveVelocity, iSaveVorticity, iSaveMask, iSavePressure
 

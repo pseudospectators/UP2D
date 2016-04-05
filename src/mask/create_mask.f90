@@ -53,9 +53,6 @@ contains
       do iy=0,ny-1
         R = dsqrt( (dble(ix)*dx-x0)**2 +(dble(iy)*dy-y0)**2 )
         call SmoothStep(mask(ix,iy), R, R0, smooth)
-
-! us(ix,iy,1) = -1.d0
-
       enddo
     enddo
     !$omp end parallel do
