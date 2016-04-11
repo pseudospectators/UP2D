@@ -44,7 +44,7 @@ subroutine time_step
       close (14)
 
       if ((time-T_lastsave >= tsave) .or. (modulo(it,itsave)==0)) then
-        !save output fields to disk
+        ! save output fields to disk
         call save_fields(time, it, u, uk, vort)
         T_lastsave=time
       endif
@@ -68,6 +68,7 @@ subroutine time_step
           nint(100.d0*time/Tmax), max_divergence(uk)
       endif
   enddo
+  write(*,*) "Saving fields for the last time..."
   call save_fields(time, it, u, uk, vort)
   deallocate( pk,vort,u,uk,nlk)
   write (*,*) "Loop done."

@@ -47,7 +47,6 @@ endif
 ifort:=$(shell $(FC) --version | head -c 5)
 ifeq ($(ifort),ifort)
 PPFLAG= -fpp #preprocessor flag
-DIFORT= -DIFORT # define the IFORT variable
 FFLAGS += -module $(OBJDIR) # specify directory for modules.
 FFLAGS += -vec_report0
 endif
@@ -56,7 +55,6 @@ endif
 ifeq ($(shell $(FC) -qversion 2>&1 | head -c 3),IBM)
 FFLAGS += -qmoddir=$(OBJDIR)
 FFLAGS += -I$(OBJDIR)
-DIFORT=-WF,-DTURING # this defines the TURING with the IBM compiler
 PPFLAG=-qsuffix=cpp=f90  #preprocessor flag
 endif
 
@@ -71,9 +69,8 @@ HDF_LIB = $(HDF_ROOT)/lib
 HDF_INC = $(HDF_ROOT)/include
 
 LDFLAGS = -L$(FFT_LIB) -lfftw3_threads -lfftw3 -lm
-LDFLAGS += $(HDF5_FLAGS) -L$(HDF_LIB) -lhdf5_fortran -lhdf5 -lz -ldl
-LDFLAGS += -llapack -lm
-FFLAGS += -I$(HDF_INC) -I$(FFT_INC) $(PPFLAG) $(DIFORT)
+LDFLAGS += $(HDF5_FLAGS) -L$(HDF_LIB) -lhdf5_fortran -lhdf5 -lz -ldl -lm
+FFLAGS += -I$(HDF_INC) -I$(FFT_INC)
 
 
 # Both programs are compiled by default.
@@ -101,9 +98,6 @@ $(OBJDIR)/fieldexport.o: fieldexport.f90 $(OBJDIR)/share_vars.o $(OBJDIR)/gif_ut
 	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/cal_nlk.o: cal_nlk.f90 $(OBJDIR)/share_vars.o $(OBJDIR)/fieldexport.o
 	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/passive_scalar.o: passive_scalar.f90 $(OBJDIR)/vars.o $(OBJDIR)/basic_operators.o $(OBJDIR)/ghostpoints.o $(OBJDIR)/helpers.o
-	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
-
 # Compile remaining objects from Fortran files.
 $(OBJDIR)/%.o: %.f90 $(MOBJS)
 	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)

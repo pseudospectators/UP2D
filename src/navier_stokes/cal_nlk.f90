@@ -27,7 +27,7 @@ subroutine cal_nlk (time, u, uk, vor, nlk)
   ! compute vorticity. the curl is computed in F-space, then the result is
   ! transformed back to x-space (for the non-linear term)
   call curl (uk, work1)
-  call cofitxy(work1, vor)
+  call cofitxy( work1, vor)
 
   ! Compute non-linear term and penalization term. We have two variants. Note
   ! products are evaluated in x-space (pseudospectral code)
@@ -43,6 +43,15 @@ subroutine cal_nlk (time, u, uk, vor, nlk)
   elseif (iParallel == "yes") then
     ! In the second variant, we include only the perpendicular part of the flow field
     ! in the penalization term, i.e.  vor x u - chi/eta (u-uparallel-us)
+
+
+    ! NOTE: this is of course only applicable for a cylinder
+
+    if (imask /= "cylinder") then
+      write(*,*) "error: only for cylinders..."
+      stop
+    endif
+
 
     !$omp parallel do private(iy,ix,theta,u_parallel)
     do iy=0,ny-1
