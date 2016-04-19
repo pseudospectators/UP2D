@@ -44,7 +44,6 @@ subroutine cal_nlk (time, u, uk, vor, nlk)
     ! In the second variant, we include only the perpendicular part of the flow field
     ! in the penalization term, i.e.  vor x u - chi/eta (u-uparallel-us)
 
-
     ! NOTE: this is of course only applicable for a cylinder
 
     if (imask /= "cylinder") then
