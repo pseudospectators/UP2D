@@ -5,7 +5,6 @@ module RK2_module
 subroutine RK2 (time, dt,it, u, uk, p, vort, nlk, mask, us, mask_sponge)
   use share_vars
   use rhs
-  use masks
   implicit none
   real(kind=pr),dimension(0:nx-1,0:ny-1), intent(inout) :: mask, mask_sponge
   real(kind=pr),dimension(0:nx-1,0:ny-1), intent (inout) :: vort, p
@@ -22,7 +21,6 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk, mask, us, mask_sponge)
 
   allocate(nlk2(0:nx-1, 0:ny-1,1:2), uk_tmp(0:nx-1, 0:ny-1,1:2), u_tmp(0:nx-1, 0:ny-1,1:2))
   allocate(workvis(0:nx-1, 0:ny-1))
-
 
   !-- determine time step
   dt = adjust_dt (time,it,u)
