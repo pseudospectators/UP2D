@@ -1,10 +1,12 @@
-subroutine init_fields (time, u, uk, pk, vor, nlk)
+subroutine init_fields (time, u, uk, pk, vor, nlk, mask, us, mask_sponge)
   use share_vars
   use hdf5_wrapper
   implicit none
   real(kind=pr), intent(out) :: time
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2), intent (inout) :: u, uk, nlk
   real(kind=pr), dimension(0:nx-1,0:ny-1), intent (inout) :: vor, pk
+  real(kind=pr),dimension(0:nx-1,0:ny-1), intent(inout) :: mask, mask_sponge
+  real(kind=pr),dimension(0:nx-1,0:ny-1,1:2), intent(inout) :: us
   real(kind=pr), dimension(:,:), allocatable :: vortk
   real(kind=pr) :: r0,we,d,r1,r2, max_divergence, dummy1,dummy2,dummy3
   character(len=80) :: file
@@ -59,11 +61,11 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
     d  = 0.1d0
 
     do ix=0,nx-1
-    do iy=0,ny-1
-       r1 = sqrt( (real(ix)*dx-x0)**2 + (real(iy)*dy-y0-d)**2 ) / r0
-       r2 = sqrt( (real(ix)*dx-x0)**2 + (real(iy)*dy-y0+d)**2 ) / r0
-       vor(ix,iy) = we * (1.d0-r1**2)*exp(-r1**2) - we * (1.d0-r2**2)*exp(-r2**2)
-    enddo
+      do iy=0,ny-1
+         r1 = sqrt( (real(ix)*dx-x0)**2 + (real(iy)*dy-y0-d)**2 ) / r0
+         r2 = sqrt( (real(ix)*dx-x0)**2 + (real(iy)*dy-y0+d)**2 ) / r0
+         vor(ix,iy) = we * (1.d0-r1**2)*exp(-r1**2) - we * (1.d0-r2**2)*exp(-r2**2)
+      enddo
     enddo
 
     call fft ( vor, vortk )

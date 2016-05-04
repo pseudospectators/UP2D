@@ -1,4 +1,4 @@
-subroutine time_step !(u, uk, nlk, pk, vort)
+subroutine time_step (u, uk, nlk, pk, vort, mask, us, mask_sponge)
   use share_vars
   use masks
   use hdf5_wrapper
@@ -6,20 +6,17 @@ subroutine time_step !(u, uk, nlk, pk, vort)
   use timing
   implicit none
   real(kind=pr) :: time=0.0d0, dt1=0.0d0, max_divergence
-  real(kind=pr), dimension(:,:,:), allocatable :: u, uk, nlk
-  real(kind=pr), dimension(:,:), allocatable :: pk, vort
+  real(kind=pr),dimension(0:nx-1,0:ny-1,1:2), intent(inout) :: u, uk, us, nlk
+  real(kind=pr),dimension(0:nx-1,0:ny-1), intent(inout) :: pk, vort, mask, mask_sponge
   real(kind=pr) :: T_lastdrag=0.0d0, T_lastsave=0.0d0, t1, time_left
   integer :: it=0
   character(len=5) :: timestring
 
-  allocate( pk(0:nx-1,0:ny-1), vort(0:nx-1,0:ny-1), u(0:nx-1,0:ny-1,1:2) )
-  allocate( uk(0:nx-1,0:ny-1,1:2),nlk(0:nx-1,0:ny-1,1:2) )
-
   if (FD_2nd) write (*,*) "!!! ATTENTION; RUNNING IN REDUCED ACCURACY MODE"
 
   !-- Initialize fields or read values from a backup file
-  call init_fields (time, u, uk, pk, vort, nlk)
-  call sponge_mask(time)
+  call init_fields(time, u, uk, pk, vort, nlk, mask, us, mask_sponge)
+  call sponge_mask(time, mask_sponge)
 
   write (*,'("Initialization done, looping now.")')
   write (*,'("time=",es12.4," Tmax=",es12.4," it=",i2," nt=",i9)') time, Tmax, it, nt
@@ -33,7 +30,7 @@ subroutine time_step !(u, uk, nlk, pk, vort)
     !----------------------------------------------------------------
     !-- Actual time step
     !----------------------------------------------------------------
-    call RK2 (time, dt1, it, u, uk, pk, vort, nlk)
+    call RK2 (time, dt1, it, u, uk, pk, vort, nlk, mask, us, mask_sponge)
     ! Advance in time
     time = time + dt1
     it = it + 1
@@ -45,7 +42,7 @@ subroutine time_step !(u, uk, nlk, pk, vort)
 
     if ( time_for_output( time, dt1, it, tsave, itsave, Tmax, 0.d0) ) then
       ! save output fields to disk
-      call save_fields(time, it, u, uk, vort)
+      call save_fields(time, it, u, uk, vort, mask, us, mask_sponge)
       T_lastsave=time
     endif
 
@@ -69,6 +66,5 @@ subroutine time_step !(u, uk, nlk, pk, vort)
     endif
   enddo
 
-  deallocate( pk,vort,u,uk,nlk)
   write (*,*) "Loop done."
 end subroutine time_step

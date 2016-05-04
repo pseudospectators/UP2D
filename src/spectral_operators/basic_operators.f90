@@ -9,9 +9,9 @@ subroutine cofdx (fk, fk_dx)
   use share_vars
   implicit none
   integer kx, ky, k
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: fk
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dx
-  real (kind=pr) :: scale1, keff
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: fk
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dx
+  real(kind=pr) :: scale1, keff
 
   scale1 = 2.d0*pi/xl
 
@@ -58,9 +58,9 @@ subroutine cofdy (fk, fk_dy)
   use share_vars
   implicit none
   integer :: kx, ky, k
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: fk
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dy
-  real (kind=pr) :: scale1, keff
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: fk
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dy
+  real(kind=pr) :: scale1, keff
 
   scale1 = 2.d0*pi/yl
 
@@ -105,9 +105,9 @@ subroutine cofdxdx (fk, fk_dxdx)
   use share_vars
   implicit none
   integer kx, ky
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: fk
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dxdx
-  real (kind=pr) :: scale
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: fk
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dxdx
+  real(kind=pr) :: scale
 
   scale = (2.d0*pi/xl)**2
 
@@ -134,9 +134,9 @@ subroutine cofdxdy (fk, fk_dxdy)
   use share_vars
   implicit none
   integer kx, kx_max, ky, ky_max
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: fk
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dxdy
-  real (kind=pr) :: fac, scale
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: fk
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dxdy
+  real(kind=pr) :: fac, scale
 
   scale = (2.d0*pi/xl) * (2.d0*pi/yl)
   kx_max = (nx/2-1)
@@ -168,9 +168,9 @@ subroutine cofdydy (fk, fk_dydy)
   use share_vars
   implicit none
   integer kx, ky
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (in)  :: fk
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dydy
-  real (kind=pr) :: scale
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (in)  :: fk
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: fk_dydy
+  real(kind=pr) :: scale
 
   scale = (2.d0*pi/yl)**2
 
@@ -190,10 +190,10 @@ subroutine poisson (f, ans)
 ! Calculate solution to the Poisson equation f = -grad^2 ans in Fourier space
   use share_vars
   implicit none
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: f
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: ans
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) :: f
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: ans
   integer :: kx, kx_max, ky, ky_max
-  real (kind=pr) :: quot, scalex,scaley, kx2eff, ky2eff
+  real(kind=pr) :: quot, scalex,scaley, kx2eff, ky2eff
   kx_max = (nx/2-1)
   ky_max = (ny/2-1)
 
@@ -239,9 +239,9 @@ subroutine curl( uk, vortk )
   ! this routine computes the streamfunction and the velocity field given a vorticity in fourier space
   use share_vars
   implicit none
-  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: uk
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out)  :: vortk
-  real (kind=pr), dimension (:,:), allocatable :: work1, work2
+  real(kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: uk
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out)  :: vortk
+  real(kind=pr), dimension (:,:), allocatable :: work1, work2
   integer :: iy
   allocate(work1(0:nx-1, 0:ny-1), work2(0:nx-1, 0:ny-1))
 
@@ -261,9 +261,9 @@ end subroutine
 subroutine divergence( uk, divuk )
   use share_vars
   implicit none
-  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: uk
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out)  :: divuk
-  real (kind=pr), dimension (:,:), allocatable :: work1, work2
+  real(kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: uk
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out)  :: divuk
+  real(kind=pr), dimension (:,:), allocatable :: work1, work2
   integer :: iy
 
   allocate(work1(0:nx-1, 0:ny-1), work2(0:nx-1, 0:ny-1))
@@ -282,14 +282,13 @@ subroutine divergence( uk, divuk )
 end subroutine
 
 
-
 subroutine vorticity2velocity( vortk, uk )
   ! this routine computes the streamfunction and the velocity field given a vorticity in fourier space
   use share_vars
   implicit none
-  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: uk
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (in)  :: vortk
-  real (kind=pr), dimension (:,:), allocatable :: stream
+  real(kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: uk
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (in)  :: vortk
+  real(kind=pr), dimension (:,:), allocatable :: stream
   integer :: iy
 
   allocate(stream(0:nx-1, 0:ny-1))
@@ -314,9 +313,9 @@ subroutine cal_vis (dt, vis)
   use share_vars
   implicit none
   integer :: kx, kx_max, ky, ky_max
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent(out) :: vis
-  real (kind=pr), intent (in) :: dt
-  real (kind=pr) :: coefx, coefy,scalex,scaley, kx2eff, ky2eff
+  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent(out) :: vis
+  real(kind=pr), intent (in) :: dt
+  real(kind=pr) :: coefx, coefy,scalex,scaley, kx2eff, ky2eff
 
   scalex = (2.d0*pi/xl)**2
   scaley = (2.d0*pi/yl)**2
@@ -357,14 +356,14 @@ end subroutine cal_vis
 function max_divergence(uk)
   use share_vars
   implicit none
-  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: uk
+  real(kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: uk
   real(kind=pr):: max_divergence
-  real (kind=pr), dimension (:,:), allocatable :: work1, work2, work3
+  real(kind=pr), dimension (:,:), allocatable :: work1, work2, work3
 
   allocate(work1(0:nx-1, 0:ny-1), work2(0:nx-1, 0:ny-1), work3(0:nx-1, 0:ny-1))
   call cofdx( uk(:,:,1),work1 )
   call cofdy( uk(:,:,2),work2 )
   call ifft(work1+work2,work3)
-  max_divergence = maxval( dabs((1.0d0-mask*eps)*work3) )
+  max_divergence = maxval( work3 )
   deallocate(work1,work2,work3)
 end function

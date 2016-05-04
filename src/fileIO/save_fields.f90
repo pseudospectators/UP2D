@@ -1,11 +1,13 @@
-subroutine save_fields(time, it, u, uk, vort)
+subroutine save_fields(time, it, u, uk, vort, mask, us, mask_sponge)
   use share_vars
   implicit none
 
   real(kind=pr), intent (in) :: time
   integer, intent(in) :: it
-  real(kind=pr), dimension (0:nx-1, 0:ny-1, 1:2), intent (in) :: u,uk
-  real(kind=pr), dimension(0:nx-1,0:ny-1), intent(in) :: vort
+  real(kind=pr),dimension(0:nx-1,0:ny-1),intent(inout) :: vort
+  real(kind=pr),dimension(0:nx-1,0:ny-1),intent(inout) :: mask, mask_sponge
+  real(kind=pr),dimension(0:nx-1,0:ny-1,1:2),intent(inout) :: u,uk
+  real(kind=pr),dimension(0:nx-1,0:ny-1,1:2),intent(inout) :: us
 
   real(kind=pr),dimension (:,:), allocatable :: work, pk
   character(len=strlen) :: timestring
@@ -31,7 +33,7 @@ subroutine save_fields(time, it, u, uk, vort)
   endif
 
   if ( iSavePressure == 1 ) then
-    call cal_pressure (time,u,uk,pk)
+    call cal_pressure (time, u, uk, pk, mask, us, mask_sponge)
     call ifft(pk, work)
     call SaveField( time, "p_"//trim(timestring), work)
   endif

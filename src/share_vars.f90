@@ -22,14 +22,12 @@ module share_vars
   logical, save :: FD_2nd = .false.
 
   ! sponge term
-  real (kind=pr), dimension (:,:), allocatable, save :: mask_sponge
   character (len=strlen), save :: iSpongeType
   real(kind=pr), save :: eps_sponge
   integer, save :: use_sponge = 0
 
   ! memory
-  real (kind=pr), dimension (:,:), allocatable, save :: dealiase, mask
-  real (kind=pr), dimension (:,:,:), allocatable, save :: us
+  real(kind=pr), dimension (:,:), allocatable, save :: dealiase
 
 !!!!!!!!!!!!!
 contains

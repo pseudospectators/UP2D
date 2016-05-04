@@ -7,16 +7,17 @@ module rhs
 ! Compute right hand side of penalized Navier-Stokes, without the pressure
 ! the resulting field is NOT divergence free, add the pressure later!
 !-------------------------------------------------------------------------------
-subroutine cal_nlk (time, u, uk, vor, nlk)
+subroutine cal_nlk (time, u, uk, vor, nlk, mask, us, mask_sponge)
   use share_vars
   implicit none
-  real (kind=pr), intent (in) :: 					time
-  real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: 		vor
-  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: 	u
-  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: 	uk
-  real (kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (out) :: 	nlk
-  real (kind=pr), dimension (:,:), allocatable :: work1, work2
-  real (kind=pr), dimension (:,:,:), allocatable :: sp_tmp
+  real(kind=pr),intent (in) :: 					time
+  real(kind=pr),dimension (0:nx-1, 0:ny-1),intent(inout) :: vor, mask, mask_sponge
+  real(kind=pr),dimension (0:nx-1, 0:ny-1,1:2),intent(inout) :: u, us
+  real(kind=pr),dimension (0:nx-1, 0:ny-1,1:2),intent(inout) :: uk
+  real(kind=pr),dimension (0:nx-1, 0:ny-1,1:2),intent(inout) :: nlk
+
+  real(kind=pr),dimension (:,:), allocatable :: work1, work2
+  real(kind=pr),dimension (:,:,:), allocatable :: sp_tmp
   integer :: ix,iy
   real(kind=pr) :: theta, u_parallel
 

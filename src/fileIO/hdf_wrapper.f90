@@ -150,7 +150,7 @@ subroutine write_attribute_dble(adims,aname,attribute,dim,dset_id)
 
   integer, intent(in) :: dim
   integer(hsize_t), DIMENSION(dim), intent(in) :: adims  ! Attribute dimension
-  real (kind=pr), DIMENSION(dim), intent (in) :: attribute
+  real(kind=pr), DIMENSION(dim), intent (in) :: attribute
   character(len=*), intent(in) :: aname ! attribute name
   integer(hid_t),intent(in) :: dset_id  ! dataset identifier
   integer, parameter :: arank = 1
@@ -213,8 +213,8 @@ subroutine read_flusi_hdf5_2d_openmp( filename, field )
   real(kind=pr),dimension(0:nx-1,0:ny-1),intent (out) :: field
 
   integer, parameter        :: rank = 2 ! data dimensionality (2D or 3D)
-  real (kind=pr)            :: time, xl_file, yl_file
-  real (kind=pr)            :: fmax,fmin,favg,viscosity_dummy
+  real(kind=pr)            :: time, xl_file, yl_file
+  real(kind=pr)            :: fmax,fmin,favg,viscosity_dummy
   character(len=80)         :: dsetname
   integer                   :: nx_file, ny_file, i
 
@@ -358,7 +358,7 @@ subroutine Fetch_attributes_2d_openmp( filename, nx, ny, xl, yl, time, viscosity
 
   integer, parameter :: pr = 8
   integer, intent (out) :: nx, ny
-  real (kind=pr), intent(out) :: xl,yl,time,viscosity
+  real(kind=pr), intent(out) :: xl,yl,time,viscosity
 
   character(len=*) :: filename  ! file name
   character(len=80) :: dsetname  ! dataset name
@@ -368,8 +368,8 @@ subroutine Fetch_attributes_2d_openmp( filename, nx, ny, xl, yl, time, viscosity
   integer(hid_t) :: attr_id       ! attribute identifier
   integer(hid_t) :: aspace_id     ! attribute dataspace identifier
 
-  real (kind=pr) ::  attr_data  ! attribute data
-  real (kind=pr), dimension (1:2) :: attr_data2
+  real(kind=pr) ::  attr_data  ! attribute data
+  real(kind=pr), dimension (1:2) :: attr_data2
   integer, dimension (1:2) :: attr_data3
 
   integer     ::   error ! error flag

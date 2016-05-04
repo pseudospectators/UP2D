@@ -2,13 +2,15 @@ module RK2_module
   implicit none
   contains
 
-subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
+subroutine RK2 (time, dt,it, u, uk, p, vort, nlk, mask, us, mask_sponge)
   use share_vars
   use rhs
   use masks
   implicit none
-  real(kind=pr), dimension(0:nx-1,0:ny-1,1:2), intent (inout) :: u, uk, nlk
-  real(kind=pr), dimension(0:nx-1,0:ny-1), intent (inout) :: vort, p
+  real(kind=pr),dimension(0:nx-1,0:ny-1), intent(inout) :: mask, mask_sponge
+  real(kind=pr),dimension(0:nx-1,0:ny-1), intent (inout) :: vort, p
+  real(kind=pr),dimension(0:nx-1,0:ny-1,1:2), intent (inout) :: u, uk, nlk
+  real(kind=pr),dimension(0:nx-1,0:ny-1,1:2), intent(inout) :: us
   real(kind=pr), intent (out) :: dt
   real(kind=pr), intent (in) :: time
   real(kind=pr), dimension (:,:), allocatable :: workvis
@@ -28,10 +30,10 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   !-- compute integrating factor
   call cal_vis (dt, workvis)
   !-- mask and us
-  call create_mask (time)
+  call create_mask (time, mask, us)
   !-- RHS and pressure
-  call cal_nlk (time, u, uk, vort, nlk)
-  call add_pressure (nlk, uk, u, vort)
+  call cal_nlk (time, u, uk, vort, nlk, mask, us, mask_sponge)
+  call add_pressure (nlk)
 
   !-- do the euler step
   !$omp parallel do private (iy)
@@ -53,10 +55,10 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   ! do second RK2 step (RHS evaluation with the argument defined above)
   !---------------------------------------------------------------------------------
   !-- mask and us
-  call create_mask (time+dt)
+  call create_mask (time+dt, mask, us)
   !-- RHS and pressure
-  call cal_nlk (time+dt, u_tmp, uk_tmp, vort, nlk2)
-  call add_pressure (nlk2, uk_tmp, u_tmp, vort)
+  call cal_nlk (time+dt, u_tmp, uk_tmp, vort, nlk2, mask, us, mask_sponge)
+  call add_pressure (nlk2)
 
   !-- sum up all the terms (final step)
   !$omp parallel do private (iy)

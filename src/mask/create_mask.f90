@@ -3,11 +3,13 @@ module masks
 contains
 
   !===============================================================================
-  subroutine create_mask (time)
+  subroutine create_mask (time, mask, us)
     use share_vars
     implicit none
-    real (kind=pr), intent (in) :: time
-    real (kind=pr) :: R
+    real(kind=pr), intent (in) :: time
+    real(kind=pr),dimension(0:nx-1,0:ny-1),intent(inout) :: mask
+    real(kind=pr),dimension(0:nx-1,0:ny-1,1:2),intent(inout) :: us
+    real(kind=pr) :: R
     integer :: ix, iy
 
     mask = 0.d0
@@ -15,11 +17,11 @@ contains
 
     select case (iMask)
     case('cylinder')
-      call cylinder()
+      call cylinder(mask, us)
     case('ellipse')
-      call ellipse()
+      call ellipse(mask, us)
     case('moving_cylinder')
-      call moving_cylinder(time)
+      call moving_cylinder(time, mask, us)
     case('none')
       mask = 0.d0
     case default
@@ -37,9 +39,11 @@ contains
 
   !===============================================================================
 
-  subroutine cylinder()
+  subroutine cylinder(mask, us)
     use share_vars
     implicit none
+    real(kind=pr),dimension(0:nx-1,0:ny-1),intent(inout) :: mask
+    real(kind=pr),dimension(0:nx-1,0:ny-1,1:2),intent(inout) :: us
     integer :: ix,iy
     real(kind=pr)::R,R0,smooth
 
@@ -60,9 +64,11 @@ contains
 
   !===============================================================================
 
-  subroutine ellipse()
+  subroutine ellipse(mask, us)
     use share_vars
     implicit none
+    real(kind=pr),dimension(0:nx-1,0:ny-1),intent(inout) :: mask
+    real(kind=pr),dimension(0:nx-1,0:ny-1,1:2),intent(inout) :: us
     integer :: ix,iy
     real(kind=pr)::R,R0,x,y
 
@@ -88,12 +94,16 @@ contains
 
   !===============================================================================
 
-  subroutine moving_cylinder(time)
+  subroutine moving_cylinder(time,mask, us)
     use share_vars
     implicit none
     real(kind=pr),intent(in) :: time
+    real(kind=pr),dimension(0:nx-1,0:ny-1),intent(inout) :: mask
+    real(kind=pr),dimension(0:nx-1,0:ny-1,1:2),intent(inout) :: us
+
     integer :: ix,iy
     real(kind=pr) :: R, R0, smooth
+
     R0 = 0.5d0
     smooth = 2.d0*max(dx,dy)
     x0 = xl/2.d0 + sin(2.d0*pi*time)
@@ -119,8 +129,8 @@ contains
   subroutine SmoothStep (f,x,t,h)
     use share_vars
     implicit none
-    real (kind=pr), intent (out) :: f
-    real (kind=pr), intent (in)  :: x,t,h
+    real(kind=pr), intent (out) :: f
+    real(kind=pr), intent (in)  :: x,t,h
 
     if (x<=t-h) then
       f = 1.d0

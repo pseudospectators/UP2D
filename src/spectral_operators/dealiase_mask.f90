@@ -4,7 +4,7 @@ subroutine dealiase_mask
   implicit none
   integer :: kx, ky
   integer :: kx_max, ky_max 
-  real (kind=pr)    :: kx_trunc, ky_trunc
+  real(kind=pr)    :: kx_trunc, ky_trunc
 
   kx_max = (nx/2-1) 
   ky_max = (ny/2-1)
