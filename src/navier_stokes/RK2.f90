@@ -6,17 +6,17 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk, mask, us, mask_sponge)
   use share_vars
   use rhs
   implicit none
+  integer,intent(in) :: it
+  real(kind=pr),intent(out) :: dt
+  real(kind=pr),intent(in) :: time
   real(kind=pr),dimension(0:nx-1,0:ny-1), intent(inout) :: mask, mask_sponge
   real(kind=pr),dimension(0:nx-1,0:ny-1), intent (inout) :: vort, p
   real(kind=pr),dimension(0:nx-1,0:ny-1,1:2), intent (inout) :: u, uk, nlk
   real(kind=pr),dimension(0:nx-1,0:ny-1,1:2), intent(inout) :: us
-  real(kind=pr), intent (out) :: dt
-  real(kind=pr), intent (in) :: time
-  real(kind=pr), dimension(:,:), allocatable :: workvis
-  real(kind=pr), dimension(:,:,:), allocatable :: nlk2, uk_tmp, u_tmp
+  real(kind=pr),dimension(:,:), allocatable :: workvis
+  real(kind=pr),dimension(:,:,:), allocatable :: nlk2, uk_tmp, u_tmp
 
   integer :: iy
-  integer, intent(in) :: it
   real(kind=pr) :: adjust_dt, max_divergence
 
   allocate(nlk2(0:nx-1, 0:ny-1,1:2), uk_tmp(0:nx-1, 0:ny-1,1:2), u_tmp(0:nx-1, 0:ny-1,1:2))
@@ -47,7 +47,6 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk, mask, us, mask_sponge)
   !-- velocity in phys. space
   call ifft (uk_tmp(:,:,1), u_tmp(:,:,1))
   call ifft (uk_tmp(:,:,2), u_tmp(:,:,2))
-
 
   !---------------------------------------------------------------------------------
   ! do second RK2 step (RHS evaluation with the argument defined above)
