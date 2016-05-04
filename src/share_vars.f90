@@ -5,16 +5,15 @@ module share_vars
 
   integer, save :: nx, ny
   integer, save :: nt
-  integer, save :: iDealias, nPalettes=14
+  integer, save :: iDealias
 
-  real(kind=pr), save :: colorscale = 0.d0 ! scaling for farge palette (vorticity)
   real(kind=pr), save :: xl,yl,dx,dy,x0,y0, delta
   real(kind=pr), save :: Tmax, CFL, tsave, tdrag, dt_fixed=0.d0, dt_max=0.d0, tsave_first=0.d0
   real(kind=pr), save :: nu, eps, pi
   real(kind=pr), save :: ux_mean, uy_mean
   integer, save :: itsave
-  character(len=strlen),save :: intelligent_dt="yes"
-  character(len=strlen),save :: inicond, iMask, iMeanFlow, iMethod, iParallel
+  character(len=strlen),save :: intelligent_dt = "yes"
+  character(len=strlen),save :: inicond, iMask, iMeanFlow, iMethod
 
   integer, save :: iSaveVelocity, iSaveVorticity, iSaveMask, iSavePressure
 
@@ -27,7 +26,7 @@ module share_vars
   integer, save :: use_sponge = 0
 
   ! memory
-  real(kind=pr), dimension (:,:), allocatable, save :: dealiase
+  real(kind=pr), dimension(:,:), allocatable, save :: dealiase
 
 !!!!!!!!!!!!!
 contains

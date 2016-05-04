@@ -11,23 +11,20 @@ subroutine cal_nlk (time, u, uk, vor, nlk, mask, us, mask_sponge)
   use share_vars
   implicit none
   real(kind=pr),intent (in) :: 					time
-  real(kind=pr),dimension (0:nx-1, 0:ny-1),intent(inout) :: vor, mask, mask_sponge
-  real(kind=pr),dimension (0:nx-1, 0:ny-1,1:2),intent(inout) :: u, us
-  real(kind=pr),dimension (0:nx-1, 0:ny-1,1:2),intent(inout) :: uk
-  real(kind=pr),dimension (0:nx-1, 0:ny-1,1:2),intent(inout) :: nlk
+  real(kind=pr),dimension(0:nx-1, 0:ny-1),intent(inout) :: vor, mask, mask_sponge
+  real(kind=pr),dimension(0:nx-1, 0:ny-1,1:2),intent(inout) :: u, us
+  real(kind=pr),dimension(0:nx-1, 0:ny-1,1:2),intent(inout) :: uk
+  real(kind=pr),dimension(0:nx-1, 0:ny-1,1:2),intent(inout) :: nlk
 
-  real(kind=pr),dimension (:,:), allocatable :: work1, work2
-  real(kind=pr),dimension (:,:,:), allocatable :: sp_tmp
+  real(kind=pr),dimension(:,:), allocatable :: work1, work2
   integer :: ix,iy
-  real(kind=pr) :: theta, u_parallel
 
   allocate(work1(0:nx-1, 0:ny-1), work2(0:nx-1, 0:ny-1))
-  allocate( sp_tmp(0:nx-1, 0:ny-1,1:2) )
 
   ! compute vorticity. the curl is computed in F-space, then the result is
   ! transformed back to x-space (for the non-linear term)
-  call curl (uk, work1)
-  call ifft( work1, vor)
+  call curl(uk, work1)
+  call ifft(work1, vor)
 
   ! Compute non-linear term and penalization term. Note products are evaluated
   ! in x-space (pseudospectral code). this is the classical term, vor x u - chi/eta (u-us)
@@ -39,23 +36,11 @@ subroutine cal_nlk (time, u, uk, vor, nlk, mask, us, mask_sponge)
   !$omp end parallel do
 
   !-- non-linear terms to fourier space
-  call fft ( work1, nlk(:,:,1) )
-  call fft ( work2, nlk(:,:,2) )
+  call fft(work1, nlk(:,:,1))
+  call fft(work2, nlk(:,:,2))
 
   !-- sponge term
-  if (use_sponge == 1) then
-    ! apply sponge penalization to vorticity
-    !$omp parallel do private(iy)
-    do iy=0,ny-1
-      work1(:,iy) = -mask_sponge(:,iy)*vor(:,iy)/eps_sponge
-    enddo
-    !$omp end parallel do
-    call fft(work1,work2)
-    ! obtain the velocity
-    call vorticity2velocity( work2, sp_tmp )
-    ! add sponge term to NL terms (in F-space)
-    nlk = nlk + sp_tmp
-  endif
+  call add_sponge_term(time, nlk, vor, mask_sponge, work1, work2 )
 
   !$omp parallel do private(iy)
   do iy=0,ny-1
@@ -65,7 +50,6 @@ subroutine cal_nlk (time, u, uk, vor, nlk, mask, us, mask_sponge)
   !$omp end parallel do
 
   deallocate(work1, work2)
-  deallocate(sp_tmp)
 end subroutine cal_nlk
 
 end module rhs

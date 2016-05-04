@@ -13,8 +13,8 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk, mask, us, mask_sponge)
   real(kind=pr),dimension(0:nx-1,0:ny-1,1:2), intent(inout) :: us
   real(kind=pr), intent (out) :: dt
   real(kind=pr), intent (in) :: time
-  real(kind=pr), dimension (:,:), allocatable :: workvis
-  real(kind=pr), dimension (:,:,:), allocatable :: nlk2, uk_tmp, u_tmp
+  real(kind=pr), dimension(:,:), allocatable :: workvis
+  real(kind=pr), dimension(:,:,:), allocatable :: nlk2, uk_tmp, u_tmp
 
   integer :: iy
   integer, intent(in) :: it

@@ -10,8 +10,8 @@
 function adjust_dt(time,it, u)
   use share_vars
   implicit none
-  real(kind=pr), dimension (0:nx-1, 0:ny-1,1:2), intent (in) :: u
-  real(kind=pr), dimension (0:nx-1, 0:ny-1) :: work2
+  real(kind=pr), dimension(0:nx-1, 0:ny-1,1:2), intent (in) :: u
+  real(kind=pr), dimension(0:nx-1, 0:ny-1) :: work2
   real(kind=pr) :: dt1, u_max, adjust_dt, t
   real(kind=pr), intent (in) :: time
   integer, intent (in) :: it

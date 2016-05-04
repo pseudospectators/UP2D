@@ -39,7 +39,7 @@ subroutine Start_Simulation()
   implicit none
   real(kind=pr), dimension(:,:,:), allocatable :: u, uk, nlk, us
   real(kind=pr), dimension(:,:), allocatable :: pk, vort,mask
-  real(kind=pr), dimension (:,:), allocatable, save :: mask_sponge
+  real(kind=pr), dimension(:,:), allocatable, save :: mask_sponge
 
   write (*,*) "*** information: entering StartSimulation"
 

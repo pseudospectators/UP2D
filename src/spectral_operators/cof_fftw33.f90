@@ -27,7 +27,7 @@ subroutine fft_initialize
 
   integer :: ierr, init_flag = FFTW_MEASURE, i,id,ix,iy
   complex(kind=pr),dimension(:,:),allocatable :: fftwdata_c
-  real(kind=pr),dimension (:,:),allocatable ::  fftwdata_r
+  real(kind=pr),dimension(:,:),allocatable ::  fftwdata_r
   real(kind=pr),dimension(:,:),allocatable :: work1, work2, work3
   real(kind=pr),dimension(:,:,:),allocatable :: u
   real(kind=pr)::e
@@ -132,8 +132,8 @@ subroutine fft (f, fk)
   use fftw33_descriptors
   implicit none
 
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) ::  f
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) ::  fk
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (in) ::  f
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (out) ::  fk
   complex(kind=pr), dimension(:,:), allocatable :: ft
   real(kind=pr) :: norm
   integer :: ix, iy
@@ -186,8 +186,8 @@ subroutine ifft (fk, f)
   use fftw33_descriptors
   implicit none
 
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) ::  fk
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) ::  f
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (in) ::  fk
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (out) ::  f
   complex(kind=pr), dimension(:,:), allocatable :: ft
   integer :: ix, iy
 

@@ -146,9 +146,9 @@ subroutine coftx (f, fk)
   use mkl_fft_descriptors
   implicit none
   integer :: j
-  real(kind=pr), dimension ( (nx+2) * ny ) :: ft
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) ::  f
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) ::  fk
+  real(kind=pr), dimension( (nx+2) * ny ) :: ft
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (in) ::  f
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (out) ::  fk
   integer :: Status
 
   ! Arrange the data in a 1D array
@@ -185,9 +185,9 @@ subroutine cofitx (fk, f)
   use mkl_fft_descriptors
   implicit none
   integer :: j
-  real(kind=pr), dimension ( (nx+2) * ny ) :: ft
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) ::  fk
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) ::  f
+  real(kind=pr), dimension( (nx+2) * ny ) :: ft
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (in) ::  fk
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (out) ::  f
   integer :: Status
 
   ! Arrange the data in a 1D array
@@ -224,9 +224,9 @@ subroutine cofty (f, fk)
   use mkl_fft_descriptors
   implicit none
   integer :: j
-  real(kind=pr), dimension ( nx * (ny+2) ) :: ft
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) ::  f
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) ::  fk
+  real(kind=pr), dimension( nx * (ny+2) ) :: ft
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (in) ::  f
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (out) ::  fk
   integer :: Status
 
   ! Arrange the data in a 1D array
@@ -263,9 +263,9 @@ subroutine cofity (fk, f)
   use mkl_fft_descriptors
   implicit none
   integer :: j
-  real(kind=pr), dimension ( nx * (ny+2) ) :: ft
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) ::  fk
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) ::  f
+  real(kind=pr), dimension( nx * (ny+2) ) :: ft
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (in) ::  fk
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (out) ::  f
   integer :: Status
 
   ! Arrange the data in a 1D array
@@ -304,9 +304,9 @@ subroutine fft (f, fk)
   use mkl_fft_descriptors
   implicit none
   integer :: j
-  real(kind=pr), dimension ( (nx+2) * (ny+2) ) :: ft
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) ::  f
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) ::  fk
+  real(kind=pr), dimension( (nx+2) * (ny+2) ) :: ft
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (in) ::  f
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (out) ::  fk
   integer :: Status
 
   ! Arrange the data in a 1D array
@@ -356,9 +356,9 @@ subroutine ifft (fk, f)
   use mkl_fft_descriptors
   implicit none
   integer :: j
-  real(kind=pr), dimension ( (nx+2) * (ny+2) ) :: ft
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (in) ::  fk
-  real(kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) ::  f
+  real(kind=pr), dimension( (nx+2) * (ny+2) ) :: ft
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (in) ::  fk
+  real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (out) ::  f
   integer :: Status
 
   ! Arrange the result in a Temperton-like ordering
@@ -404,9 +404,9 @@ subroutine cofts (f, fk, L, n)
   implicit none
   integer, intent (in) :: L, n
   integer :: j
-  real(kind=pr), dimension ( (L+2) * n ) :: ft
-  real(kind=pr), dimension (0:L-1, 0:n-1), intent (in) ::  f
-  real(kind=pr), dimension (0:L-1, 0:n-1), intent (out) ::  fk
+  real(kind=pr), dimension( (L+2) * n ) :: ft
+  real(kind=pr), dimension(0:L-1, 0:n-1), intent (in) ::  f
+  real(kind=pr), dimension(0:L-1, 0:n-1), intent (out) ::  fk
   integer :: Status, strides_in(3)
   type(DFTI_DESCRIPTOR), POINTER :: Desc_Handle_1D
 
@@ -469,9 +469,9 @@ subroutine cofits (fk, f, L, n)
   implicit none
   integer, intent (in) :: L, n
   integer :: j
-  real(kind=pr), dimension ( (L+2) * n ) :: ft
-  real(kind=pr), dimension (0:L-1, 0:n-1), intent (in) ::  fk
-  real(kind=pr), dimension (0:L-1, 0:n-1), intent (out) ::  f
+  real(kind=pr), dimension( (L+2) * n ) :: ft
+  real(kind=pr), dimension(0:L-1, 0:n-1), intent (in) ::  fk
+  real(kind=pr), dimension(0:L-1, 0:n-1), intent (out) ::  f
   integer :: Status, strides_in(3)
   type(DFTI_DESCRIPTOR), POINTER :: Desc_Handle_1D
 

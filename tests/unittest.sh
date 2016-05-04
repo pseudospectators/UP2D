@@ -8,7 +8,7 @@ echo "***************************************************"
 #tar xzf tests_data.tar.gz
 
 # list all the test scrits you want, separated by spaces
-tests=(dipole.sh cylinder.sh cylinder_resume.sh)
+tests=(sponge.sh dipole.sh cylinder.sh cylinder_resume.sh)
 
 # link flusi and mhd from .. to . if this isn't already done.
 if [ ! -f UP2D ]; then

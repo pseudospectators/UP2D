@@ -9,7 +9,7 @@ subroutine save_fields(time, it, u, uk, vort, mask, us, mask_sponge)
   real(kind=pr),dimension(0:nx-1,0:ny-1,1:2),intent(inout) :: u,uk
   real(kind=pr),dimension(0:nx-1,0:ny-1,1:2),intent(inout) :: us
 
-  real(kind=pr),dimension (:,:), allocatable :: work, pk
+  real(kind=pr),dimension(:,:), allocatable :: work, pk
   character(len=strlen) :: timestring
 
   allocate(work(0:nx-1, 0:ny-1), pk(0:nx-1, 0:ny-1))

@@ -369,8 +369,8 @@ subroutine Fetch_attributes_2d_openmp( filename, nx, ny, xl, yl, time, viscosity
   integer(hid_t) :: aspace_id     ! attribute dataspace identifier
 
   real(kind=pr) ::  attr_data  ! attribute data
-  real(kind=pr), dimension (1:2) :: attr_data2
-  integer, dimension (1:2) :: attr_data3
+  real(kind=pr), dimension(1:2) :: attr_data2
+  integer, dimension(1:2) :: attr_data3
 
   integer     ::   error ! error flag
   integer(hsize_t), dimension(1) :: data_dims
