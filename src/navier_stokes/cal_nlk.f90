@@ -9,7 +9,6 @@ module rhs
 !-------------------------------------------------------------------------------
 subroutine cal_nlk (time, u, uk, vor, nlk)
   use share_vars
-  use FieldExport
   implicit none
   real (kind=pr), intent (in) :: 					time
   real (kind=pr), dimension (0:nx-1, 0:ny-1), intent (out) :: 		vor
@@ -29,43 +28,14 @@ subroutine cal_nlk (time, u, uk, vor, nlk)
   call curl (uk, work1)
   call cofitxy( work1, vor)
 
-  ! Compute non-linear term and penalization term. We have two variants. Note
-  ! products are evaluated in x-space (pseudospectral code)
-  if (iParallel == "no") then
-    ! the first variant is the classical term, vor x u - chi/eta (u-us)
-    !$omp parallel do private(iy)
-    do iy=0,ny-1
-      work1(:,iy) = +vor(:,iy)*u(:,iy,2) -mask(:,iy)*(u(:,iy,1)-us(:,iy,1))
-      work2(:,iy) = -vor(:,iy)*u(:,iy,1) -mask(:,iy)*(u(:,iy,2)-us(:,iy,2))
-    enddo
-    !$omp end parallel do
-
-  elseif (iParallel == "yes") then
-    ! In the second variant, we include only the perpendicular part of the flow field
-    ! in the penalization term, i.e.  vor x u - chi/eta (u-uparallel-us)
-
-    ! NOTE: this is of course only applicable for a cylinder
-
-    if (imask /= "cylinder") then
-      write(*,*) "error: only for cylinders..."
-      stop
-    endif
-
-
-    !$omp parallel do private(iy,ix,theta,u_parallel)
-    do iy=0,ny-1
-      do ix=0,nx-1
-        theta = atan2(dble(iy)*dy-y0,dble(ix)*dx-x0)
-        u_parallel = -u(ix,iy,1)*sin(theta)   + u(ix,iy,2)*cos(theta)
-        work1(ix,iy) = +vor(ix,iy)*u(ix,iy,2) -mask(ix,iy)*( u(ix,iy,1)+u_parallel*sin(theta)-us(ix,iy,1) )
-        work2(ix,iy) = -vor(ix,iy)*u(ix,iy,1) -mask(ix,iy)*( u(ix,iy,2)-u_parallel*cos(theta)-us(ix,iy,2) )
-      enddo
-    enddo
-    !$omp end parallel do
-  else
-    write(*,*) "error, iParallel="//iParallel
-    stop
-  endif
+  ! Compute non-linear term and penalization term. Note products are evaluated
+  ! in x-space (pseudospectral code). this is the classical term, vor x u - chi/eta (u-us)
+  !$omp parallel do private(iy)
+  do iy=0,ny-1
+    work1(:,iy) = +vor(:,iy)*u(:,iy,2) -mask(:,iy)*(u(:,iy,1)-us(:,iy,1))
+    work2(:,iy) = -vor(:,iy)*u(:,iy,1) -mask(:,iy)*(u(:,iy,2)-us(:,iy,2))
+  enddo
+  !$omp end parallel do
 
   !-- non-linear terms to fourier space
   call coftxy ( work1, nlk(:,:,1) )

@@ -1,6 +1,5 @@
 subroutine init_fields (time, u, uk, pk, vor, nlk)
   use share_vars
-  use FieldExport
   use hdf5_wrapper
   implicit none
   real(kind=pr), intent(out) :: time

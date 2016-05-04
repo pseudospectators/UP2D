@@ -7,7 +7,7 @@ save_fields.f90 init_fields.f90 \
 lamballais.f90  mean_velocity.f90 \
 add_diffusion.f90 add_pressure.f90 add_pressure_grad.f90 cal_pressure.f90 \
 dt.f90 RK2.f90 RK2_implicit.f90 \
-cof_fftw33.f90 dealiase_mask.f90 spectral_essentials.f90 \
+cof_fftw33.f90 dealiase_mask.f90 basic_operators.f90 \
 time_step.f90 params.f90 sponge.f90
 
 # Object and module directory:
@@ -15,7 +15,7 @@ OBJDIR=obj
 OBJS := $(FFILES:%.f90=$(OBJDIR)/%.o)
 
 # Files that create modules:
-MFILES = timing.f90 share_vars.f90 cal_nlk.f90 fieldexport.f90 gif_util.f90 \
+MFILES = timing.f90 share_vars.f90 cal_nlk.f90 \
 create_mask.f90 ini_files_parser.f90 hdf_wrapper.f90
 MOBJS := $(MFILES:%.f90=$(OBJDIR)/%.o)
 
@@ -84,19 +84,15 @@ UP2D: dns.f90 $(MOBJS) $(OBJS)
 # Fortran). Objects are specified in MOBJS (module objects).
 $(OBJDIR)/share_vars.o: share_vars.f90
 	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/gif_util.o: gif_util.f90
-	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/timing.o: timing.f90 $(OBJDIR)/share_vars.o
 	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/hdf_wrapper.o: hdf_wrapper.f90 $(OBJDIR)/share_vars.o
 	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
 $(OBJDIR)/ini_files_parser.o: ini_files_parser.f90 $(OBJDIR)/share_vars.o
 	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/create_mask.o: create_mask.f90 $(OBJDIR)/share_vars.o $(OBJDIR)/fieldexport.o
+$(OBJDIR)/create_mask.o: create_mask.f90 $(OBJDIR)/share_vars.o
 	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/fieldexport.o: fieldexport.f90 $(OBJDIR)/share_vars.o $(OBJDIR)/gif_util.o
-	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
-$(OBJDIR)/cal_nlk.o: cal_nlk.f90 $(OBJDIR)/share_vars.o $(OBJDIR)/fieldexport.o
+$(OBJDIR)/cal_nlk.o: cal_nlk.f90 $(OBJDIR)/share_vars.o
 	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
 # Compile remaining objects from Fortran files.
 $(OBJDIR)/%.o: %.f90 $(MOBJS)

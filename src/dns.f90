@@ -1,6 +1,5 @@
 program dns
   use share_vars
-  use FieldExport
   implicit none
   character(len=40) :: infile
 

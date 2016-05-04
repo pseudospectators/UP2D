@@ -7,7 +7,6 @@
 !-------------------------------------------------------------------------------
 subroutine add_pressure (nlk)
   use share_vars
-  use fieldexport
   implicit none
   real(kind=pr), dimension (0:nx-1,0:ny-1,1:2), intent (inout) :: nlk
   real(kind=pr), dimension(:,:), allocatable :: work1, work2, work3
