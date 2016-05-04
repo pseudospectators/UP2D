@@ -13,7 +13,7 @@ subroutine save_fields(time, it, u, uk, vort)
   allocate(work(0:nx-1, 0:ny-1), pk(0:nx-1, 0:ny-1))
 
   write(timestring,'(i6.6)') nint(time*100.d0)
-  write(timestring,'(i6.6)') it
+  !write(timestring,'(i6.6)') it
   write(*,'("Saving. time=",es12.4," vormax=",es12.4," fname=",A)') time, maxval(vort), timestring
 
 

@@ -82,9 +82,11 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
          call read_flusi_hdf5_2d_openmp( file, vor )
          call fft ( vor, vortk )
          call vorticity2velocity ( vortk, uk )
+         ! the biot-savart operator does not contain the mean flow, so, since we
+         ! read our backup from a vorticity file, we have to add the mean flow mode
+         call mean_flow(uk)
          call ifft( uk(:,:,1), u(:,:,1))
          call ifft( uk(:,:,2), u(:,:,2))
-
        else
           !--------------------------------------------------
           ! unknown inicond : error
@@ -93,8 +95,6 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
           write (*,*) '??? ERROR: Invalid initial condition'
           stop
        endif
-
-
   end select
 
   if(inicond(1:8) == "backup::") then

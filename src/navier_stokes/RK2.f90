@@ -16,14 +16,14 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
 
   integer :: iy
   integer, intent(in) :: it
-  real(kind=pr) :: timestep, max_divergence
+  real(kind=pr) :: adjust_dt, max_divergence
 
   allocate(nlk2(0:nx-1, 0:ny-1,1:2), uk_tmp(0:nx-1, 0:ny-1,1:2), u_tmp(0:nx-1, 0:ny-1,1:2))
   allocate(workvis(0:nx-1, 0:ny-1))
 
 
   !-- determine time step
-  dt = timestep (time,it,u)
+  dt = adjust_dt (time,it,u)
 
   !-- compute integrating factor
   call cal_vis (dt, workvis)
