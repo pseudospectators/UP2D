@@ -32,7 +32,7 @@ subroutine save_fields(time, it, u, uk, vort)
 
   if ( iSavePressure == 1 ) then
     call cal_pressure (time,u,uk,pk)
-    call cofitxy(pk, work)
+    call ifft(pk, work)
     call SaveField( time, "p_"//trim(timestring), work)
   endif
 

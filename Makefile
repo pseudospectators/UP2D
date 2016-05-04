@@ -6,7 +6,7 @@ FFILES = active_penalization.f90 \
 save_fields.f90 init_fields.f90 \
 lamballais.f90  mean_velocity.f90 \
 add_diffusion.f90 add_pressure.f90 add_pressure_grad.f90 cal_pressure.f90 \
-dt.f90 RK2.f90 RK2_implicit.f90 \
+dt.f90 RK2.f90 RK2_implicit.f90 postprocessing.f90 \
 cof_fftw33.f90 dealiase_mask.f90 basic_operators.f90 \
 time_step.f90 params.f90 sponge.f90
 

@@ -66,9 +66,9 @@ subroutine fft_initialize
     work3(ix,:) = dcos( dble(ix)*dx*2.d0*pi/xl )*2.d0*pi/xl
   enddo
 
-  call coftxy(work1,work2)
+  call fft(work1,work2)
   call cofdx(work2,work1)
-  call cofitxy(work1,work2)
+  call ifft(work1,work2)
   e = sum((work2-work3)**2)*dx*dy
   write(*,*) "FFT testing error=", e
 
@@ -87,9 +87,9 @@ subroutine fft_initialize
     work3(:,iy) = dcos( dble(iy)*dy*2.d0*pi/yl )*2.d0*pi/yl
   enddo
 
-  call coftxy(work1,work2)
+  call fft(work1,work2)
   call cofdy(work2,work1)
-  call cofitxy(work1,work2)
+  call ifft(work1,work2)
   e = sum((work2-work3)**2)*dx*dy
   write(*,*) "FFT testing error=", e
 
@@ -122,7 +122,7 @@ end subroutine fft_free
 
 
 
-subroutine coftxy (f, fk)
+subroutine fft (f, fk)
   !====================================================================
   !     Calculation of the Fourier-coefficients of a real function
   !     along x (1st index) and y (2nd index)
@@ -172,11 +172,11 @@ subroutine coftxy (f, fk)
 
   ! mode KF left unconsidered => filtering
   deallocate( ft )
-end subroutine coftxy
+end subroutine fft
 
 
 
-subroutine cofitxy (fk, f)
+subroutine ifft (fk, f)
   !====================================================================
   !     Calculation of a real function from its Fourier coefficients
   !     along x (1st index) and y (2nd index)
@@ -221,4 +221,4 @@ subroutine cofitxy (fk, f)
 
   ! mode KF left unconsidered => filtering
   deallocate( ft )
-end subroutine cofitxy
+end subroutine ifft

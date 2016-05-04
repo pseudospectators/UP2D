@@ -293,7 +293,7 @@ end subroutine cofity
 
 
 
-subroutine coftxy (f, fk)
+subroutine fft (f, fk)
 !====================================================================
 !     Calculation of the Fourier-coefficients of a real function
 !     along x (1st index) and y (2nd index)
@@ -342,10 +342,10 @@ subroutine coftxy (f, fk)
   !$omp end parallel do
 
   ! mode KF left unconsidered => filtering
-end subroutine coftxy
+end subroutine fft
 
 
-subroutine cofitxy (fk, f)
+subroutine ifft (fk, f)
 !====================================================================
 !     Calculation of a real function from its Fourier coefficients
 !     along x (1st index) and y (2nd index)
@@ -387,7 +387,7 @@ subroutine cofitxy (fk, f)
   !$omp end parallel do
 
   ! mode KF left unconsidered => filtering
-end subroutine cofitxy
+end subroutine ifft
 
 
 

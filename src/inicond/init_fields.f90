@@ -27,9 +27,12 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
     vor = 0.d0
     pk = 0.d0
 
+  !*****************
   case ('meanflow')
+    !*****************
     u(:,:,1) = 1.d0
-    call coftxy(u(:,:,1),uk(:,:,1))
+    call fft(u(:,:,1),uk(:,:,1))
+
   !*****************
   case ('turbulent')
   !*****************
@@ -41,10 +44,10 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
     enddo
     enddo
 
-    call coftxy ( vor, vortk )
+    call fft ( vor, vortk )
     call vorticity2velocity ( vortk, uk )
-    call cofitxy( uk(:,:,1), u(:,:,1))
-    call cofitxy( uk(:,:,2), u(:,:,2))
+    call ifft( uk(:,:,1), u(:,:,1))
+    call ifft( uk(:,:,2), u(:,:,2))
 
   !*****************
   case ('dipole')
@@ -63,10 +66,10 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
     enddo
     enddo
 
-    call coftxy ( vor, vortk )
+    call fft ( vor, vortk )
     call vorticity2velocity ( vortk, uk )
-    call cofitxy( uk(:,:,1), u(:,:,1))
-    call cofitxy( uk(:,:,2), u(:,:,2))
+    call ifft( uk(:,:,1), u(:,:,1))
+    call ifft( uk(:,:,2), u(:,:,2))
 
   case default
        if(inicond(1:8) == "backup::") then
@@ -77,10 +80,10 @@ subroutine init_fields (time, u, uk, pk, vor, nlk)
          write (*,*) "*** inicond: resuming backup "//file
          call Fetch_attributes_2d_openmp( file, ix, iy, dummy1, dummy2, time, dummy3 )
          call read_flusi_hdf5_2d_openmp( file, vor )
-         call coftxy ( vor, vortk )
+         call fft ( vor, vortk )
          call vorticity2velocity ( vortk, uk )
-         call cofitxy( uk(:,:,1), u(:,:,1))
-         call cofitxy( uk(:,:,2), u(:,:,2))
+         call ifft( uk(:,:,1), u(:,:,1))
+         call ifft( uk(:,:,2), u(:,:,2))
 
        else
           !--------------------------------------------------

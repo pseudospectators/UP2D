@@ -26,7 +26,7 @@ subroutine cal_nlk (time, u, uk, vor, nlk)
   ! compute vorticity. the curl is computed in F-space, then the result is
   ! transformed back to x-space (for the non-linear term)
   call curl (uk, work1)
-  call cofitxy( work1, vor)
+  call ifft( work1, vor)
 
   ! Compute non-linear term and penalization term. Note products are evaluated
   ! in x-space (pseudospectral code). this is the classical term, vor x u - chi/eta (u-us)
@@ -38,8 +38,8 @@ subroutine cal_nlk (time, u, uk, vor, nlk)
   !$omp end parallel do
 
   !-- non-linear terms to fourier space
-  call coftxy ( work1, nlk(:,:,1) )
-  call coftxy ( work2, nlk(:,:,2) )
+  call fft ( work1, nlk(:,:,1) )
+  call fft ( work2, nlk(:,:,2) )
 
   !-- sponge term
   if (use_sponge == 1) then
@@ -49,7 +49,7 @@ subroutine cal_nlk (time, u, uk, vor, nlk)
       work1(:,iy) = -mask_sponge(:,iy)*vor(:,iy)/eps_sponge
     enddo
     !$omp end parallel do
-    call coftxy(work1,work2)
+    call fft(work1,work2)
     ! obtain the velocity
     call vorticity2velocity( work2, sp_tmp )
     ! add sponge term to NL terms (in F-space)

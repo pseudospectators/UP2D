@@ -364,7 +364,7 @@ function max_divergence(uk)
   allocate(work1(0:nx-1, 0:ny-1), work2(0:nx-1, 0:ny-1), work3(0:nx-1, 0:ny-1))
   call cofdx( uk(:,:,1),work1 )
   call cofdy( uk(:,:,2),work2 )
-  call cofitxy(work1+work2,work3)
+  call ifft(work1+work2,work3)
   max_divergence = maxval( dabs((1.0d0-mask*eps)*work3) )
   deallocate(work1,work2,work3)
 end function

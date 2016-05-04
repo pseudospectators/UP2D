@@ -45,8 +45,8 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
   call mean_flow (uk_tmp)
 
   !-- velocity in phys. space
-  call cofitxy (uk_tmp(:,:,1), u_tmp(:,:,1))
-  call cofitxy (uk_tmp(:,:,2), u_tmp(:,:,2))
+  call ifft (uk_tmp(:,:,1), u_tmp(:,:,1))
+  call ifft (uk_tmp(:,:,2), u_tmp(:,:,2))
 
 
   !---------------------------------------------------------------------------------
@@ -71,11 +71,11 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk)
 
   !-- compute vorticity (to return in)
   call curl (uk, workvis)
-  call cofitxy(workvis, vort)
+  call ifft(workvis, vort)
 
   !-- velocity in phys. space
-  call cofitxy (uk(:,:,1), u(:,:,1))
-  call cofitxy (uk(:,:,2), u(:,:,2))
+  call ifft (uk(:,:,1), u(:,:,1))
+  call ifft (uk(:,:,2), u(:,:,2))
 
   deallocate(nlk2, uk_tmp, u_tmp,workvis)
 
