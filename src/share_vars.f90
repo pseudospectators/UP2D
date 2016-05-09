@@ -7,7 +7,7 @@ module share_vars
   integer, save :: nt
   integer, save :: iDealias
 
-  real(kind=pr), save :: xl,yl,dx,dy,x0,y0, delta
+  real(kind=pr), save :: xl,yl,dx,dy,x0,y0
   real(kind=pr), save :: Tmax, CFL, tsave, tdrag, dt_fixed=0.d0, dt_max=0.d0, tsave_first=0.d0
   real(kind=pr), save :: nu, eps, pi
   real(kind=pr), save :: ux_mean, uy_mean

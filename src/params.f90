@@ -18,6 +18,7 @@ subroutine get_params(paramsfile)
   call read_param(PARAMS,"Time","CFL",cfl,0.1d0)
   call read_param(PARAMS,"Time","iMethod",iMethod,"RK2")
   call read_param(PARAMS,"Time","dt_fixed",dt_fixed,0.0d0)
+  call read_param(PARAMS,"Time","dt_max",dt_max,0.0d0)
   call read_param(PARAMS,"ReynoldsNumber","nu",nu,1.d-2)
 
   ! Initial conditions section
@@ -33,7 +34,6 @@ subroutine get_params(paramsfile)
   ! Geometry section
   call read_param(PARAMS,"Geometry","xl",xl, 1.d0)
   call read_param(PARAMS,"Geometry","yl",yl, 1.d0)
-  call read_param(PARAMS,"Geometry","delta",delta, 0.1d0)
 
   ! saving section
   call read_param(PARAMS,"Saving","tsave",tsave, 1.d0)
@@ -41,14 +41,13 @@ subroutine get_params(paramsfile)
   call read_param(PARAMS,"Saving","tdrag",tdrag, 1.d0)
   call read_param(PARAMS,"Saving","iSaveVorticity",iSaveVorticity, 1)
   call read_param(PARAMS,"Saving","iSaveVelocity",iSaveVelocity, 1)
-  call read_param(PARAMS,"Saving","iSaveMask",iSaveMask, 1)
   call read_param(PARAMS,"Saving","iSavePressure",iSavePressure, 1)
+  call read_param(PARAMS,"Saving","iSaveMask",iSaveMask, 1)
 
   ! sponge
   call read_param(PARAMS,"Sponge","iSpongeType",iSpongeType, "none")
   call read_param(PARAMS,"Sponge","use_sponge",use_sponge, 0)
   call read_param(PARAMS,"Sponge","eps_sponge",eps_sponge, 1.0d0)
-
 
   ! mean flow
   call read_param(PARAMS,"MeanFlow","iMeanFlow",iMeanFlow, "none")
@@ -56,10 +55,10 @@ subroutine get_params(paramsfile)
   call read_param(PARAMS,"MeanFlow","uy_mean",uy_mean, 0.d0)
 
   ! Set other parameters (all procs)
-  pi=4.d0 *datan(1.d0)
+  pi = 4.d0 * datan(1.d0)
   ! lattice spacing is global
-  dx=xl/dble(nx)
-  dy=yl/dble(ny)
+  dx = xl/dble(nx)
+  dy = yl/dble(ny)
 
 
   ! clean ini file
