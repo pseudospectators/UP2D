@@ -1,5 +1,5 @@
 subroutine save_fields(time, it, u, uk, vort, mask, us, mask_sponge)
-  use share_vars
+  use vars
   implicit none
 
   real(kind=pr), intent (in) :: time
@@ -45,7 +45,7 @@ end subroutine
 
 ! save a single field to file (this is just a wrapper)
 subroutine SaveField( time, filename, field_out)
-  use share_vars
+  use vars
   use hdf5_wrapper
   implicit none
 

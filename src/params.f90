@@ -1,7 +1,7 @@
 ! Wrapper to read parameters from an ini file for fsi.  Also reads
 ! parameters which are set in the vars module.
 subroutine get_params(paramsfile)
-  use share_vars
+  use vars
   use ini_files_parser
 
   type(inifile) :: PARAMS

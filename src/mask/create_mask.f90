@@ -1,6 +1,6 @@
 !===============================================================================
 subroutine create_mask (time, mask, us)
-  use share_vars
+  use vars
   implicit none
   real(kind=pr), intent (in) :: time
   real(kind=pr),dimension(0:nx-1,0:ny-1),intent(inout) :: mask
@@ -36,7 +36,7 @@ end subroutine create_mask
 !===============================================================================
 
 subroutine cylinder(mask, us)
-  use share_vars
+  use vars
   implicit none
   real(kind=pr),dimension(0:nx-1,0:ny-1),intent(inout) :: mask
   real(kind=pr),dimension(0:nx-1,0:ny-1,1:2),intent(inout) :: us
@@ -61,7 +61,7 @@ end subroutine cylinder
 !===============================================================================
 
 subroutine ellipse(mask, us)
-  use share_vars
+  use vars
   implicit none
   real(kind=pr),dimension(0:nx-1,0:ny-1),intent(inout) :: mask
   real(kind=pr),dimension(0:nx-1,0:ny-1,1:2),intent(inout) :: us
@@ -91,7 +91,7 @@ end subroutine ellipse
 !===============================================================================
 
 subroutine moving_cylinder(time,mask, us)
-  use share_vars
+  use vars
   implicit none
   real(kind=pr),intent(in) :: time
   real(kind=pr),dimension(0:nx-1,0:ny-1),intent(inout) :: mask
@@ -123,7 +123,7 @@ end subroutine moving_cylinder
 !===============================================================================
 
 subroutine SmoothStep (f,x,t,h)
-  use share_vars
+  use vars
   implicit none
   real(kind=pr), intent (out) :: f
   real(kind=pr), intent (in)  :: x,t,h

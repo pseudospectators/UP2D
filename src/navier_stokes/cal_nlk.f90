@@ -8,7 +8,7 @@ module rhs
 ! the resulting field is NOT divergence free, add the pressure later!
 !-------------------------------------------------------------------------------
 subroutine cal_nlk (time, u, uk, vor, nlk, mask, us, mask_sponge)
-  use share_vars
+  use vars
   implicit none
   real(kind=pr),intent (in) :: 					time
   real(kind=pr),dimension(0:nx-1, 0:ny-1),intent(inout) :: vor, mask, mask_sponge

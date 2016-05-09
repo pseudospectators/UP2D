@@ -2,7 +2,7 @@
 ! Wrapper for different postprocessing tools
 !-------------------------------------------------------------------------------
 subroutine postprocessing()
-  use share_vars
+  use vars
   implicit none
   character(len=strlen) :: postprocessing_mode, mode, filename, key1, key2
   logical :: help
@@ -58,7 +58,7 @@ end subroutine postprocessing
 ! so that we don't need to store entire fields but rather the *.key only
 subroutine keyvalues(filename)
   use hdf5_wrapper
-  use share_vars
+  use vars
   implicit none
   character(len=*), intent(in) :: filename
   real(kind=pr) :: time, npoints, x,y
@@ -118,7 +118,7 @@ end subroutine keyvalues
 !-------------------------------------------------------------------------------
 ! compares to *.key files if they're equal
 subroutine compare_key(key1,key2)
-  use share_vars
+  use vars
   implicit none
   character(len=*), intent(in) :: key1,key2
   real(kind=pr) :: a1,a2,b1,b2,c1,c2,d1,d2,t1,t2,q1,q2
@@ -198,7 +198,7 @@ end subroutine compare_key
 ! bit what you have been doing.
 !-------------------------------------------------------------------------------
 subroutine postprocessing_ascii_header( io_stream )
-  use share_vars
+  use vars
   implicit none
   integer, intent(in) :: io_stream
   integer :: i

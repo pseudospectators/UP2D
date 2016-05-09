@@ -14,7 +14,7 @@
 ! This module is not MPI-aware. use the mpi layer in ini_files_parser_mpi for this
 !-------------------------------------------------------------------------------
 module ini_files_parser
-  use share_vars, only : pr,dx,dy
+  use vars, only : pr,dx,dy
 
   ! maximum width of parameter file. note we have very long lines if we read long
   ! arrays, as it happens for example when we read fourier coefficients for insect

@@ -1,6 +1,6 @@
 subroutine dealiase_mask
 !  Elliptical dealiasing (truncation 2/3 rule)
-  use share_vars
+  use vars
   implicit none
   integer :: kx, ky
   integer :: kx_max, ky_max 

@@ -3,7 +3,7 @@ module RK2_module
   contains
 
 subroutine RK2 (time, dt,it, u, uk, p, vort, nlk, mask, us, mask_sponge)
-  use share_vars
+  use vars
   use rhs
   implicit none
   integer,intent(in) :: it

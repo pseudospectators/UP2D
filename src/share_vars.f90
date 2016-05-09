@@ -1,4 +1,4 @@
-module share_vars
+module vars
   implicit none
   integer, parameter :: pr = kind (0.d0)
   integer, parameter :: strlen=80
@@ -72,4 +72,4 @@ logical function time_for_output( time, dt, it, tfrequ, ifrequ, tmax, tfirst )
   endif
 end function
 
-end module share_vars
+end module vars

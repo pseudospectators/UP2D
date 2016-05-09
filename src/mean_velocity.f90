@@ -1,5 +1,5 @@
 subroutine mean_flow (uk)
-  use share_vars
+  use vars
   implicit none
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2), intent(inout) :: uk
 

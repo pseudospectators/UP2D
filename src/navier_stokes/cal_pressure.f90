@@ -1,7 +1,7 @@
 
 
 subroutine cal_pressure (time, u, uk, pk, mask, us, mask_sponge)
-  use share_vars
+  use vars
   use rhs
   implicit none
   real(kind=pr),intent(in) :: time

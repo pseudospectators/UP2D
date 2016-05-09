@@ -6,7 +6,7 @@ subroutine cofdx (fk, fk_dx)
 !     ck = ak + i bk with ak= fk(2k,l) and bk= fk(2k+1,l)
 !                         for k=0, kx-1 and all l=0,ny-1
 !---------------------------------------------------------------
-  use share_vars
+  use vars
   implicit none
   integer kx, ky, k
   real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (in) :: fk
@@ -55,7 +55,7 @@ subroutine cofdy (fk, fk_dy)
 !     ck = ak + i bk with ak= fk(k,2l) and bk= fk(k,2l+1)
 !                         for l=0, ky-1 and all k=0,nx-1
 !---------------------------------------------------------------
-  use share_vars
+  use vars
   implicit none
   integer :: kx, ky, k
   real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (in) :: fk
@@ -102,7 +102,7 @@ subroutine cofdxdx (fk, fk_dxdx)
 !     Ck = Ak + i Bk with Ak= Fk(2k,l) and Bk= Fk(2k+1,l)
 !                         for k=0, KX-1 and all l=0,NY-1
 !---------------------------------------------------------------
-  use share_vars
+  use vars
   implicit none
   integer kx, ky
   real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (in) :: fk
@@ -131,7 +131,7 @@ subroutine cofdxdy (fk, fk_dxdy)
 !     Ck = Ak + i Bk with Ak= Fk(2k,l) and Bk= Fk(2k+1,l)
 !                         for k=0, KX-1 and all l=0,NY-1
 !---------------------------------------------------------------
-  use share_vars
+  use vars
   implicit none
   integer kx, kx_max, ky, ky_max
   real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (in) :: fk
@@ -165,7 +165,7 @@ subroutine cofdydy (fk, fk_dydy)
 !     Ck = Ak + i Bk with Ak= Fk(2k,l) and Bk= Fk(2k+1,l)
 !                         for k=0, KX-1 and all l=0,NY-1
 !---------------------------------------------------------------
-  use share_vars
+  use vars
   implicit none
   integer kx, ky
   real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (in)  :: fk
@@ -188,7 +188,7 @@ end subroutine
 
 subroutine poisson (f, ans)
 ! Calculate solution to the Poisson equation f = -grad^2 ans in Fourier space
-  use share_vars
+  use vars
   implicit none
   real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (in) :: f
   real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (out) :: ans
@@ -237,7 +237,7 @@ end subroutine poisson
 
 subroutine curl( uk, vortk )
   ! this routine computes the streamfunction and the velocity field given a vorticity in fourier space
-  use share_vars
+  use vars
   implicit none
   real(kind=pr), dimension(0:nx-1, 0:ny-1,1:2), intent (in) :: uk
   real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (out)  :: vortk
@@ -259,7 +259,7 @@ end subroutine
 
 
 subroutine divergence( uk, divuk )
-  use share_vars
+  use vars
   implicit none
   real(kind=pr), dimension(0:nx-1, 0:ny-1,1:2), intent (in) :: uk
   real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (out)  :: divuk
@@ -284,7 +284,7 @@ end subroutine
 
 subroutine vorticity2velocity( vortk, uk )
   ! this routine computes the streamfunction and the velocity field given a vorticity in fourier space
-  use share_vars
+  use vars
   implicit none
   real(kind=pr), dimension(0:nx-1, 0:ny-1,1:2), intent (out) :: uk
   real(kind=pr), dimension(0:nx-1, 0:ny-1), intent (in)  :: vortk
@@ -310,7 +310,7 @@ subroutine cal_vis (dt, vis)
 !  exp (-nu*k^2*dt)
 !  Optimized for vectorization (Dmitry, Feb 1, 2008)
 !---------------------------------------------------------------
-  use share_vars
+  use vars
   implicit none
   integer :: kx, kx_max, ky, ky_max
   real(kind=pr), dimension(0:nx-1, 0:ny-1), intent(out) :: vis
@@ -354,7 +354,7 @@ end subroutine cal_vis
 
 
 function max_divergence(uk)
-  use share_vars
+  use vars
   implicit none
   real(kind=pr), dimension(0:nx-1, 0:ny-1,1:2), intent (in) :: uk
   real(kind=pr):: max_divergence

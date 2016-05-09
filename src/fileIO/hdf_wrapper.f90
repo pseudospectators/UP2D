@@ -1,7 +1,7 @@
 module hdf5_wrapper
 
   use hdf5
-  use share_vars, only : nx,ny,xl,yl,nu,pr,strlen,eps
+  use vars, only : nx,ny,xl,yl,nu,pr,strlen,eps
 
 contains
 

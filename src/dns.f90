@@ -1,5 +1,5 @@
 program dns
-  use share_vars
+  use vars
   implicit none
   character(len=strlen) :: infile
 
@@ -35,7 +35,7 @@ end program dns
 
 
 subroutine Start_Simulation()
-  use share_vars
+  use vars
   implicit none
   real(kind=pr), dimension(:,:,:), allocatable :: u, uk, nlk, us
   real(kind=pr), dimension(:,:), allocatable :: pk, vort,mask

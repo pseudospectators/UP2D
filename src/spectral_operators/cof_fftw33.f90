@@ -8,7 +8,7 @@
 
 
 module fftw33_descriptors
-  use share_vars
+  use vars
   implicit none
   integer, save :: nthreads ! this holds (globally) the number of threads
   integer*8, save :: Desc_Handle_xy_f, Desc_Handle_xy_b
@@ -19,7 +19,7 @@ subroutine fft_initialize
   !====================================================================
   !     Allocate memory and initialize FFT
   !====================================================================
-  use share_vars
+  use vars
   use fftw33_descriptors
   use omp_lib
   implicit none
@@ -109,7 +109,7 @@ subroutine fft_free
   !====================================================================
   !     Free memory allocated for FFT
   !====================================================================
-  use share_vars
+  use vars
   use fftw33_descriptors
   implicit none
 
@@ -128,7 +128,7 @@ subroutine fft (f, fk)
   !     along x (1st index) and y (2nd index)
   !     FILTERING
   !====================================================================
-  use share_vars
+  use vars
   use fftw33_descriptors
   implicit none
 
@@ -182,7 +182,7 @@ subroutine ifft (fk, f)
   !     along x (1st index) and y (2nd index)
   !     FILTERING
   !====================================================================
-  use share_vars
+  use vars
   use fftw33_descriptors
   implicit none
 

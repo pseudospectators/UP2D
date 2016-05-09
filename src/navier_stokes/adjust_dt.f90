@@ -8,7 +8,7 @@
 ! 5 - dt is smaller than tsave and tintegral
 !-------------------------------------------------------------------------------
 function adjust_dt(time,it, u)
-  use share_vars
+  use vars
   implicit none
   real(kind=pr), dimension(0:nx-1, 0:ny-1,1:2), intent (in) :: u
   real(kind=pr), dimension(0:nx-1, 0:ny-1) :: work2

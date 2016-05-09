@@ -1,6 +1,6 @@
 subroutine add_diffusion (nlk, uk)
   ! adds the explicit diffusion term nu*laplace(u) to nlk
-  use share_vars
+  use vars
   implicit none
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2), intent (inout) :: nlk
   real(kind=pr), dimension(0:nx-1,0:ny-1,1:2), intent (in) :: uk

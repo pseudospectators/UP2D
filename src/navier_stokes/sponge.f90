@@ -2,7 +2,7 @@
 ! set up the mask for the sponge term
 !-------------------------------------------------------------------------------
 subroutine sponge_mask(time, mask_sponge)
-  use share_vars
+  use vars
   implicit none
   real(kind=pr), intent (in) :: time
   real(kind=pr),dimension(0:nx-1,0:ny-1), intent(inout) :: mask_sponge
@@ -29,7 +29,7 @@ end subroutine sponge_mask
 ! Add the sponge term to the non-linear terms in fourier space
 !-------------------------------------------------------------------------------
 subroutine add_sponge_term(time, nlk, vor, mask_sponge, work1, work2)
-  use share_vars
+  use vars
   implicit none
   real(kind=pr),intent(in) :: time
   real(kind=pr),dimension(0:nx-1,0:ny-1,1:2),intent(inout) :: nlk

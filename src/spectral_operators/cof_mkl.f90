@@ -19,7 +19,7 @@ subroutine fft_initialize
 !====================================================================
 !     Allocate memory and initialize FFT
 !====================================================================
-  use share_vars
+  use vars
   use mkl_dfti
   use mkl_fft_descriptors
   implicit none
@@ -119,7 +119,7 @@ subroutine fft_free
 !====================================================================
 !     Free memory allocated for FFT
 !====================================================================
-  use share_vars
+  use vars
   use mkl_dfti
   use mkl_fft_descriptors
   implicit none
@@ -141,7 +141,7 @@ subroutine coftx (f, fk)
 !     along x (1st index)
 !     FILTERING
 !====================================================================
-  use share_vars
+  use vars
   use mkl_dfti
   use mkl_fft_descriptors
   implicit none
@@ -180,7 +180,7 @@ subroutine cofitx (fk, f)
 !     along x (1st index)
 !     FILTERING
 !====================================================================
-  use share_vars
+  use vars
   use mkl_dfti
   use mkl_fft_descriptors
   implicit none
@@ -219,7 +219,7 @@ subroutine cofty (f, fk)
 !     along y (2nd index)
 !     FILTERING
 !====================================================================
-  use share_vars
+  use vars
   use mkl_dfti
   use mkl_fft_descriptors
   implicit none
@@ -258,7 +258,7 @@ subroutine cofity (fk, f)
 !     along y (2nd index)
 !     FILTERING
 !====================================================================
-  use share_vars
+  use vars
   use mkl_dfti
   use mkl_fft_descriptors
   implicit none
@@ -299,7 +299,7 @@ subroutine fft (f, fk)
 !     along x (1st index) and y (2nd index)
 !     FILTERING
 !====================================================================
-  use share_vars
+  use vars
   use mkl_dfti
   use mkl_fft_descriptors
   implicit none
@@ -351,7 +351,7 @@ subroutine ifft (fk, f)
 !     along x (1st index) and y (2nd index)
 !     FILTERING
 !====================================================================
-  use share_vars
+  use vars
   use mkl_dfti
   use mkl_fft_descriptors
   implicit none
@@ -398,7 +398,7 @@ subroutine cofts (f, fk, L, n)
 !     FILTERING
 !     MK library is used
 !====================================================================
-  use share_vars
+  use vars
   use mkl_dfti
   use mkl_fft_descriptors
   implicit none
@@ -463,7 +463,7 @@ subroutine cofits (fk, f, L, n)
 !     FILTERING
 !     MK library is used
 !====================================================================
-  use share_vars
+  use vars
   use mkl_dfti
   use mkl_fft_descriptors
   implicit none

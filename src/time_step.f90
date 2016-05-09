@@ -1,5 +1,5 @@
 subroutine time_step (u, uk, nlk, pk, vort, mask, us, mask_sponge)
-  use share_vars
+  use vars
   use masks
   use hdf5_wrapper
   use RK2_module

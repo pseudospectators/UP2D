@@ -1,5 +1,5 @@
 subroutine init_fields (time, u, uk, pk, vor, nlk, mask, us, mask_sponge)
-  use share_vars
+  use vars
   use hdf5_wrapper
   implicit none
   real(kind=pr), intent(out) :: time
