@@ -114,4 +114,5 @@ subroutine init_fields (time, u, uk, pk, vor, nlk, mask, us, mask_sponge)
   write(*,'("inicond=",A," max field divergence ",es12.4)') trim(inicond), max_divergence(uk)
 
   deallocate(vortk)
+  tstart=time
 end subroutine
