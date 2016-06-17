@@ -18,18 +18,19 @@ subroutine save_fields(time, it, u, uk, vort, mask, us, mask_sponge)
   !write(timestring,'(i6.6)') it
   write(*,'("Saving. time=",es12.4," vormax=",es12.4," fname=",A)') time, maxval(vort), timestring
 
-
   if ( iSaveVorticity == 1) then
-    call SaveField( time, "vor_"//trim(timestring), vort)
+    call curl (uk, work)
+    call ifft (work, vort)
+    call SaveField (time, "vor_"//trim(timestring), vort)
   endif
 
   if ( iSaveVelocity == 1) then
-    call SaveField( time, "ux_"//trim(timestring), u(:,:,1))
-    call SaveField( time, "uy_"//trim(timestring), u(:,:,2))
+    call SaveField (time, "ux_"//trim(timestring), u(:,:,1))
+    call SaveField (time, "uy_"//trim(timestring), u(:,:,2))
   endif
 
   if ( iSaveMask == 1) then
-    call SaveField( time, "mask_"//trim(timestring), mask)
+    call SaveField (time, "mask_"//trim(timestring), mask)
   endif
 
   if ( iSavePressure == 1 ) then

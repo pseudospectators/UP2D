@@ -17,8 +17,10 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk, mask, us, mask_sponge)
   real(kind=pr),dimension(:,:,:), allocatable :: nlk2, uk_tmp, u_tmp
 
   integer :: iy
-  real(kind=pr) :: adjust_dt, max_divergence
+  real(kind=pr) :: adjust_dt
 
+  ! allocate memory for work arrays. note we should not use them from stack, but
+  ! allocateable instead, to avoid issues with stack limitations.
   allocate(nlk2(0:nx-1, 0:ny-1,1:2), uk_tmp(0:nx-1, 0:ny-1,1:2), u_tmp(0:nx-1, 0:ny-1,1:2))
   allocate(workvis(0:nx-1, 0:ny-1))
 
@@ -68,11 +70,10 @@ subroutine RK2 (time, dt,it, u, uk, p, vort, nlk, mask, us, mask_sponge)
   !-- mean flow forcing
   call mean_flow (uk)
 
-  !-- compute vorticity (to return in)
-  call curl (uk, workvis)
-  call ifft(workvis, vort)
-
   !-- velocity in phys. space
+  !-- note: we now advanced in fourier space (uk) and transform back to phys. space (u)
+  !-- to ensure that bith fields are synchronous. this is useful, for example, for drag
+  !-- computation
   call ifft (uk(:,:,1), u(:,:,1))
   call ifft (uk(:,:,2), u(:,:,2))
 

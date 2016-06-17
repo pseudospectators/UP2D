@@ -4,19 +4,19 @@ subroutine time_step (u, uk, nlk, pk, vort, mask, us, mask_sponge)
   use RK2_module
   use timing_module
   implicit none
-  real(kind=pr) :: time=0.0d0, dt1=0.0d0, max_divergence
+  real(kind=pr) :: time=0.0d0, dt1=0.0d0
   real(kind=pr),dimension(0:nx-1,0:ny-1,1:2), intent(inout) :: u, uk, us, nlk
   real(kind=pr),dimension(0:nx-1,0:ny-1), intent(inout) :: pk, vort, mask, mask_sponge
-  real(kind=pr) :: T_lastdrag=0.0d0, T_lastsave=0.0d0, t1
+  real(kind=pr) :: t1
   integer :: it=0
-
-  character(len=5) :: timestring
 
   if (FD_2nd) write (*,*) "!!! ATTENTION; RUNNING IN REDUCED ACCURACY MODE"
   t1 = MPI_wtime()
 
   !-- Initialize fields or read values from a backup file
   call init_fields(time, u, uk, pk, vort, nlk, mask, us, mask_sponge)
+  !-- create the sponge mask (we currently do this only once and assume it is not
+  !-- time dependent.)
   call sponge_mask(time, mask_sponge)
 
   write (*,'("Initialization done, looping now.")')
@@ -42,10 +42,9 @@ subroutine time_step (u, uk, nlk, pk, vort, mask, us, mask_sponge)
     if ( time_for_output( time, dt1, it, tsave, itsave, Tmax, 0.d0) ) then
       ! save output fields to disk
       call save_fields(time, it, u, uk, vort, mask, us, mask_sponge)
-      T_lastsave=time
     endif
 
-    ! remaining time
+    ! output remaining time
     if (modulo(it,5)==0) then
       call are_we_there_yet( time, t1, dt1, it )
     endif
