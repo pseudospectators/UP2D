@@ -50,7 +50,7 @@ subroutine get_params(paramsfile)
   call read_param(PARAMS,"Sponge","iSpongeType",iSpongeType, "none")
   call read_param(PARAMS,"Sponge","use_sponge",use_sponge, 0)
   call read_param(PARAMS,"Sponge","eps_sponge",eps_sponge, 1.0d0)
-
+  call read_param(PARAMS,"Sponge","infile_sponge",infile_sponge, 'none.h5')
   ! mean flow
   call read_param(PARAMS,"MeanFlow","iMeanFlow",iMeanFlow, "none")
   call read_param(PARAMS,"MeanFlow","ux_mean",ux_mean, 0.d0)

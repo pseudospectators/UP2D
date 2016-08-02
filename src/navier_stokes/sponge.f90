@@ -3,17 +3,30 @@
 !-------------------------------------------------------------------------------
 subroutine sponge_mask(time, mask_sponge)
   use vars
+  use hdf5_wrapper
   implicit none
   real(kind=pr), intent (in) :: time
   real(kind=pr),dimension(0:nx-1,0:ny-1), intent(inout) :: mask_sponge
   real(kind=pr) :: R
   integer :: ix, iy
+  logical, save :: first_call = .true.
 
   if (use_sponge == 0) return
+  if (first_call .eqv. .false.) return
 
   mask_sponge = 0.d0
 
   select case (iSpongeType)
+  case ('from_file')
+    call read_flusi_hdf5_2d_openmp( infile_sponge, mask_sponge )
+    ! if the maximum value of the mask is not 1.d0, then we have saved mask/eps
+    ! in the previous simulation.
+    if (maxval(mask_sponge) > 1.d0) then
+      write(*,*) "The sponge mask we read does not appear to be normalized.."
+      write(*,*) "Previous eps_sponge=", 1.d0/maxval(mask_sponge)
+      ! re-normalize to unity
+      mask_sponge = mask_sponge / maxval(mask_sponge)
+    endif
   case ('everywhere')
     mask_sponge = 1.d0
   case('none')
@@ -22,6 +35,8 @@ subroutine sponge_mask(time, mask_sponge)
     write (*,*) "mask not defnd", iSpongeType
     stop
   end select
+
+  first_call = .false.
 
 end subroutine sponge_mask
 

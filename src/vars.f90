@@ -13,7 +13,7 @@ module vars
   real(kind=pr), save :: ux_mean, uy_mean
   integer, save :: itsave, iMoving
   character(len=strlen),save :: intelligent_dt = "yes"
-  character(len=strlen),save :: inicond, iMask, iMeanFlow, iMethod, infile_mask
+  character(len=strlen),save :: inicond, iMask, iMeanFlow, iMethod, infile_mask, infile_sponge
 
   integer, save :: iSaveVelocity, iSaveVorticity, iSaveMask, iSavePressure
 
