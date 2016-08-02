@@ -1,12 +1,19 @@
 !===============================================================================
 subroutine create_mask (time, mask, us)
   use vars
+  use hdf5_wrapper
   implicit none
   real(kind=pr), intent (in) :: time
   real(kind=pr),dimension(0:nx-1,0:ny-1),intent(inout) :: mask
   real(kind=pr),dimension(0:nx-1,0:ny-1,1:2),intent(inout) :: us
   real(kind=pr) :: R
   integer :: ix, iy
+  logical, save :: first_call = .true.
+
+  ! if thi sis the first call to the routine, we surely have to draw the mask
+  ! but if the obstacle is fixed (iMoving==0) we have to do this ONLY in the first
+  ! step.
+  if ((first_call .eqv. .false.).and.(iMoving==0)) return
 
   mask = 0.d0
   us   = 0.d0
@@ -18,6 +25,16 @@ subroutine create_mask (time, mask, us)
     call ellipse(mask, us)
   case('moving_cylinder')
     call moving_cylinder(time, mask, us)
+  case('from_file')
+    call read_flusi_hdf5_2d_openmp( infile_mask, mask )
+    ! if the maximum value of the mask is not 1.d0, then we have saved mask/eps
+    ! in the previous simulation.
+    if (maxval(mask) > 1.d0) then
+      write(*,*) "The mask we read does not appear to be normalized.."
+      write(*,*) "Previous eps=", 1.d0/maxval(mask)
+      ! re-normalize to unity
+      mask = mask / maxval(mask)
+    endif
   case('none')
     mask = 0.d0
   case default
@@ -30,6 +47,10 @@ subroutine create_mask (time, mask, us)
     mask(:,iy) = mask(:,iy) / eps
   enddo
   !$omp end parallel do
+
+
+  ! we now are sure that this is no longer the first call
+  first_call = .false.
 
 end subroutine create_mask
 

@@ -50,7 +50,7 @@ subroutine time_step (u, uk, nlk, pk, vort, mask, us, mask_sponge)
     endif
   enddo
 
-  write (*,*) "Loop done."
+  write (*,*) "Loop done, elapsed time=",MPI_wtime()-t1
 end subroutine time_step
 
 

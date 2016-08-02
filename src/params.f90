@@ -29,6 +29,8 @@ subroutine get_params(paramsfile)
 
   ! Penalization section
   call read_param(PARAMS,"Penalization","iMask",iMask, "none")
+  call read_param(PARAMS,"Penalization","iMoving",iMoving, 1)
+  call read_param(PARAMS,"Penalization","infile_mask",infile_mask, 'none.h5')
   call read_param(PARAMS,"Penalization","eps",eps, 1.d-2)
 
   ! Geometry section
