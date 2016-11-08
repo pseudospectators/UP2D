@@ -95,7 +95,10 @@ $(OBJDIR)/%.o: %.f90 $(MOBJS)
 	$(FC) $(FFLAGS) -c -o $@ $< $(LDFLAGS)
 
 clean:
-	rm -rf $(PROGRAMS) $(OBJDIR)/*.o $(OBJDIR)/*.mod a.out
+	rm -rf $(PROGRAMS) $(OBJDIR)/*.o $(OBJDIR)/*.mod UP2D
+
+cleanall:
+	\rm -rf *.t *.h5 *.xmf
 
 tidy:
 	rm -rf $(OBJDIR)/*.o $(OBJDIR)/*.mod a.out

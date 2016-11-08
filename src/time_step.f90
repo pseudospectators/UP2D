@@ -41,7 +41,8 @@ subroutine time_step (u, uk, nlk, pk, vort, mask, us, mask_sponge)
 
     if ( time_for_output( time, dt1, it, tsave, itsave, Tmax, 0.d0) ) then
       ! save output fields to disk
-      call save_fields(time, it, u, uk, vort, mask, us, mask_sponge)
+       call save_fields(time, it, u, uk, vort, mask, us, mask_sponge)
+       call write_xdmf(time, it)
     endif
 
     ! output remaining time
